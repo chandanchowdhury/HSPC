@@ -1,0 +1,280 @@
+# Online editor at
+# http://editor.swagger.io/#!/
+####
+swagger: '2.0'
+info:
+  title: HSPC API
+  description: HSPC API Server
+  version: "0.0.1"
+  contact:
+    name: API Support
+    email: chandanchowdhury@ksu.edu
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+# the domain of the service
+host: hspc.cs.ksu.com
+# security definitions:
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: api_key
+    in: header
+    # array of all schemes that your API supports
+schemes:
+  - https
+# will be prefixed to all paths
+basePath: /v1
+produces:
+  - application/json
+paths:
+  /school:
+    get:
+      summary: Returns a school
+      description: Given a school id, return the details
+      tags:
+        - School
+      operationId: getSchoolDetails
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security:
+        - "api_key": []
+      parameters:
+        - name: school_id
+          description: ID of the School
+          in: query
+          required: true
+          type: string
+      responses:
+        200:
+          description: School Information
+          schema:
+            $ref: '#/definitions/School'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: First step is to create schools
+      description: |
+        Create a new school
+      tags:
+        - School
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security:
+        - "api_key": []
+      parameters:
+        - name: school
+          description: school object
+          required: true
+          in: body
+          schema: 
+            $ref: '#/definitions/School'
+      responses:
+        200:
+          description: Return the ID of the newly created school
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Update school details
+      description: Update school
+      tags:
+        - School
+      parameters:
+        - name: school_id
+          in: query
+          description: ID of the school
+          required: true
+          type: string
+        - name: school
+          description: School object
+          in: body
+          schema:
+            $ref: '#/definitions/School'
+      responses:
+        200:
+          description: Returns School ID of the updated school
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a school
+      description: Given a school id, delete the school
+      tags:
+        - School
+      operationId: deleteSchool
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security:
+        - "api_key": []
+      parameters:
+        - name: school_id
+          description: ID of the School
+          in: query
+          required: true
+          type: string
+      responses:
+        200:
+          description: Return ID of the deleted school if successfully deleted
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+#
+### Define all the Models
+# Ref: https://github.com/OAI/OpenAPI-Specification/blob/3.0.0-rc0/versions/3.0.md#schemaObject
+
+definitions:
+  EmailAddress:
+    type: object
+    properties:
+      emailaddress_id:
+        type: integer
+        format: int32
+      emailaddress:
+        type: string
+        format: email
+    required:
+      - emailaddress
+
+  Address:
+    type: object
+    properties:
+      address_id:
+        type: integer
+        format: int32
+      country:
+        type: string
+        description: Country 
+        default: USA
+      state:
+        type: string
+        description: State
+      city:
+        type: string
+        description: city or town
+      line2:
+        type: string
+        description: optional details like street 
+      line1:
+        type: string
+        description: building and room
+    required:
+      - state
+      - city
+      - line1
+
+  School:
+    type: object
+    properties:
+      school_id:
+        type: string
+        description: ID of the school in DB
+      school_name:
+        type: string
+        description: Name of the school
+        example: Ideal World High School
+      address_id:
+        type: integer
+        format: int32
+    required:
+      - school_id
+      - school_name
+
+  Advisor:
+    type: object
+    properties:
+      advisor_id:
+        type: integer
+        format: int32
+        minimum: 0
+      advisor_name:
+        type: string
+      emailaddress_id:
+        type: integer
+        format: int32
+        minimum: 0
+      advisor_password:
+        type: string
+        format: password
+      school_id:
+        type: integer
+        format: int32
+    required:
+        - advisor_name
+        - advisor_email
+        - advisor_password
+        - school_id
+        
+  Student:
+    type: object
+    properties:
+      student_id:
+        type: integer
+        format: int32
+        minimum: 0
+      student_name:
+        type: string
+      school_id:
+        type: integer
+        format: int32
+    required:
+      - student_name
+      
+  Team:
+    type: object
+    properties:
+      team_id:
+        type: integer
+        format: int32
+        minimum: 0
+      team_name:
+        type: string
+      advisor_id:
+        type: integer
+        format: int32
+        minimum: 0
+      team_division:
+        type: string
+        enum:
+          - B # for Beginner
+          - A # for Advance
+      team_members:
+        type: array
+        items:
+          student_id:
+            type: integer
+            format: int32
+            minimum: 0
+    required:
+      - team_id
+      - team_name
+      - team_division
+      - advisor_id
+      
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
