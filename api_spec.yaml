@@ -1,6 +1,7 @@
 # Online editor at
 # http://editor.swagger.io/#!/
 ####
+---
 swagger: '2.0'
 info:
   title: HSPC API
@@ -13,7 +14,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 # the domain of the service
-host: hspc.cs.ksu.com
+# host: hspc.cs.ksu.com
 # security definitions:
 securityDefinitions:
   api_key:
@@ -22,31 +23,146 @@ securityDefinitions:
     in: header
     # array of all schemes that your API supports
 schemes:
-  - https
+  # TODO: Disable HTTP and enable HTTPS when implementing in production
+  - http
+  # - https
 # will be prefixed to all paths
 basePath: /v1
+consumes:
+  - application/json
 produces:
   - application/json
 paths:
+  /emailaddress:
+    post:
+      operationId: Add new email address
+      tags:
+        - emailaddress
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/EmailAddress'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/EmailAddress'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /emailaddress/{id}:
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        format: int32
+        required: true
+    get:
+      tags:
+        - emailaddress
+      operationId: getEmailAddress
+      responses:
+        200:
+          description: Get an email address using ID
+          schema:
+            $ref: '#/definitions/EmailAddress'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update emailaddress
+      tags:
+        - emailaddress
+      operationId: updateEmailAddress
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: EmailAddress object
+          schema:
+            $ref: '#/definitions/EmailAddress'
+      responses:
+        200:
+          description: Returns ID of the updated emailaddress
+          schema:
+            type: integer
+            format: int32
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Given a email address id, delete the emailaddress
+      tags:
+        - emailaddress
+      operationId: deleteEmailAddress
+      responses:
+        200:
+          description: Return ID of the deleted email address if successfully deleted
+          schema:
+            type: integer
+            format: int32
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    #
+
   /school:
     get:
-      summary: Returns a school
+      description: Return the list of schools
+      tags:
+        - school
+      operationId: getAllSchools
+      responses:
+        200:
+          description: List of Schools
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/School'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      description: Create a new school
+      operationId: createSchool
+      tags:
+        - school
+      parameters:
+        - name: body
+          in: body
+          description: school object
+          required: true
+          schema:
+            $ref: '#/definitions/School'
+      responses:
+        200:
+          description: Return the ID of the newly created school
+          schema:
+            $ref: '#/definitions/School'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /schoo/{id}:
+    parameters:
+      - name: id
+        description: ID of the School
+        in: path
+        type: integer
+        format: int32
+        required: true
+    get:
       description: Given a school id, return the details
       tags:
-        - School
-      operationId: getSchoolDetails
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      security:
-        - "api_key": []
-      parameters:
-        - name: school_id
-          description: ID of the School
-          in: query
-          required: true
-          type: string
+        - school
+      operationId: getSchool
       responses:
         200:
           description: School Information
@@ -56,45 +172,12 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    post:
-      summary: First step is to create schools
-      description: |
-        Create a new school
-      tags:
-        - School
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      security:
-        - "api_key": []
-      parameters:
-        - name: school
-          description: school object
-          required: true
-          in: body
-          schema: 
-            $ref: '#/definitions/School'
-      responses:
-        200:
-          description: Return the ID of the newly created school
-          schema:
-            type: string
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
     put:
-      summary: Update school details
       description: Update school
       tags:
-        - School
+        - school
+      operationId: updateSchool
       parameters:
-        - name: school_id
-          in: query
-          description: ID of the school
-          required: true
-          type: string
         - name: school
           description: School object
           in: body
@@ -104,34 +187,23 @@ paths:
         200:
           description: Returns School ID of the updated school
           schema:
-            type: string
+            type: integer
+            format: int32
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
     delete:
-      summary: Deletes a school
       description: Given a school id, delete the school
       tags:
-        - School
+        - school
       operationId: deleteSchool
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      security:
-        - "api_key": []
-      parameters:
-        - name: school_id
-          description: ID of the School
-          in: query
-          required: true
-          type: string
       responses:
         200:
           description: Return ID of the deleted school if successfully deleted
           schema:
-            type: string
+            type: integer
+            format: int32
         default:
           description: Unexpected error
           schema:
@@ -147,6 +219,7 @@ definitions:
       emailaddress_id:
         type: integer
         format: int32
+        minimum: 1
       emailaddress:
         type: string
         format: email
@@ -159,10 +232,14 @@ definitions:
       address_id:
         type: integer
         format: int32
+        minimum: 1
       country:
         type: string
-        description: Country 
+        description: Country
         default: USA
+      zipcode:
+        type: string
+        description: Zip code
       state:
         type: string
         description: State
@@ -171,7 +248,7 @@ definitions:
         description: city or town
       line2:
         type: string
-        description: optional details like street 
+        description: optional details like street
       line1:
         type: string
         description: building and room
@@ -184,7 +261,9 @@ definitions:
     type: object
     properties:
       school_id:
-        type: string
+        type: integer
+        format: int32
+        minimum: 1
         description: ID of the school in DB
       school_name:
         type: string
@@ -203,13 +282,13 @@ definitions:
       advisor_id:
         type: integer
         format: int32
-        minimum: 0
+        minimum: 1
       advisor_name:
         type: string
       emailaddress_id:
         type: integer
         format: int32
-        minimum: 0
+        minimum: 1
       advisor_password:
         type: string
         format: password
@@ -218,17 +297,17 @@ definitions:
         format: int32
     required:
         - advisor_name
-        - advisor_email
+        - emailaddress_id
         - advisor_password
         - school_id
-        
+
   Student:
     type: object
     properties:
       student_id:
         type: integer
         format: int32
-        minimum: 0
+        minimum: 1
       student_name:
         type: string
       school_id:
@@ -236,20 +315,20 @@ definitions:
         format: int32
     required:
       - student_name
-      
+
   Team:
     type: object
     properties:
       team_id:
         type: integer
         format: int32
-        minimum: 0
+        minimum: 1
       team_name:
         type: string
       advisor_id:
         type: integer
         format: int32
-        minimum: 0
+        minimum: 1
       team_division:
         type: string
         enum:
@@ -258,16 +337,16 @@ definitions:
       team_members:
         type: array
         items:
-          student_id:
+          #- student_id:
             type: integer
             format: int32
-            minimum: 0
+            minimum: 1
     required:
       - team_id
       - team_name
       - team_division
       - advisor_id
-      
+
   Error:
     type: object
     properties:
