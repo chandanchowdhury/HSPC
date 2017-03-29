@@ -37,7 +37,7 @@ paths:
 # API paths for emailaddress
   /emailaddress:
     post:
-      operationId: Add new email address
+      #operationId: insert_emailaddress
       tags:
         - emailaddress
       parameters:
@@ -65,7 +65,7 @@ paths:
     get:
       tags:
         - emailaddress
-      operationId: getEmailAddress
+      # operationId: getEmailAddress
       responses:
         200:
           description: Get an email address using ID
@@ -79,7 +79,7 @@ paths:
       description: Update emailaddress
       tags:
         - emailaddress
-      operationId: updateEmailAddress
+      # operationId: updateEmailAddress
       parameters:
         - name: body
           in: body
@@ -101,7 +101,7 @@ paths:
       description: Given a email address id, delete the emailaddress
       tags:
         - emailaddress
-      operationId: deleteEmailAddress
+      #operationId: deleteEmailAddress
       responses:
         200:
           description: Return ID of the deleted email address if successfully deleted
@@ -119,7 +119,7 @@ paths:
       description: Return the list of schools
       tags:
         - school
-      operationId: getAllSchools
+      # operationId: getAllSchools
       responses:
         200:
           description: List of Schools
@@ -133,7 +133,7 @@ paths:
             $ref: '#/definitions/Error'
     post:
       description: Create a new school
-      operationId: createSchool
+      # operationId: createSchool
       tags:
         - school
       parameters:
@@ -164,7 +164,7 @@ paths:
       description: Given a school id, return the details
       tags:
         - school
-      operationId: getSchool
+      # operationId: getSchool
       responses:
         200:
           description: School Information
@@ -178,7 +178,7 @@ paths:
       description: Update school
       tags:
         - school
-      operationId: updateSchool
+      # operationId: updateSchool
       parameters:
         - name: school
           description: School object
@@ -199,7 +199,7 @@ paths:
       description: Given a school id, delete the school
       tags:
         - school
-      operationId: deleteSchool
+      # operationId: deleteSchool
       responses:
         200:
           description: Return ID of the deleted school if successfully deleted
