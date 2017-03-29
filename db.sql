@@ -1,17 +1,8 @@
-
-/*
-DROP TABLE IF EXISTS EmailAddress;
-DROP TABLE IF EXISTS Address;
-DROP TABLE IF EXISTS School;
-DROP TABLE IF EXISTS Advisor;
-DROP TABLE IF EXISTS Student;
-DROP TABLE IF EXISTS Team;
-DROP TABLE IF EXISTS StudentTeam;
- */
-
 CREATE TABLE EmailAddress (
     emailaddress_id INTEGER NOT NULL PRIMARY KEY
     , emailaddress VARCHAR NOT NULL
+    , CONSTRAINT EmailAddress_unique
+        UNIQUE (emailaddress)
 );
 
 CREATE TABLE Address (
@@ -34,7 +25,7 @@ CREATE TABLE School (
 
 /*
 TODO:
-    * Q: Do we need to store any other details for a student? Like Phone number.
+    * Q: Do we need to store any other details for a Advisor? Like Phone number.
 */
 CREATE TABLE Advisor (
     advisor_id INTEGER NOT NULL PRIMARY KEY
@@ -50,7 +41,7 @@ CREATE TABLE Advisor (
 
 /*
 TODO:
-    * Q: Do we need to store any other details for a student? Like, DoB, Std etc?
+    * Q: Do we need to store any other details for a student? Like DoB, current Std etc?
 */
 CREATE TABLE Student (
     student_id INTEGER NOT NULL PRIMARY KEY
