@@ -12,7 +12,7 @@ PWD=`pwd`
 DBPATH=$PWD/postgres_db
 
 # make sure the DB directory exists
-mkdir -p db_dir
+mkdir -p $DBPATH
 
 # run postgres with required parameters
 docker run -d -t -p 5432:5432 --rm \
