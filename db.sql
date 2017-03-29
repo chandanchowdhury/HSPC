@@ -1,12 +1,13 @@
+
 CREATE TABLE EmailAddress (
-    emailaddress_id INTEGER NOT NULL PRIMARY KEY
+    emailaddress_id SERIAL NOT NULL PRIMARY KEY
     , emailaddress VARCHAR NOT NULL
     , CONSTRAINT EmailAddress_unique
         UNIQUE (emailaddress)
 );
 
 CREATE TABLE Address (
-    address_id INTEGER NOT NULL PRIMARY KEY
+    address_id SERIAL NOT NULL PRIMARY KEY
     , address_country VARCHAR NOT NULL
     , address_zip   VARCHAR NOT NULL
     , address_state VARCHAR NOT NULL
@@ -16,7 +17,7 @@ CREATE TABLE Address (
 );
 
 CREATE TABLE School (
-    school_id INTEGER NOT NULL PRIMARY KEY
+    school_id SERIAL NOT NULL PRIMARY KEY
     , school_name VARCHAR NOT NULL
     , address_id INTEGER NOT NULL
     , CONSTRAINT School_FK_address_id
@@ -28,7 +29,7 @@ TODO:
     * Q: Do we need to store any other details for a Advisor? Like Phone number.
 */
 CREATE TABLE Advisor (
-    advisor_id INTEGER NOT NULL PRIMARY KEY
+    advisor_id SERIAL NOT NULL PRIMARY KEY
     , advisor_name VARCHAR NOT NULL
     , emailaddress_id INTEGER NOT NULL
     , advisor_password VARCHAR NOT NULL
@@ -44,7 +45,7 @@ TODO:
     * Q: Do we need to store any other details for a student? Like DoB, current Std etc?
 */
 CREATE TABLE Student (
-    student_id INTEGER NOT NULL PRIMARY KEY
+    student_id SERIAL NOT NULL PRIMARY KEY
     , student_name VARCHAR NOT NULL
     , school_id INTEGER
     , CONSTRAINT Student_FK_school_id
@@ -56,7 +57,7 @@ TODO:
     * Q: Do we need to store more than one advisor for a team?
 */
 CREATE TABLE Team (
-    team_id INTEGER NOT NULL PRIMARY KEY
+    team_id SERIAL NOT NULL PRIMARY KEY
     , team_name VARCHAR NOT NULL
     , team_division CHAR(1) NOT NULL
     , advisor_id INTEGER NOT NULL
