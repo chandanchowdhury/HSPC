@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 #docker pull postgres
 
 POSTGRES_DB=HSPC
