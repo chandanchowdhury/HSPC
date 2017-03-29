@@ -14,14 +14,15 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 # the domain of the service
+# TODO: Enable is production
 # host: hspc.cs.ksu.com
-# security definitions:
-securityDefinitions:
-  api_key:
-    type: apiKey
-    name: api_key
-    in: header
-    # array of all schemes that your API supports
+# security definitions
+#securityDefinitions:
+#  api_key:
+#    type: apiKey
+#    name: api_key
+#    in: header
+# array of all schemes that your API supports
 schemes:
   # TODO: Disable HTTP and enable HTTPS when implementing in production
   - http
@@ -33,6 +34,7 @@ consumes:
 produces:
   - application/json
 paths:
+# API paths for emailaddress
   /emailaddress:
     post:
       operationId: Add new email address
@@ -110,8 +112,8 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    #
-
+# TODO: API paths for Address
+# API paths for School
   /school:
     get:
       description: Return the list of schools
@@ -208,6 +210,12 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+
+# TODO: API paths for Advisor
+# TODO: API paths for Student
+# TODO: API paths for Team
+# TODO: API paths for Login
+
 #
 ### Define all the Models
 # Ref: https://github.com/OAI/OpenAPI-Specification/blob/3.0.0-rc0/versions/3.0.md#schemaObject
@@ -225,7 +233,7 @@ definitions:
         format: email
     required:
       - emailaddress
-
+  # TODO: Model for login
   Address:
     type: object
     properties:
