@@ -1,7 +1,8 @@
 
-CREATE TABLE EmailAddress (
-    emailaddress_id SERIAL NOT NULL PRIMARY KEY
+CREATE TABLE Credential (
+    credential_id SERIAL NOT NULL PRIMARY KEY
     , emailaddress VARCHAR NOT NULL
+    , password_hash VARCHAR
     , CONSTRAINT EmailAddress_unique
         UNIQUE (emailaddress)
 );
@@ -31,13 +32,12 @@ TODO:
 CREATE TABLE Advisor (
     advisor_id SERIAL NOT NULL PRIMARY KEY
     , advisor_name VARCHAR NOT NULL
-    , emailaddress_id INTEGER NOT NULL
-    , advisor_password VARCHAR NOT NULL
+    , credential_id INTEGER NOT NULL
     , school_id INTEGER NOT NULL
     , CONSTRAINT Student_FK_school_id
         FOREIGN KEY(school_id) REFERENCES School(school_id)
-    , CONSTRAINT Advisor_FK_emailaddress_id
-        FOREIGN KEY(emailaddress_id) REFERENCES EmailAddress(emailaddress_id)
+    , CONSTRAINT Advisor_FK_credential_id
+        FOREIGN KEY(credential_id) REFERENCES credential(credential_id)
 );
 
 /*

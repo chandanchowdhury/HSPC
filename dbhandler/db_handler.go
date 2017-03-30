@@ -33,84 +33,92 @@ func getDBConn() *sql.DB {
 /**
 Insert an email address into the table
  **/
-func EmailAddressCreate(emailaddress string) int {
+func CredentialCreate(emailaddress string, password_hash string) int {
 	db := getDBConn()
 
-	log.Printf("# Inserting emailaddress")
+	log.Printf("# Creating credential")
 
 	var lastInsertId int
-	err := db.QueryRow("INSERT INTO emailaddress(emailaddress) VALUES($1) returning emailaddress_id;", emailaddress).Scan(&lastInsertId)
+
+	err := db.QueryRow("INSERT INTO Credential(emailaddress, password_hash) VALUES($1, $2) returning credential_id;", emailaddress, password_hash).Scan(&lastInsertId)
 	checkErr(err)
-	log.Printf("emailaddress_id = %d", lastInsertId)
+	log.Printf("credential_id = %d", lastInsertId)
 
 	return lastInsertId
 }
 
 /**
-Read an email address from the table
+Read an credential from the table
  **/
-func EmailAddressRead(emailaddress_id int) string {
-	var emailaddress string
+func CredentialRead(emailaddress string) string {
+	var password_hash string
 	db := getDBConn()
 
-	log.Printf("# Reading emailaddress")
+	log.Printf("# Reading Credential")
+	log.Printf("emailaddress = %s", emailaddress)
 
-	rows := db.QueryRow("SELECT emailaddress FROM emailaddress WHERE emailaddress_id = $1", emailaddress_id)
+	stmt, err := db.Prepare("SELECT password_hash FROM Credential WHERE emailaddress = $1")
+	defer stmt.Close()
 
-	err := rows.Scan(&emailaddress)
+	rows, err := stmt.Query(emailaddress)
+	defer rows.Close()
+
 	checkErr(err)
 
-	log.Printf("emailaddress_id = %d, emailaddress = %s", emailaddress_id, emailaddress)
+	for rows.Next() {
+		err := rows.Scan(&password_hash)
+		checkErr(err)
+		return password_hash
+	}
 
-	return emailaddress
+	return ""
 }
-
 
 /**
 Update an email address in the table
  **/
-func EmailAddressUpdate(emailaddress_id int, emailaddress string) int {
+func CredentialUpdate(emailaddress string, password string) int {
 	db := getDBConn()
 
-	log.Printf("# Updating emailaddress")
-	log.Printf("emailaddress_id = %d, emailaddress = %s", emailaddress_id, emailaddress)
+	log.Printf("# Updating Credential")
+	log.Printf("emailaddress = %s", emailaddress)
 
-	stmt, err := db.Prepare("UPDATE emailaddress SET emailaddress = $1 WHERE emailaddress_id = $2")
+	stmt, err := db.Prepare("UPDATE Credential SET emailaddress = $1, password_hash = $2 WHERE emailaddress = $1")
 	defer stmt.Close()
 
-	result, err := stmt.Exec(emailaddress, emailaddress_id)
+	result, err := stmt.Exec(emailaddress, password)
 
 	checkErr(err)
 
 	updateCount, err := result.RowsAffected()
 
 	if ( updateCount == 1) {
-		return emailaddress_id
+		return 0
 	}
 
 	return -1
 }
 
 /**
-Delete an email address in the table
+Delete an email address from the table
  **/
-func EmailAddressDelete(emailaddress_id int) int {
+func CredentialDelete(emailaddress string) int {
 	db := getDBConn()
 
-	log.Printf("# Deleting emailaddress")
-	log.Printf("emailaddress_id = %d", emailaddress_id)
+	log.Printf("# Deleting Credential")
+	log.Printf("emailaddress = %s", emailaddress)
 
-	stmt, err := db.Prepare("DELETE FROM emailaddress WHERE emailaddress_id = $1")
+	stmt, err := db.Prepare("DELETE FROM Credential WHERE emailaddress = $1")
 	defer stmt.Close()
 
-	result, err := stmt.Exec(emailaddress_id)
+	result, err := stmt.Exec(emailaddress)
 
 	checkErr(err)
 
 	deleteCount, err := result.RowsAffected()
 
 	if ( deleteCount == 1) {
-		return emailaddress_id
+		return 0
 	}
 
 	return -1

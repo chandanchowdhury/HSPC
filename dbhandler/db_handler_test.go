@@ -4,76 +4,76 @@ import (
 	"testing"
 )
 
-func TestEmailAddressInsert(t *testing.T) {
+func TestCredentialInsert(t *testing.T) {
 	var tests = []struct {
 		emailaddress string
-		emailaddress_id int
+		password string
+		credential_id int
 	} {
-		{"test@ksu.edu", 1},
-		{"test1@ksu.edu", 2},
+		{"test@ksu.edu", "test", 1},
+		{"test1@ksu.edu", "test1", 2},
 	}
 
 	for _, c := range tests {
-		got := EmailAddressCreate(c.emailaddress)
+		got := CredentialCreate(c.emailaddress, c.password)
 
-		if (got != c.emailaddress_id) {
-			t.Errorf("Inserted %s with expected ID %i, but got %i",c.emailaddress, c.emailaddress_id, got)
+		if (got != c.credential_id) {
+			t.Errorf("Inserted %s with expected ID %i, but got %i",c.emailaddress, c.emailaddress, got)
 		}
 	}
 }
 
-func TestEmailAddressGet(t *testing.T) {
+func TestCredentialGet(t *testing.T) {
 	var tests = []struct {
 		emailaddress string
-		emailaddress_id int
+		password string
 	} {
-		{"test@ksu.edu", 1},
-		{"test1@ksu.edu", 2},
+		{"test@ksu.edu", "test"},
+		{"test1@ksu.edu", "test1"},
 	}
 
 	for _, c := range tests {
-		got := EmailAddressRead(c.emailaddress_id)
+		got := CredentialRead(c.emailaddress)
 
-		if (got != c.emailaddress) {
-			t.Errorf("Queried ID = %d with expected emailaddress %s, but got %s",c.emailaddress_id, c.emailaddress, got)
+		if (got != c.password) {
+			t.Errorf("Queried emailaddress = %s with expected password %s, but got %s",c.emailaddress, c.password, got)
 		}
 	}
 }
 
-func TestEmailAddressUpdate(t *testing.T) {
+func TestCredentialUpdate(t *testing.T) {
 	var tests = []struct {
 		emailaddress string
-		emailaddress_id int
+		password string
 	} {
-		{"test2@ksu.edu", 2},
+		{"test1@ksu.edu", "test2"},
 	}
 
 	for _, c := range tests {
-		_ = EmailAddressUpdate(c.emailaddress_id, c.emailaddress)
+		_ = CredentialUpdate(c.emailaddress, c.password)
 
-		got := EmailAddressRead(c.emailaddress_id)
+		got := CredentialRead(c.emailaddress)
 
-		if (got != c.emailaddress) {
-			t.Errorf("Updated ID = %d with new emailaddress %s, but got %s",c.emailaddress_id, c.emailaddress, got)
+		if (got != c.password) {
+			t.Errorf("Updated emailadress = %s with new password %s, but got %s",c.emailaddress, c.password, got)
 		}
 	}
 }
 
-func TestEmailAddressDelete(t *testing.T) {
+func TestCredentialDelete(t *testing.T) {
 	var tests = []struct {
 		emailaddress string
-		emailaddress_id int
 	} {
-		{"test2@ksu.edu", 2},
+		{"test1@ksu.edu"},
 	}
 
 	for _, c := range tests {
-		_ = EmailAddressDelete(c.emailaddress_id)
+		_ = CredentialDelete(c.emailaddress)
 
-		got := EmailAddressRead(c.emailaddress_id)
+		got := CredentialRead(c.emailaddress)
 
 		if (got == c.emailaddress) {
-			t.Errorf("Deleted ID = %d with new emailaddress %s, but still got %s",c.emailaddress_id, c.emailaddress, got)
+			t.Errorf("Deleted emailaddress = %s but still got %s",c.emailaddress, got)
 		}
 	}
 }
