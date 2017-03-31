@@ -34,92 +34,171 @@ consumes:
 produces:
   - application/json
 paths:
-# API paths for emailaddress
-  /emailaddress:
+# API paths for Credential
+  /credential:
     post:
-      #operationId: insert_emailaddress
       tags:
-        - emailaddress
+        - credential
       parameters:
         - name: body
           in: body
           required: true
           schema:
-            $ref: '#/definitions/EmailAddress'
+            $ref: '#/definitions/Credential'
       responses:
         200:
-          description: Success
+          description: Return the Credential ID
           schema:
-            $ref: '#/definitions/EmailAddress'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /emailaddress/{id}:
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        format: int32
-        required: true
-    get:
-      tags:
-        - emailaddress
-      # operationId: getEmailAddress
-      responses:
-        200:
-          description: Get an email address using ID
-          schema:
-            $ref: '#/definitions/EmailAddress'
+            type: int
+            format: int32
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
     put:
-      description: Update emailaddress
+      description: Update credential
       tags:
-        - emailaddress
-      # operationId: updateEmailAddress
+        - credential
       parameters:
         - name: body
           in: body
           required: true
-          description: EmailAddress object
+          description: Updated Credential object
           schema:
-            $ref: '#/definitions/EmailAddress'
+            $ref: '#/definitions/Credential'
       responses:
         200:
-          description: Returns ID of the updated emailaddress
+          description: Returns success
           schema:
-            type: integer
-            format: int32
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - credential
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Updated Credential object
+          schema:
+            $ref: '#/definitions/Credential'
+      responses:
+        200:
+          description: Get a credential object using emailaddress
+          schema:
+            $ref: '#/definitions/Credential'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
     delete:
-      description: Given a email address id, delete the emailaddress
+      description: Given an emailaddress, delete the credential
       tags:
-        - emailaddress
-      #operationId: deleteEmailAddress
+        - credential
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Updated Credential object
+          schema:
+            $ref: '#/definitions/Credential'
       responses:
         200:
-          description: Return ID of the deleted email address if successfully deleted
+          description: Return success
           schema:
-            type: integer
-            format: int32
+            type: string
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-# TODO: API paths for Address
+
+# API paths for Address
+  /address:
+    post:
+      description: create an address
+      tags:
+        - address
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Address'
+      response:
+        200:
+          description: Return the ID of the newly created school
+            schema:
+              type: int
+              format: int32
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+    /address/{id}:
+      parameters:
+        - name: id
+          description: ID of the Address
+          in: path
+          type: integer
+          format: int32
+          required: true
+      get:
+        description: Given a address id, return the details
+        tags:
+          - address
+        responses:
+          200:
+            description: Address Information
+            schema:
+              $ref: '#/definitions/Address'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+      put:
+        description: Update address
+        tags:
+          - address
+        parameters:
+          - name: address
+            description: address object
+            in: body
+            schema:
+              $ref: '#/definitions/Address'
+        responses:
+          200:
+            description: Returns address ID of the updated address
+            schema:
+              type: integer
+              format: int32
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+      delete:
+        description: Given a address id, delete the address
+        tags:
+          - address
+        responses:
+          200:
+            description: Return ID of the deleted address if successfully deleted
+            schema:
+              type: integer
+              format: int32
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+
 # API paths for School
   /school:
     get:
       description: Return the list of schools
       tags:
         - school
-      # operationId: getAllSchools
       responses:
         200:
           description: List of Schools
@@ -133,7 +212,6 @@ paths:
             $ref: '#/definitions/Error'
     post:
       description: Create a new school
-      # operationId: createSchool
       tags:
         - school
       parameters:
@@ -164,7 +242,6 @@ paths:
       description: Given a school id, return the details
       tags:
         - school
-      # operationId: getSchool
       responses:
         200:
           description: School Information
@@ -178,7 +255,6 @@ paths:
       description: Update school
       tags:
         - school
-      # operationId: updateSchool
       parameters:
         - name: school
           description: School object
@@ -199,7 +275,6 @@ paths:
       description: Given a school id, delete the school
       tags:
         - school
-      # operationId: deleteSchool
       responses:
         200:
           description: Return ID of the deleted school if successfully deleted
@@ -221,19 +296,21 @@ paths:
 # Ref: https://github.com/OAI/OpenAPI-Specification/blob/3.0.0-rc0/versions/3.0.md#schemaObject
 
 definitions:
-  EmailAddress:
+  Credential:
     type: object
     properties:
-      emailaddress_id:
+      credential_id:
         type: integer
         format: int32
         minimum: 1
       emailaddress:
         type: string
         format: email
+      password:
+        type: string
+        format: password
     required:
       - emailaddress
-  # TODO: Model for login
   Address:
     type: object
     properties:
