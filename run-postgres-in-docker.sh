@@ -1,5 +1,5 @@
 #!/bin/bash
-#docker pull postgres
+docker pull postgres
 
 POSTGRES_DB=HSPC
 POSTGRES_USER=hspc
