@@ -11,6 +11,12 @@ PWD=`pwd`
 # where the DB files will be stored
 DBPATH=$PWD/postgres_db
 
+if [ "$1" = "clean" ]
+then
+    echo "Deleting direcotries..."
+    rm -rf $DBPATH
+fi
+
 # make sure the DB directory exists
 mkdir -p $DBPATH
 
