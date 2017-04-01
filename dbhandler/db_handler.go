@@ -33,12 +33,12 @@ func getDBConn() *sql.DB {
 /**
 Insert an email address into the table
  **/
-func CredentialCreate(emailaddress string, password_hash string) int {
+func CredentialCreate(emailaddress string, password_hash string) uint32 {
 	db := getDBConn()
 
 	log.Printf("# Creating credential")
 
-	var lastInsertId int
+	var lastInsertId uint32
 
 	err := db.QueryRow("INSERT INTO Credential(emailaddress, password_hash) VALUES($1, $2) returning credential_id;", emailaddress, password_hash).Scan(&lastInsertId)
 	checkErr(err)
@@ -50,14 +50,14 @@ func CredentialCreate(emailaddress string, password_hash string) int {
 /**
 Read an credential from the table
  **/
-func CredentialRead(emailaddress string) string {
-	var password_hash string
+func CredentialRead(emailaddress string) credential_struct {
+	var credential = credential_struct{}
 	db := getDBConn()
 
 	log.Printf("# Reading Credential")
 	log.Printf("emailaddress = %s", emailaddress)
 
-	stmt, err := db.Prepare("SELECT password_hash FROM Credential WHERE emailaddress = $1")
+	stmt, err := db.Prepare("SELECT credential_id, emailaddress, password_hash FROM Credential WHERE emailaddress = $1")
 	defer stmt.Close()
 
 	rows, err := stmt.Query(emailaddress)
@@ -66,18 +66,18 @@ func CredentialRead(emailaddress string) string {
 	checkErr(err)
 
 	for rows.Next() {
-		err := rows.Scan(&password_hash)
+		err := rows.Scan(&credential.credential_id, &credential.emailaddress, &credential.password_hash)
 		checkErr(err)
-		return password_hash
+		return credential
 	}
 
-	return ""
+	return credential
 }
 
 /**
 Update an email address in the table
  **/
-func CredentialUpdate(emailaddress string, password string) int {
+func CredentialUpdate(emailaddress string, password string) int32 {
 	db := getDBConn()
 
 	log.Printf("# Updating Credential")
@@ -102,7 +102,7 @@ func CredentialUpdate(emailaddress string, password string) int {
 /**
 Delete an email address from the table
  **/
-func CredentialDelete(emailaddress string) int {
+func CredentialDelete(emailaddress string) uint32 {
 	db := getDBConn()
 
 	log.Printf("# Deleting Credential")
@@ -121,5 +121,34 @@ func CredentialDelete(emailaddress string) int {
 		return 0
 	}
 
-	return -1
+	return 0
+}
+
+func AddressCreate(address address_struct) uint32 {
+
+    //TODO: complete the logic
+
+    return 0
+}
+
+func AddressRead(address_id uint32) address_struct {
+    var address = address_struct{}
+
+    //TODO: complete the logic
+
+    return address
+}
+
+func AddressUpdate(address address_struct) address_struct {
+    var address = address_struct{}
+
+    //TODO: complete the logic
+
+    return address
+}
+
+func AddressDelete(address_id uint32) uint32 {
+    //TODO: complete the logic
+
+    return 0
 }
