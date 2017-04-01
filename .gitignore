@@ -1,3 +1,7 @@
+cmd/
+models/
+mongodb_store/
+restapi/
 postgres_db/
 .idea/
 *.txt
