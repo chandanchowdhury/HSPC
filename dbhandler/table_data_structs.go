@@ -55,7 +55,9 @@ type team_score_struct struct {
 
 type parking struct {
     parking_id uint32
-
+    vehicle_count uint32
+    validation string
+    advisor_id uint32
 }
 
 type problem_struct struct {
