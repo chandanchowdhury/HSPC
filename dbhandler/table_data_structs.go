@@ -72,7 +72,7 @@ type solution_struct struct {
     solution_desc string
 }
 
-type problem_solution struct {
+type problem_solution_struct struct {
     problem_id uint32
     solution_id uint32
 }
