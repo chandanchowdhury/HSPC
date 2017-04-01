@@ -42,7 +42,10 @@ func CredentialCreate(emailaddress string, password_hash string) uint32 {
 	var lastInsertId uint32
 
 	err := db.QueryRow("INSERT INTO Credential(emailaddress, password_hash) VALUES($1, $2) returning credential_id;", emailaddress, password_hash).Scan(&lastInsertId)
-	checkErr(err)
+	if err != nil {
+        return 0
+    }
+
 	log.Printf("credential_id = %d", lastInsertId)
 
 	return lastInsertId
@@ -135,8 +138,6 @@ func AddressRead(address_id uint32) address_struct {
 }
 
 func AddressUpdate(address address_struct) address_struct {
-    var address = address_struct{}
-
     //TODO: complete the logic
 
     return address
@@ -194,8 +195,6 @@ func AdvisorRead(advisor_id uint32) advisor_struct {
 }
 
 func AdvisorUpdate(advisor advisor_struct) advisor_struct {
-    var advisor = advisor_struct{}
-
     //TODO: complete the logic
 
     return advisor
@@ -225,8 +224,6 @@ func TeamRead(team_id uint32) team_struct {
 }
 
 func TeamUpdate(team team_struct) team_struct {
-    var team = team_struct{}
-
     //TODO: complete the logic
 
     return team
@@ -256,8 +253,6 @@ func studentRead(student_id uint32) student_struct {
 }
 
 func studentUpdate(student student_struct) student_struct {
-    var student = student_struct{}
-
     //TODO: complete the logic
 
     return student
@@ -287,8 +282,6 @@ func teamscoreRead(teamscore_id uint32) team_score_struct {
 }
 
 func teamscoreUpdate(teamscore team_score_struct) team_score_struct {
-    var teamscore = team_score_struct{}
-
     //TODO: complete the logic
 
     return teamscore
@@ -318,8 +311,6 @@ func parkingRead(parking_id uint32) team_score_struct {
 }
 
 func parkingUpdate(parking team_score_struct) team_score_struct {
-    var parking = team_score_struct{}
-
     //TODO: complete the logic
 
     return parking
@@ -349,8 +340,6 @@ func problemRead(problem_id uint32) problem_struct {
 }
 
 func problemUpdate(problem problem_struct) problem_struct {
-    var problem = problem_struct{}
-
     //TODO: complete the logic
 
     return problem
@@ -380,8 +369,6 @@ func solutionRead(solution_id uint32) solution_struct {
 }
 
 func solutionUpdate(solution solution_struct) solution_struct {
-    var solution = solution_struct{}
-
     //TODO: complete the logic
 
     return solution
@@ -411,8 +398,6 @@ func problemsolutionRead(problemsolution_id uint32) problem_solution_struct {
 }
 
 func problemsolutionUpdate(problemsolution problem_solution_struct) problem_solution_struct {
-    var problemsolution = problem_solution_struct{}
-
     //TODO: complete the logic
 
     return problemsolution

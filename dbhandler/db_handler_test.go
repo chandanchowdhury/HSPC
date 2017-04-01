@@ -14,7 +14,7 @@ func TestCredentialCreate(t *testing.T) {
 		got := CredentialCreate(c.emailaddress, c.password_hash)
 
 		if (got != c.credential_id) {
-			t.Errorf("Inserted %s with expected ID %i, but got %i",c.emailaddress, c.emailaddress, got)
+			t.Errorf("Inserted %s with expected ID %d, but got %d",c.emailaddress, c.credential_id, got)
 		}
 	}
 }
@@ -35,30 +35,25 @@ func TestCredentialRead(t *testing.T) {
 }
 
 func TestCredentialUpdate(t *testing.T) {
-	var tests = []struct {
-		emailaddress string
-		password string
-	} {
-		{"test1@ksu.edu", "test2"},
+	var tests = []credential_struct {
+		{1, "test1@ksu.edu", "test2"},
 	}
 
 	for _, c := range tests {
-		_ = CredentialUpdate(c.emailaddress, c.password)
+		_ = CredentialUpdate(c.emailaddress, c.password_hash)
 
 		got := CredentialRead(c.emailaddress)
 
-		if (got.password_hash != c.password) {
-			t.Errorf("Updated emailadress = %s with new password %s, but got %s",c.emailaddress, c.password, got)
+		if (got.password_hash != c.password_hash) {
+			t.Errorf("Updated emailadress = %s with new password %s, but got %s",c.emailaddress, c.password_hash, got)
 		}
 	}
 }
 
 func TestCredentialDelete(t *testing.T) {
-	var tests = []struct {
-		emailaddress string
-	} {
-		{"test1@ksu.edu"},
-	}
+    var tests = []credential_struct {
+        {1, "test1@ksu.edu", "test2"},
+    }
 
 	for _, c := range tests {
 		_ = CredentialDelete(c.emailaddress)
