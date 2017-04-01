@@ -9,6 +9,7 @@ import (
 	"log"
 )
 
+//TODO: Read from a config file or environment
 const (
 	DB_USER     = "hspc"
 	DB_PASSWORD = "HSPC-Password"
@@ -31,7 +32,7 @@ func getDBConn() *sql.DB {
 }
 
 /**
-Insert an email address into the table
+Credential
  **/
 func CredentialCreate(emailaddress string, password_hash string) uint32 {
 	db := getDBConn()
@@ -47,9 +48,6 @@ func CredentialCreate(emailaddress string, password_hash string) uint32 {
 	return lastInsertId
 }
 
-/**
-Read an credential from the table
- **/
 func CredentialRead(emailaddress string) credential_struct {
 	var credential = credential_struct{}
 	db := getDBConn()
@@ -74,9 +72,6 @@ func CredentialRead(emailaddress string) credential_struct {
 	return credential
 }
 
-/**
-Update an email address in the table
- **/
 func CredentialUpdate(emailaddress string, password string) int32 {
 	db := getDBConn()
 
@@ -99,9 +94,6 @@ func CredentialUpdate(emailaddress string, password string) int32 {
 	return -1
 }
 
-/**
-Delete an email address from the table
- **/
 func CredentialDelete(emailaddress string) uint32 {
 	db := getDBConn()
 
@@ -124,6 +116,9 @@ func CredentialDelete(emailaddress string) uint32 {
 	return 0
 }
 
+/*
+Address
+*/
 func AddressCreate(address address_struct) uint32 {
 
     //TODO: complete the logic
@@ -148,6 +143,282 @@ func AddressUpdate(address address_struct) address_struct {
 }
 
 func AddressDelete(address_id uint32) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+/*
+School
+*/
+func SchoolCreate(school school_struct) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+func SchoolRead(school_id uint32) school_struct {
+    var school = school_struct{}
+    //TODO: complete the logic
+
+    return school
+}
+
+func SchoolUpdate(school school_struct) school_struct {
+    //TODO: complete the logic
+
+    return school
+}
+
+func SchoolDelete(school_id uint32) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+/*
+Advisor
+*/
+func AdvisorCreate(advisor advisor_struct) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+func AdvisorRead(advisor_id uint32) advisor_struct {
+    var advisor = advisor_struct{}
+
+    //TODO: complete the logic
+
+    return advisor
+}
+
+func AdvisorUpdate(advisor advisor_struct) advisor_struct {
+    var advisor = advisor_struct{}
+
+    //TODO: complete the logic
+
+    return advisor
+}
+
+func AdvisorDelete(advisor_id uint32) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+/*
+Team
+*/
+func TeamCreate(team team_struct) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+func TeamRead(team_id uint32) team_struct {
+    var team = team_struct{}
+
+    //TODO: complete the logic
+
+    return team
+}
+
+func TeamUpdate(team team_struct) team_struct {
+    var team = team_struct{}
+
+    //TODO: complete the logic
+
+    return team
+}
+
+func TeamDelete(team_id uint32) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+/*
+Student
+*/
+func studentCreate(student student_struct) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+func studentRead(student_id uint32) student_struct {
+    var student = student_struct{}
+
+    //TODO: complete the logic
+
+    return student
+}
+
+func studentUpdate(student student_struct) student_struct {
+    var student = student_struct{}
+
+    //TODO: complete the logic
+
+    return student
+}
+
+func studentDelete(student_id uint32) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+/*
+Team Score
+*/
+func teamscoreCreate(teamscore team_score_struct) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+func teamscoreRead(teamscore_id uint32) team_score_struct {
+    var teamscore = team_score_struct{}
+
+    //TODO: complete the logic
+
+    return teamscore
+}
+
+func teamscoreUpdate(teamscore team_score_struct) team_score_struct {
+    var teamscore = team_score_struct{}
+
+    //TODO: complete the logic
+
+    return teamscore
+}
+
+func teamscoreDelete(teamscore_id uint32) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+/*
+Parking
+*/
+func parkingCreate(parking team_score_struct) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+func parkingRead(parking_id uint32) team_score_struct {
+    var parking = team_score_struct{}
+
+    //TODO: complete the logic
+
+    return parking
+}
+
+func parkingUpdate(parking team_score_struct) team_score_struct {
+    var parking = team_score_struct{}
+
+    //TODO: complete the logic
+
+    return parking
+}
+
+func parkingDelete(parking_id uint32) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+/*
+Problem
+*/
+func problemCreate(problem problem_struct) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+func problemRead(problem_id uint32) problem_struct {
+    var problem = problem_struct{}
+
+    //TODO: complete the logic
+
+    return problem
+}
+
+func problemUpdate(problem problem_struct) problem_struct {
+    var problem = problem_struct{}
+
+    //TODO: complete the logic
+
+    return problem
+}
+
+func problemDelete(problem_id uint32) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+/*
+Solution
+*/
+func solutionCreate(solution solution_struct) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+func solutionRead(solution_id uint32) solution_struct {
+    var solution = solution_struct{}
+
+    //TODO: complete the logic
+
+    return solution
+}
+
+func solutionUpdate(solution solution_struct) solution_struct {
+    var solution = solution_struct{}
+
+    //TODO: complete the logic
+
+    return solution
+}
+
+func solutionDelete(solution_id uint32) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+/*
+Problem_Solution
+*/
+func problemsolutionCreate(problemsolution problem_solution_struct) uint32 {
+    //TODO: complete the logic
+
+    return 0
+}
+
+func problemsolutionRead(problemsolution_id uint32) problem_solution_struct {
+    var problemsolution = problem_solution_struct{}
+
+    //TODO: complete the logic
+
+    return problemsolution
+}
+
+func problemsolutionUpdate(problemsolution problem_solution_struct) problem_solution_struct {
+    var problemsolution = problem_solution_struct{}
+
+    //TODO: complete the logic
+
+    return problemsolution
+}
+
+func problemsolutionDelete(problemsolution_id uint32) uint32 {
     //TODO: complete the logic
 
     return 0
