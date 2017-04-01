@@ -1,5 +1,18 @@
+/*
+Maintain the order as they follow they dependency.
+*/
+DROP TABLE IF EXISTS parking;
+DROP TABLE IF EXISTS team_score;
+DROP TABLE IF EXISTS student;
+DROP TABLE IF EXISTS team;
+DROP TABLE IF EXISTS school_advisor;
+DROP TABLE IF EXISTS advisor;
+DROP TABLE IF EXISTS school;
+DROP TABLE IF EXISTS credential;
+DROP TABLE IF EXISTS address;
 
-CREATE TABLE Credential (
+
+CREATE TABLE credential (
     credential_id SERIAL NOT NULL PRIMARY KEY
     , emailaddress VARCHAR NOT NULL
     , password_hash VARCHAR
@@ -7,7 +20,8 @@ CREATE TABLE Credential (
         UNIQUE (emailaddress)
 );
 
-CREATE TABLE Address (
+
+CREATE TABLE address (
     address_id SERIAL NOT NULL PRIMARY KEY
     , address_country VARCHAR NOT NULL
     , address_zip   VARCHAR NOT NULL
@@ -17,60 +31,88 @@ CREATE TABLE Address (
     , address_line2 VARCHAR
 );
 
-CREATE TABLE School (
+
+CREATE TABLE school (
     school_id SERIAL NOT NULL PRIMARY KEY
     , school_name VARCHAR NOT NULL
     , address_id INTEGER NOT NULL
     , CONSTRAINT School_FK_address_id
-            FOREIGN KEY(address_id) REFERENCES Address(address_id)
-    );
+            FOREIGN KEY(address_id) REFERENCES address(address_id)
+);
 
-/*
-TODO:
-    * Q: Do we need to store any other details for a Advisor? Like Phone number.
-*/
-CREATE TABLE Advisor (
+
+CREATE TABLE advisor (
     advisor_id SERIAL NOT NULL PRIMARY KEY
     , advisor_name VARCHAR NOT NULL
     , credential_id INTEGER NOT NULL
-    , school_id INTEGER NOT NULL
-    , CONSTRAINT Student_FK_school_id
-        FOREIGN KEY(school_id) REFERENCES School(school_id)
     , CONSTRAINT Advisor_FK_credential_id
         FOREIGN KEY(credential_id) REFERENCES credential(credential_id)
 );
 
+
+CREATE TABLE school_advisor(
+  school_id INTEGER NOT NULL PRIMARY KEY
+  , advisor_id INTEGER NOT NULL
+  , CONSTRAINT school_advisor_FK_school_id
+      FOREIGN KEY(school_id) REFERENCES school(school_id)
+  , CONSTRAINT school_advisor_FK_advisor_id
+      FOREIGN KEY(advisor_id) REFERENCES advisor(advisor_id)
+
+);
+
+
 /*
-TODO:
-    * Q: Do we need to store any other details for a student? Like DoB, current Std etc?
+Division:
+    A - Advanced
+    B - Beginner
 */
-CREATE TABLE Student (
+CREATE TABLE team (
+    team_id SERIAL NOT NULL PRIMARY KEY
+  , team_name VARCHAR NOT NULL
+  , team_division CHAR(1) NOT NULL
+  , advisor_id INTEGER NOT NULL
+  , CONSTRAINT team_FK_advisor_id
+FOREIGN KEY(advisor_id) REFERENCES advisor(advisor_id)
+);
+
+
+/*
+Grade: 1,2,3,4
+*/
+CREATE TABLE student (
     student_id SERIAL NOT NULL PRIMARY KEY
     , student_name VARCHAR NOT NULL
-    , school_id INTEGER
-    , CONSTRAINT Student_FK_school_id
-        FOREIGN KEY(school_id) REFERENCES School(school_id)
+    , student_grade CHAR(1) NOT NULL
+    , school_id INTEGER NOT NULL
+    , team_id INTEGER
+    , CONSTRAINT student_FK_school_id
+        FOREIGN KEY(school_id) REFERENCES school(school_id)
+    , CONSTRAINT student_team_FK_team_id
+        FOREIGN KEY(team_id) REFERENCES team(team_id)
+);
+
+
+CREATE TABLE team_score (
+  team_id INTEGER NOT NULL
+  , problem_id INTEGER NOT NULL
+  , CONSTRAINT Team_Score_FK_team_id
+      FOREIGN KEY (team_id) REFERENCES Team(team_id)
+);
+
+
+/*
+TODO: If buses do not need parking validation, do we have to keep track of them in DB?
+*/
+CREATE TABLE parking (
+  parking_id SERIAL NOT NULL PRIMARY KEY
+  , vehicle_type CHAR(1) NOT NULL
+  , vehicle_count INTEGER NOT NULL
+  , validation VARCHAR NOT NULL
+  , advisor_id INTEGER
+  , CONSTRAINT parking_FK_advisor_id
+      FOREIGN KEY(advisor_id) REFERENCES advisor(advisor_id)
 );
 
 /*
-TODO:
-    * Q: Do we need to store more than one advisor for a team?
+  Problem and Solution will be stored in MongoDB.
 */
-CREATE TABLE Team (
-    team_id SERIAL NOT NULL PRIMARY KEY
-    , team_name VARCHAR NOT NULL
-    , team_division CHAR(1) NOT NULL
-    , advisor_id INTEGER NOT NULL
-    , CONSTRAINT Team_FK_advisor_id
-        FOREIGN KEY(advisor_id) REFERENCES Advisor(advisor_id)
-);
-
-CREATE TABLE StudentTeam (
-    student_id INTEGER NOT NULL
-    , team_id INTEGER NOT NULL
-    , CONSTRAINT StudentTeam_FK_student_id
-        FOREIGN KEY(student_id) REFERENCES Student(student_id)
-    , CONSTRAINT StudentTeam_FK_team_id
-        FOREIGN KEY(team_id) REFERENCES Team(team_id)
-    , CONSTRAINT StudentTeam_PK PRIMARY KEY (student_id, team_id)
-);
