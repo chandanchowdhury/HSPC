@@ -1,8 +1,8 @@
 # High School Programming Contest (HSPC)
 
 The goal of this project is to build an web based application for the High School 
-Programming Contest here at Kansas State university. Please visit hspc.cs.ksu.edu 
-for more details.
+Programming Contest here at Kansas State university. Please visit 
+[HSPC page](https://www.cs.ksu.edu/hspc) for more details.
 
 Although the application is being developed specifically for HSPC, however any programming contest event which 
  follows a pattern similar to HSPC, should be able to use the application.
