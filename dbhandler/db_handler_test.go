@@ -75,7 +75,7 @@ func TestAddressCreate(t *testing.T) {
         got := AddressCreate(c)
 
         if (got != c.address_id) {
-            t.Errorf("Created address with expected ID %d, bit got %d", c.address_id, got)
+            t.Errorf("Created address with expected ID %d, but got %d", c.address_id, got)
         }
     }
 }
@@ -88,8 +88,8 @@ func TestAddressRead(t *testing.T) {
     for _, c := range addresses {
         got := AddressRead(c.address_id)
 
-        if (got.address_id != c.address_id) {
-            t.Errorf("Created address with expected ID %d, bit got %d", c.address_id, got.address_id)
+        if (got.line1 != c.line1) {
+            t.Errorf("Tried reading address with ID %d and expected line1 %s but got %s", c.address_id, c.line1, got.line1)
         }
     }
 }
@@ -100,10 +100,12 @@ func TestAddressUpdate(t *testing.T) {
     }
 
     for _, c := range addresses {
-        got := AddressUpdate(c)
+        _ = AddressUpdate(c)
 
-        if (got.address_id != c.address_id) {
-            t.Errorf("Created address with expected ID %d, bit got %d", c.address_id, got.address_id)
+        got := AddressRead(c.address_id)
+
+        if (got.line1 != c.line1) {
+            t.Errorf("Updated address ID %d with expected line1 as %s, but got %s", c.address_id, c.line1, got.line1)
         }
     }
 }
@@ -117,7 +119,7 @@ func TestAddressDelete(t *testing.T) {
         got := AddressDelete(c.address_id)
 
         if (got != c.address_id) {
-            t.Errorf("Deleted address with expected ID %d, bit got %d", c.address_id, got)
+            t.Errorf("Deleted address with expected ID %d, but got %d", c.address_id, got)
         }
     }
 }
