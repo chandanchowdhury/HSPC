@@ -34,17 +34,23 @@ func getDBConn() *sql.DB {
 /**
 Credential
  **/
-func CredentialCreate(emailaddress string, password_hash string) uint32 {
-	db := getDBConn()
-
+func CredentialCreate(emailaddress string, password_hash string) int64 {
 	log.Printf("# Creating credential")
 
-	var lastInsertId uint32
+	db := getDBConn()
 
-	err := db.QueryRow("INSERT INTO Credential(emailaddress, password_hash) VALUES($1, $2) returning credential_id;", emailaddress, password_hash).Scan(&lastInsertId)
-	if err != nil {
-        return 0
-    }
+	stmt, err := db.Prepare("INSERT INTO Credential(emailaddress, password_hash) VALUES($1, $2) returning credential_id")
+	if (err != nil) {
+		log.Fatal("Error creating prepared statement")
+		log.Panic(err)
+	}
+
+	var lastInsertId int64
+	err = stmt.QueryRow(emailaddress, password_hash).Scan(&lastInsertId)
+
+	if (err != nil) {
+		log.Fatal(err)
+	}
 
 	log.Printf("credential_id = %d", lastInsertId)
 
@@ -61,21 +67,16 @@ func CredentialRead(emailaddress string) credential_struct {
 	stmt, err := db.Prepare("SELECT credential_id, emailaddress, password_hash FROM Credential WHERE emailaddress = $1")
 	defer stmt.Close()
 
-	rows, err := stmt.Query(emailaddress)
-	defer rows.Close()
+	err = stmt.QueryRow(emailaddress).Scan(&credential.credential_id, &credential.emailaddress, &credential.password_hash)
 
-	checkErr(err)
-
-	for rows.Next() {
-		err := rows.Scan(&credential.credential_id, &credential.emailaddress, &credential.password_hash)
-		checkErr(err)
+	if (err == nil) {
 		return credential
 	}
 
 	return credential
 }
 
-func CredentialUpdate(emailaddress string, password string) int32 {
+func CredentialUpdate(emailaddress string, password string) int64 {
 	db := getDBConn()
 
 	log.Printf("# Updating Credential")
@@ -88,16 +89,16 @@ func CredentialUpdate(emailaddress string, password string) int32 {
 
 	checkErr(err)
 
-	updateCount, err := result.RowsAffected()
+	affectedCount, err := result.RowsAffected()
 
-	if ( updateCount == 1) {
-		return 0
+	if ( affectedCount != 1) {
+		log.Fatalf("Unexpected number of updates: $d", affectedCount)
 	}
 
-	return -1
+	return affectedCount
 }
 
-func CredentialDelete(emailaddress string) uint32 {
+func CredentialDelete(emailaddress string) int64 {
 	db := getDBConn()
 
 	log.Printf("# Deleting Credential")
@@ -110,55 +111,134 @@ func CredentialDelete(emailaddress string) uint32 {
 
 	checkErr(err)
 
-	deleteCount, err := result.RowsAffected()
+	affectedCount, err := result.RowsAffected()
 
-	if ( deleteCount == 1) {
-		return 0
+	if ( affectedCount != 1) {
+		log.Fatalf("Unexpected number of updates: $d", affectedCount)
 	}
 
-	return 0
+	return affectedCount
 }
 
 /*
 Address
 */
-func AddressCreate(address address_struct) uint32 {
+func AddressCreate(address address_struct) int64 {
+	db := getDBConn()
 
-    //TODO: complete the logic
+	log.Printf("# Creating Address")
 
-    return 0
+	stmt, err := db.Prepare("INSERT INTO address(address_country, address_zip, address_state, address_city, address_line1, address_line2) " +
+		"VALUES($1, $2, $3, $4, $5, $6) returning address_id")
+	defer stmt.Close()
+
+	if (err != nil) {
+		log.Fatal("Error creating prepared statement: ")
+		log.Panic(err)
+	}
+
+	var address_id int64
+	err = stmt.QueryRow(address.country, address.zipcode, address.state, address.city, address.line1, address.line2).Scan(&address_id)
+
+	if (err != nil) {
+		log.Fatal(err)
+	}
+
+	return address_id
 }
 
-func AddressRead(address_id uint32) address_struct {
+func AddressRead(address_id int64) address_struct {
+	log.Printf("# Reading Address")
+
+	db := getDBConn()
     var address = address_struct{}
 
-    //TODO: complete the logic
+	stmt, err := db.Prepare("SELECT address_id, address_country, address_zip, address_city, address_line1, address_line2 " +
+		"FROM address WHERE address_id = $1")
+	defer stmt.Close()
 
-    return address
+	if (err != nil) {
+		log.Fatal("Error creating prepared statement: ")
+		log.Panic(err)
+	}
+
+	err = stmt.QueryRow(address_id).Scan(&address.address_id, &address.country, &address.zipcode, &address.city, &address.line1, &address.line2)
+
+	if (err == nil) {
+		 return address
+	}
+
+	return address
 }
 
-func AddressUpdate(address address_struct) address_struct {
-    //TODO: complete the logic
+func AddressUpdate(address address_struct) int64 {
+	db := getDBConn()
 
-    return address
+	log.Printf("# Updating Address")
+	log.Printf("Address ID = %d", address.address_id)
+
+	stmt, err := db.Prepare("UPDATE address SET address_country = $1, address_zip = $2 " +
+		" ,address_state = $3 ,address_city = $4" +
+		" ,address_line1 = $5 ,address_line2 = $6" +
+		" WHERE address_id = $7")
+	defer stmt.Close()
+
+	if (err != nil) {
+		log.Fatal("Error creating prepared statement: ")
+		log.Panic(err)
+	}
+
+	result, err := stmt.Exec(address.country, address.zipcode, address.state, address.city, address.line1, address.line2, address.address_id)
+
+	if (err != nil) {
+		log.Fatal("Error updating")
+		log.Panic(err)
+	}
+
+	affectedCount, err := result.RowsAffected()
+
+	if ( affectedCount != 1) {
+		log.Fatalf("Unexpected number of updates: $d", affectedCount)
+	}
+
+	return affectedCount
 }
 
-func AddressDelete(address_id uint32) uint32 {
-    //TODO: complete the logic
+func AddressDelete(address_id int64) int64 {
+	db := getDBConn()
 
-    return 0
+	log.Printf("# Deleting Address")
+	log.Printf("Address ID = %d", address_id)
+
+	stmt, err := db.Prepare("DELETE FROM address WHERE address_id = $1")
+	defer stmt.Close()
+
+	result, err := stmt.Exec(address_id)
+
+	if (err != nil) {
+		log.Fatal("Delete Failed")
+		log.Panic(err)
+	}
+
+	affectedCount, err := result.RowsAffected()
+
+	if ( affectedCount != 1) {
+		log.Fatalf("Unexpected number of updates: $d", affectedCount)
+	}
+
+	return affectedCount
 }
 
 /*
 School
 */
-func SchoolCreate(school school_struct) uint32 {
+func SchoolCreate(school school_struct) int64 {
     //TODO: complete the logic
 
     return 0
 }
 
-func SchoolRead(school_id uint32) school_struct {
+func SchoolRead(school_id int64) school_struct {
     var school = school_struct{}
     //TODO: complete the logic
 
@@ -171,7 +251,7 @@ func SchoolUpdate(school school_struct) school_struct {
     return school
 }
 
-func SchoolDelete(school_id uint32) uint32 {
+func SchoolDelete(school_id int64) int64 {
     //TODO: complete the logic
 
     return 0
@@ -180,13 +260,13 @@ func SchoolDelete(school_id uint32) uint32 {
 /*
 Advisor
 */
-func AdvisorCreate(advisor advisor_struct) uint32 {
+func AdvisorCreate(advisor advisor_struct) int64 {
     //TODO: complete the logic
 
     return 0
 }
 
-func AdvisorRead(advisor_id uint32) advisor_struct {
+func AdvisorRead(advisor_id int64) advisor_struct {
     var advisor = advisor_struct{}
 
     //TODO: complete the logic
@@ -200,7 +280,7 @@ func AdvisorUpdate(advisor advisor_struct) advisor_struct {
     return advisor
 }
 
-func AdvisorDelete(advisor_id uint32) uint32 {
+func AdvisorDelete(advisor_id int64) int64 {
     //TODO: complete the logic
 
     return 0
@@ -209,13 +289,13 @@ func AdvisorDelete(advisor_id uint32) uint32 {
 /*
 Team
 */
-func TeamCreate(team team_struct) uint32 {
+func TeamCreate(team team_struct) int64 {
     //TODO: complete the logic
 
     return 0
 }
 
-func TeamRead(team_id uint32) team_struct {
+func TeamRead(team_id int64) team_struct {
     var team = team_struct{}
 
     //TODO: complete the logic
@@ -229,7 +309,7 @@ func TeamUpdate(team team_struct) team_struct {
     return team
 }
 
-func TeamDelete(team_id uint32) uint32 {
+func TeamDelete(team_id int64) int64 {
     //TODO: complete the logic
 
     return 0
@@ -238,13 +318,13 @@ func TeamDelete(team_id uint32) uint32 {
 /*
 Student
 */
-func studentCreate(student student_struct) uint32 {
+func studentCreate(student student_struct) int64 {
     //TODO: complete the logic
 
     return 0
 }
 
-func studentRead(student_id uint32) student_struct {
+func studentRead(student_id int64) student_struct {
     var student = student_struct{}
 
     //TODO: complete the logic
@@ -258,7 +338,7 @@ func studentUpdate(student student_struct) student_struct {
     return student
 }
 
-func studentDelete(student_id uint32) uint32 {
+func studentDelete(student_id int64) int64 {
     //TODO: complete the logic
 
     return 0
@@ -267,13 +347,13 @@ func studentDelete(student_id uint32) uint32 {
 /*
 Team Score
 */
-func teamscoreCreate(teamscore team_score_struct) uint32 {
+func teamscoreCreate(teamscore team_score_struct) int64 {
     //TODO: complete the logic
 
     return 0
 }
 
-func teamscoreRead(teamscore_id uint32) team_score_struct {
+func teamscoreRead(teamscore_id int64) team_score_struct {
     var teamscore = team_score_struct{}
 
     //TODO: complete the logic
@@ -287,7 +367,7 @@ func teamscoreUpdate(teamscore team_score_struct) team_score_struct {
     return teamscore
 }
 
-func teamscoreDelete(teamscore_id uint32) uint32 {
+func teamscoreDelete(teamscore_id int64) int64 {
     //TODO: complete the logic
 
     return 0
@@ -296,13 +376,13 @@ func teamscoreDelete(teamscore_id uint32) uint32 {
 /*
 Parking
 */
-func parkingCreate(parking team_score_struct) uint32 {
+func parkingCreate(parking team_score_struct) int64 {
     //TODO: complete the logic
 
     return 0
 }
 
-func parkingRead(parking_id uint32) team_score_struct {
+func parkingRead(parking_id int64) team_score_struct {
     var parking = team_score_struct{}
 
     //TODO: complete the logic
@@ -316,7 +396,7 @@ func parkingUpdate(parking team_score_struct) team_score_struct {
     return parking
 }
 
-func parkingDelete(parking_id uint32) uint32 {
+func parkingDelete(parking_id int64) int64 {
     //TODO: complete the logic
 
     return 0
@@ -325,13 +405,13 @@ func parkingDelete(parking_id uint32) uint32 {
 /*
 Problem
 */
-func problemCreate(problem problem_struct) uint32 {
+func problemCreate(problem problem_struct) int64 {
     //TODO: complete the logic
 
     return 0
 }
 
-func problemRead(problem_id uint32) problem_struct {
+func problemRead(problem_id int64) problem_struct {
     var problem = problem_struct{}
 
     //TODO: complete the logic
@@ -345,7 +425,7 @@ func problemUpdate(problem problem_struct) problem_struct {
     return problem
 }
 
-func problemDelete(problem_id uint32) uint32 {
+func problemDelete(problem_id int64) int64 {
     //TODO: complete the logic
 
     return 0
@@ -354,13 +434,13 @@ func problemDelete(problem_id uint32) uint32 {
 /*
 Solution
 */
-func solutionCreate(solution solution_struct) uint32 {
+func solutionCreate(solution solution_struct) int64 {
     //TODO: complete the logic
 
     return 0
 }
 
-func solutionRead(solution_id uint32) solution_struct {
+func solutionRead(solution_id int64) solution_struct {
     var solution = solution_struct{}
 
     //TODO: complete the logic
@@ -374,7 +454,7 @@ func solutionUpdate(solution solution_struct) solution_struct {
     return solution
 }
 
-func solutionDelete(solution_id uint32) uint32 {
+func solutionDelete(solution_id int64) int64 {
     //TODO: complete the logic
 
     return 0
@@ -383,13 +463,13 @@ func solutionDelete(solution_id uint32) uint32 {
 /*
 Problem_Solution
 */
-func problemsolutionCreate(problemsolution problem_solution_struct) uint32 {
+func problemsolutionCreate(problemsolution problem_solution_struct) int64 {
     //TODO: complete the logic
 
     return 0
 }
 
-func problemsolutionRead(problemsolution_id uint32) problem_solution_struct {
+func problemsolutionRead(problemsolution_id int64) problem_solution_struct {
     var problemsolution = problem_solution_struct{}
 
     //TODO: complete the logic
@@ -403,7 +483,7 @@ func problemsolutionUpdate(problemsolution problem_solution_struct) problem_solu
     return problemsolution
 }
 
-func problemsolutionDelete(problemsolution_id uint32) uint32 {
+func problemsolutionDelete(problemsolution_id int64) int64 {
     //TODO: complete the logic
 
     return 0
