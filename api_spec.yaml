@@ -49,8 +49,7 @@ paths:
         200:
           description: Return the Credential ID
           schema:
-            type: int
-            format: int32
+            type: string
         default:
           description: Unexpected error
           schema:
@@ -75,16 +74,17 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /credential/{id}:
+    parameters:
+      - name: id
+        description: ID of the Address
+        in: path
+        type: string
+        format: email
+        required: true
     get:
       tags:
         - credential
-      parameters:
-        - name: body
-          in: body
-          required: true
-          description: Updated Credential object
-          schema:
-            $ref: '#/definitions/Credential'
       responses:
         200:
           description: Get a credential object using emailaddress
@@ -98,13 +98,6 @@ paths:
       description: Given an emailaddress, delete the credential
       tags:
         - credential
-      parameters:
-        - name: body
-          in: body
-          required: true
-          description: Updated Credential object
-          schema:
-            $ref: '#/definitions/Credential'
       responses:
         200:
           description: Return success
@@ -127,71 +120,70 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/Address'
-      response:
+      responses:
         200:
           description: Return the ID of the newly created school
-            schema:
-              type: int
-              format: int32
-          default:
-            description: Unexpected error
-            schema:
-              $ref: '#/definitions/Error'
-    /address/{id}:
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /address/{id}:
+    parameters:
+      - name: id
+        description: ID of the Address
+        in: path
+        type: integer
+        format: int64
+        required: true
+    get:
+      description: Given a address id, return the details
+      tags:
+        - address
+      responses:
+        200:
+          description: Address Information
+          schema:
+            $ref: '#/definitions/Address'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update address
+      tags:
+        - address
       parameters:
-        - name: id
-          description: ID of the Address
-          in: path
-          type: integer
-          format: int32
-          required: true
-      get:
-        description: Given a address id, return the details
-        tags:
-          - address
-        responses:
-          200:
-            description: Address Information
-            schema:
-              $ref: '#/definitions/Address'
-          default:
-            description: Unexpected error
-            schema:
-              $ref: '#/definitions/Error'
-      put:
-        description: Update address
-        tags:
-          - address
-        parameters:
-          - name: address
-            description: address object
-            in: body
-            schema:
-              $ref: '#/definitions/Address'
-        responses:
-          200:
-            description: Returns address ID of the updated address
-            schema:
-              type: integer
-              format: int32
-          default:
-            description: Unexpected error
-            schema:
-              $ref: '#/definitions/Error'
-      delete:
-        description: Given a address id, delete the address
-        tags:
-          - address
-        responses:
-          200:
-            description: Return ID of the deleted address if successfully deleted
-            schema:
-              type: integer
-              format: int32
-          default:
-            description: Unexpected error
-            schema:
-              $ref: '#/definitions/Error'
+        - name: address
+          description: address object
+          in: body
+          schema:
+            $ref: '#/definitions/Address'
+      responses:
+        200:
+          description: Returns address ID of the updated address
+          schema:
+            type: integer
+            format: int64
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Given a address id, delete the address
+      tags:
+        - address
+      responses:
+        200:
+          description: Return ID of the deleted address if successfully deleted
+          schema:
+            type: integer
+            format: int64
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
 # API paths for School
   /school:
@@ -236,7 +228,7 @@ paths:
         description: ID of the School
         in: path
         type: integer
-        format: int32
+        format: int64
         required: true
     get:
       description: Given a school id, return the details
@@ -266,7 +258,7 @@ paths:
           description: Returns School ID of the updated school
           schema:
             type: integer
-            format: int32
+            format: int64
         default:
           description: Unexpected error
           schema:
@@ -280,16 +272,19 @@ paths:
           description: Return ID of the deleted school if successfully deleted
           schema:
             type: integer
-            format: int32
+            format: int64
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
 
 # TODO: API paths for Advisor
+# TODO: API paths for Login
 # TODO: API paths for Student
 # TODO: API paths for Team
-# TODO: API paths for Login
+# TODO: API paths for Problem
+# TODO: API paths for Solution
+# TODO: API paths for TeamScore
 
 #
 ### Define all the Models
@@ -301,7 +296,7 @@ definitions:
     properties:
       credential_id:
         type: integer
-        format: int32
+        format: int64
         minimum: 1
       emailaddress:
         type: string
@@ -316,7 +311,7 @@ definitions:
     properties:
       address_id:
         type: integer
-        format: int32
+        format: int64
         minimum: 1
       country:
         type: string
@@ -338,16 +333,18 @@ definitions:
         type: string
         description: building and room
     required:
+      - zipcode
       - state
       - city
       - line1
 
+  # One school can have only one advisor, but an advisor can represent multiple schools
   School:
     type: object
     properties:
       school_id:
         type: integer
-        format: int32
+        format: int64
         minimum: 1
         description: ID of the school in DB
       school_name:
@@ -356,63 +353,71 @@ definitions:
         example: Ideal World High School
       address_id:
         type: integer
-        format: int32
+        format: int64
+      advisor_id:
+        type: integer
+        format: int64
+        minimum: 1
     required:
       - school_id
       - school_name
+      - address_id
 
   Advisor:
     type: object
     properties:
       advisor_id:
         type: integer
-        format: int32
+        format: int64
         minimum: 1
       advisor_name:
         type: string
-      emailaddress_id:
+      credential_id:
         type: integer
-        format: int32
+        format: int64
         minimum: 1
-      advisor_password:
-        type: string
-        format: password
-      school_id:
-        type: integer
-        format: int32
     required:
         - advisor_name
-        - emailaddress_id
-        - advisor_password
-        - school_id
+        - credential_id
 
   Student:
     type: object
     properties:
       student_id:
         type: integer
-        format: int32
+        format: int64
         minimum: 1
       student_name:
         type: string
       school_id:
         type: integer
-        format: int32
+        format: int64
+      student_grade:
+        type: string
+        enum:
+          - Freshmen
+          - Sophomore
+          - Junior
+          - Senior
     required:
       - student_name
+      - school_id
+      - student_grade
 
+  # Max 3 teams allowed per school, unless we have really small participation
+  # in which case we can allow bigger schools to bring one more team.
   Team:
     type: object
     properties:
       team_id:
         type: integer
-        format: int32
+        format: int64
         minimum: 1
       team_name:
         type: string
-      advisor_id:
+      school_id:
         type: integer
-        format: int32
+        format: int64
         minimum: 1
       team_division:
         type: string
@@ -422,22 +427,60 @@ definitions:
       team_members:
         type: array
         items:
-          #- student_id:
+          # array of student_ids
             type: integer
-            format: int32
+            format: int64
             minimum: 1
     required:
-      - team_id
       - team_name
       - team_division
-      - advisor_id
+      - school_id
+
+  Problem:
+    type: object
+    properties:
+      problem_id:
+        type: integer
+        format: int64
+        minimum: 1
+      problem_desc:
+        type: string
+
+  Solution:
+    type: object
+    properties:
+      solution_id:
+        type: integer
+        format: int64
+        minimum: 1
+      solution_desc:
+        type: string
+      problem_id:
+        type: integer
+        format: int64
+        minimum: 1
+
+  TeamScore:
+    type: object
+    properties:
+      team_id:
+        type: integer
+        format: int64
+        minimum: 1
+      problem_id:
+        type: integer
+        format: int64
+        minimum: 1
+      submit_time: # in case of a tie
+        type: string
+        format: DateTime
 
   Error:
     type: object
     properties:
       code:
         type: integer
-        format: int32
+        format: int64
       message:
         type: string
       fields:
