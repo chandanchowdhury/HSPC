@@ -70,9 +70,9 @@ CREATE TABLE team (
     team_id SERIAL NOT NULL PRIMARY KEY
   , team_name VARCHAR NOT NULL
   , team_division CHAR(1) NOT NULL
-  , advisor_id INTEGER NOT NULL
-  , CONSTRAINT team_FK_advisor_id
-FOREIGN KEY(advisor_id) REFERENCES advisor(advisor_id)
+  , school_id INTEGER NOT NULL
+  , CONSTRAINT team_FK_school_id
+      FOREIGN KEY(school_id) REFERENCES school(school_id)
 );
 
 
