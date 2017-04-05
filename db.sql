@@ -16,6 +16,7 @@ CREATE TABLE credential (
     credential_id SERIAL NOT NULL PRIMARY KEY
     , emailaddress VARCHAR NOT NULL
     , password_hash VARCHAR
+    , credential_active BOOLEAN DEFAULT FALSE
     , CONSTRAINT EmailAddress_unique
         UNIQUE (emailaddress)
 );
@@ -53,6 +54,7 @@ CREATE TABLE advisor (
 CREATE TABLE school_advisor(
   school_id INTEGER NOT NULL PRIMARY KEY
   , advisor_id INTEGER NOT NULL
+  , school_advisor_active BOOLEAN DEFAULT FALSE
   , CONSTRAINT school_advisor_FK_school_id
       FOREIGN KEY(school_id) REFERENCES school(school_id)
   , CONSTRAINT school_advisor_FK_advisor_id
