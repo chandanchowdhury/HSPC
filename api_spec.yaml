@@ -304,8 +304,13 @@ definitions:
       password:
         type: string
         format: password
+      credential_active:
+        type: boolean
+        description: when an advisor registers herself, she will not be able to login unless admin has approved
     required:
       - emailaddress
+      - password
+
   Address:
     type: object
     properties:
@@ -358,8 +363,10 @@ definitions:
         type: integer
         format: int64
         minimum: 1
+      school_advisor_active:
+        type: boolean
+        description: When an advisor selects herself as a school representative, it has to be approved by admin
     required:
-      - school_id
       - school_name
       - address_id
 
@@ -445,6 +452,8 @@ definitions:
         minimum: 1
       problem_desc:
         type: string
+    required:
+      - problem_desc
 
   Solution:
     type: object
@@ -459,6 +468,9 @@ definitions:
         type: integer
         format: int64
         minimum: 1
+    required:
+      - solution_desc
+      - problem_id
 
   TeamScore:
     type: object
@@ -474,6 +486,10 @@ definitions:
       submit_time: # in case of a tie
         type: string
         format: DateTime
+    required:
+      - team_id
+      - problem_id
+      - submit_time
 
   Error:
     type: object
