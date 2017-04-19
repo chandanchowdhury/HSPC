@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS advisor;
 DROP TABLE IF EXISTS school;
 DROP TABLE IF EXISTS credential;
 DROP TABLE IF EXISTS address;
+DROP TABLE IF EXISTS session;
 
 
 CREATE TABLE credential (
@@ -118,3 +119,11 @@ CREATE TABLE parking (
 /*
   Problem and Solution will be stored in MongoDB.
 */
+
+
+CREATE TABLE Session (
+  credential_id SERIAL NOT NULL PRIMARY KEY
+  , session_data VARCHAR
+  , CONSTRAINT Session_FK_credential_id
+    FOREIGN KEY(credential_id) REFERENCES credential(credential_id)
+);
