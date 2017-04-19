@@ -14,7 +14,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 # the domain of the service
-# TODO: Enable is production
+# TODO: Enable in production
 # host: hspc.cs.ksu.com
 # security definitions
 #securityDefinitions:
@@ -107,7 +107,52 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
+# API paths for Login
+  /login/{emailaddress}/{password}:
+    get:
+      tags:
+        - login
+      parameters:
+        - name: emailaddress
+          description: Email address
+          in: path
+          type: string
+          format: email
+          required: true
+        - name: password
+          description: Password
+          in: path
+          type: string
+          format: password
+          required: true
+      responses:
+        200:
+          description: Return a new session
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /logout/{session-id}:
+    get:
+      tags:
+        - logout
+      parameters:
+        - name: session-id
+          description: The session which need to be invalidated
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Get a student object using ID
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 # API paths for Address
   /address:
     post:
@@ -187,21 +232,6 @@ paths:
 
 # API paths for School
   /school:
-    get:
-      description: Return the list of schools
-      tags:
-        - school
-      responses:
-        200:
-          description: List of Schools
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/School'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
     post:
       description: Create a new school
       tags:
@@ -218,6 +248,25 @@ paths:
           description: Return the ID of the newly created school
           schema:
             $ref: '#/definitions/School'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update school
+      tags:
+        - school
+      parameters:
+        - name: school
+          description: School object
+          in: body
+          schema:
+            $ref: '#/definitions/School'
+      responses:
+        200:
+          description: Returns success
+          schema:
+            type: string
         default:
           description: Unexpected error
           schema:
@@ -243,26 +292,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    put:
-      description: Update school
-      tags:
-        - school
-      parameters:
-        - name: school
-          description: School object
-          in: body
-          schema:
-            $ref: '#/definitions/School'
-      responses:
-        200:
-          description: Returns School ID of the updated school
-          schema:
-            type: integer
-            format: int64
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
     delete:
       description: Given a school id, delete the school
       tags:
@@ -278,13 +307,452 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-# TODO: API paths for Advisor
-# TODO: API paths for Login
-# TODO: API paths for Student
-# TODO: API paths for Team
-# TODO: API paths for Problem
-# TODO: API paths for Solution
-# TODO: API paths for TeamScore
+# API paths for Advisor
+  /advisor:
+    post:
+      tags:
+        - advisor
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Advisor'
+      responses:
+        200:
+          description: Return the Advisor ID
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update advisor
+      tags:
+        - advisor
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Updated Advisor object
+          schema:
+            $ref: '#/definitions/Advisor'
+      responses:
+        200:
+          description: Returns success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /advisor/{id}:
+    parameters:
+      - name: id
+        description: ID of the Address
+        in: path
+        type: string
+        format: email
+        required: true
+    get:
+      tags:
+        - advisor
+      responses:
+        200:
+          description: Get a advisor object using emailaddress
+          schema:
+            $ref: '#/definitions/Advisor'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Given an emailaddress, delete the advisor
+      tags:
+        - advisor
+      responses:
+        200:
+          description: Return success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+# API paths for Student
+  /student:
+    post:
+      tags:
+        - student
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Student'
+      responses:
+        200:
+          description: Return the Student ID
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update student
+      tags:
+        - student
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Updated Student object
+          schema:
+            $ref: '#/definitions/Student'
+      responses:
+        200:
+          description: Returns success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /student/{id}:
+    parameters:
+      - name: id
+        description: ID of the Address
+        in: path
+        type: string
+        format: email
+        required: true
+    get:
+      tags:
+        - student
+      responses:
+        200:
+          description: Get a student object using ID
+          schema:
+            $ref: '#/definitions/Student'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Given an student ID, delete the student
+      tags:
+        - student
+      responses:
+        200:
+          description: Return success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+# API paths for Team
+  /team:
+    post:
+      tags:
+        - team
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Team'
+      responses:
+        200:
+          description: Return the Team ID
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update team
+      tags:
+        - team
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Updated Team object
+          schema:
+            $ref: '#/definitions/Team'
+      responses:
+        200:
+          description: Returns success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /team/{id}:
+    parameters:
+      - name: id
+        description: ID of the Address
+        in: path
+        type: string
+        format: email
+        required: true
+    get:
+      tags:
+        - team
+      responses:
+        200:
+          description: Get a team object using ID
+          schema:
+            $ref: '#/definitions/Team'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Given an team ID, delete the team
+      tags:
+        - team
+      responses:
+        200:
+          description: Return success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+# API paths for Problem
+  /problem:
+    post:
+      tags:
+        - problem
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Problem'
+      responses:
+        200:
+          description: Return the Problem ID
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update problem
+      tags:
+        - problem
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Updated Problem object
+          schema:
+            $ref: '#/definitions/Problem'
+      responses:
+        200:
+          description: Returns success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /problem/{id}:
+    parameters:
+      - name: id
+        description: ID of the Address
+        in: path
+        type: string
+        format: email
+        required: true
+    get:
+      tags:
+        - problem
+      responses:
+        200:
+          description: Get a problem object using ID
+          schema:
+            $ref: '#/definitions/Problem'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Given an problem ID, delete the problem
+      tags:
+        - problem
+      responses:
+        200:
+          description: Return success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+# API paths for Solution
+  /solution:
+    post:
+      tags:
+        - solution
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Solution'
+      responses:
+        200:
+          description: Return the Solution ID
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update solution
+      tags:
+        - solution
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Updated Solution object
+          schema:
+            $ref: '#/definitions/Solution'
+      responses:
+        200:
+          description: Returns success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /solution/{id}:
+    parameters:
+      - name: id
+        description: ID of the Address
+        in: path
+        type: string
+        format: email
+        required: true
+    get:
+      tags:
+        - solution
+      responses:
+        200:
+          description: Get a solution object using ID
+          schema:
+            $ref: '#/definitions/Solution'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Given an solution ID, delete the solution
+      tags:
+        - solution
+      responses:
+        200:
+          description: Return success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+# API paths for TeamScore
+  /teamscore:
+    #get:
+    #  tags: teamscore
+    #  response:
+    #    200:
+    #      description: Retrun the list of all TeamScore
+    #      schema:
+    #        array:
+    #          $ref: '#/definitions/TeamScore'
+    post:
+      tags:
+        - teamscore
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/TeamScore'
+      responses:
+        200:
+          description: Return the TeamScore ID
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update teamscore
+      tags:
+        - teamscore
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Updated TeamScore object
+          schema:
+            $ref: '#/definitions/TeamScore'
+      responses:
+        200:
+          description: Returns success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /teamscore/{id}:
+    parameters:
+      - name: id
+        description: ID of the Address
+        in: path
+        type: string
+        format: email
+        required: true
+    get:
+      tags:
+        - teamscore
+      responses:
+        200:
+          description: Get a teamscore object using ID
+          schema:
+            $ref: '#/definitions/TeamScore'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Given an teamscore ID, delete the teamscore
+      tags:
+        - teamscore
+      responses:
+        200:
+          description: Return success
+          schema:
+            type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
 #
 ### Define all the Models
