@@ -775,6 +775,7 @@ definitions:
       credential_active:
         type: boolean
         description: when an advisor registers herself, she will not be able to login unless admin has approved
+        default: false
     required:
       - emailaddress
       - password
@@ -834,6 +835,7 @@ definitions:
       school_advisor_active:
         type: boolean
         description: When an advisor selects herself as a school representative, it has to be approved by admin
+        default: false
     required:
       - school_name
       - address_id
