@@ -271,7 +271,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /schoo/{id}:
+  /school/{id}:
     parameters:
       - name: id
         description: ID of the School
@@ -300,8 +300,7 @@ paths:
         200:
           description: Return ID of the deleted school if successfully deleted
           schema:
-            type: integer
-            format: int64
+            type: string
         default:
           description: Unexpected error
           schema:

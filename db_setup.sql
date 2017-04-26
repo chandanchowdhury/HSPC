@@ -80,20 +80,29 @@ CREATE TABLE team (
 
 
 /*
-Grade: 1,2,3,4
+Grade:
+1 - Freshmen
+2 - Sophomore
+3 - Junior
+4 - Senior
 */
 CREATE TABLE student (
     student_id SERIAL NOT NULL PRIMARY KEY
     , student_name VARCHAR NOT NULL
     , student_grade CHAR(1) NOT NULL
     , school_id INTEGER NOT NULL
-    , team_id INTEGER
     , CONSTRAINT student_FK_school_id
         FOREIGN KEY(school_id) REFERENCES school(school_id)
-    , CONSTRAINT student_team_FK_team_id
-        FOREIGN KEY(team_id) REFERENCES team(team_id)
 );
 
+CREATE TABLE TeamStudent (
+  team_id INTEGER NOT NULL
+  , student_id INTEGER NOT NULL
+  , CONSTRAINT teamstudent_FK_team_id
+      FOREIGN KEY (team_id) REFERENCES team(team_id)
+  , CONSTRAINT teamstudent_FK_student_id
+      FOREIGN KEY (student_id) REFERENCES student(student_id)
+);
 
 CREATE TABLE team_score (
   team_id INTEGER NOT NULL

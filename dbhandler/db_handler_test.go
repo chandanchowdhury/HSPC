@@ -1,15 +1,17 @@
 package dbhandler
 
 import (
-	"testing"
 	"github.com/chandanchowdhury/HSPC/models"
+	"github.com/chandanchowdhury/HSPC/dbhandler"
 	"github.com/go-openapi/strfmt"
+	"testing"
 )
 
 /**
 Credential
 */
-var false_var = false;
+var false_var = false
+
 //var true_var = true;
 
 func TestCredentialCreate(t *testing.T) {
@@ -17,13 +19,13 @@ func TestCredentialCreate(t *testing.T) {
 	var email2 strfmt.Email = strfmt.Email("test1@ksu.edu")
 	var password1 strfmt.Password = strfmt.Password("test")
 	var password2 strfmt.Password = strfmt.Password("test1")
-	var tests = []models.Credential {
+	var tests = []models.Credential{
 		{1, &email1, &password1, &false_var},
 		{2, &email2, &password2, &false_var},
 	}
 
 	for _, c := range tests {
-		got := CredentialCreate(c)
+		got := dbhandler.CredentialCreate(c)
 
 		if got != c.CredentialID {
 			t.Errorf("Inserted %s with expected ID %d, but got %d", c.Emailaddress, c.CredentialID, got)
@@ -37,7 +39,7 @@ func TestCredentialRead(t *testing.T) {
 	var password1 strfmt.Password = strfmt.Password("test")
 	var password2 strfmt.Password = strfmt.Password("test1")
 
-	var tests = []models.Credential {
+	var tests = []models.Credential{
 		{1, &email1, &password1, &false_var},
 		{2, &email2, &password2, &false_var},
 	}
@@ -54,7 +56,7 @@ func TestCredentialRead(t *testing.T) {
 func TestCredentialUpdate(t *testing.T) {
 	var email1 strfmt.Email = strfmt.Email("test@ksu.edu")
 	var password2 strfmt.Password = strfmt.Password("test2")
-	var tests = []models.Credential {
+	var tests = []models.Credential{
 		{1, &email1, &password2, &false_var},
 	}
 
@@ -101,7 +103,7 @@ func TestAddressCreate(t *testing.T) {
 
 	var addresses = []models.Address{
 		{1, &country, &zipcodes[0], &state[0], city[0], &line1[0], &line2[0]},
-		{2, &country, &zipcodes[1], &state[0],  city[1], &line1[1], &line2[1]},
+		{2, &country, &zipcodes[1], &state[0], city[1], &line1[1], &line2[1]},
 	}
 
 	for _, c := range addresses {
@@ -116,7 +118,7 @@ func TestAddressCreate(t *testing.T) {
 func TestAddressRead(t *testing.T) {
 	var country = "USA"
 	var zipcodes = []string{"66502", "67601"}
-	var state = []string{"KS"};
+	var state = []string{"KS"}
 	var city = []string{"Manhattan", "Hays"}
 	var line1 = []string{"2100 Poytz Avenue", "600"}
 	var line2 = []string{"", "Park Street"}
@@ -158,11 +160,11 @@ func TestAddressUpdate(t *testing.T) {
 }
 
 func TestAddressDelete(t *testing.T) {
-	var country = "USA";
-	var zipcodes = []string{"66502", "67601"};
-	var state = []string{"KS"};
-	var city = []string{"Manhattan", "Hays"};
-	var line1 = []string{"Poytz Avenue", "600"};
+	var country = "USA"
+	var zipcodes = []string{"66502", "67601"}
+	var state = []string{"KS"}
+	var city = []string{"Manhattan", "Hays"}
+	var line1 = []string{"Poytz Avenue", "600"}
 	var line2 = []string{"2100", "Park Street"}
 
 	var addresses = []models.Address{
@@ -185,11 +187,11 @@ School
 */
 
 func TestSchoolCreate(t *testing.T) {
-	var school_name = []string {
+	var school_name = []string{
 		"Manhattan High School", "Kansas Academy of Mathematics and Science",
-		"De Soto High Schoo",  "Andover Central High School"}
+		"De Soto High Schoo", "Andover Central High School"}
 
-	var address_id = []int64{2};
+	var address_id = []int64{2}
 
 	var schools = []models.School{
 		{1, &school_name[0], &address_id[0], 0, false},
@@ -208,11 +210,11 @@ func TestSchoolCreate(t *testing.T) {
 }
 
 func TestSchoolRead(t *testing.T) {
-	var school_name = []string {
+	var school_name = []string{
 		"Manhattan High School", "Kansas Academy of Mathematics and Science",
-		"De Soto High Schoo",  "Andover Central High School"}
+		"De Soto High Schoo", "Andover Central High School"}
 
-	var address_id = []int64{2};
+	var address_id = []int64{2}
 
 	var schools = []models.School{
 		{1, &school_name[0], &address_id[0], 0, false},
@@ -231,11 +233,11 @@ func TestSchoolRead(t *testing.T) {
 }
 
 func TestSchoolUpdate(t *testing.T) {
-	var school_name = []string {
+	var school_name = []string{
 		"Manhattan High School", "Kansas Academy of Mathematics and Science",
-		"De Soto High Schoo",  "Andover Central High School"}
+		"De Soto High Schoo", "Andover Central High School"}
 
-	var address_id = []int64{1};
+	var address_id = []int64{1}
 
 	var schools = []models.School{
 		{2, &school_name[1], &address_id[0], 0, false},
@@ -253,9 +255,9 @@ func TestSchoolUpdate(t *testing.T) {
 }
 
 func TestSchoolDelete(t *testing.T) {
-	var school_name = []string {"Andover Central High School"}
+	var school_name = []string{"Andover Central High School"}
 
-	var address_id = []int64{1};
+	var address_id = []int64{1}
 
 	var schools = []models.School{
 		{4, &school_name[0], &address_id[0], 0, false},
