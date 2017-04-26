@@ -2,7 +2,6 @@ package dbhandler
 
 import (
 	"github.com/chandanchowdhury/HSPC/models"
-	"github.com/chandanchowdhury/HSPC/dbhandler"
 	"github.com/go-openapi/strfmt"
 	"testing"
 )
@@ -25,7 +24,7 @@ func TestCredentialCreate(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		got := dbhandler.CredentialCreate(c)
+		got := CredentialCreate(c)
 
 		if got != c.CredentialID {
 			t.Errorf("Inserted %s with expected ID %d, but got %d", c.Emailaddress, c.CredentialID, got)
