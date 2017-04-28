@@ -4,37 +4,39 @@ import (
     "github.com/go-openapi/runtime/middleware"
     "github.com/chandanchowdhury/HSPC/restapi/operations/login"
     "github.com/chandanchowdhury/HSPC/dbhandler"
+    "github.com/chandanchowdhury/HSPC/models"
     "log"
 )
 
 func HandleLogin(params login.GetLoginEmailaddressPasswordParams) middleware.Responder {
     email := params.Emailaddress.String()
     password := params.Password.String()
-
     log.Printf("Received - email: %s, password: %s", email, password)
+
+    error := new(models.Error)
+    error.Message = "Failed"
 
     credential := dbhandler.CredentialRead(email)
 
-    //log.Printf("In DB - email: %p, password: %p", credential.Emailaddress, credential.Password)
-    log.Printf("In DB - email: %s, password: %s Active: %b", credential.Emailaddress.String(), credential.Password.String(), credential.CredentialActive)
-
-    resp := login.NewGetLoginEmailaddressPasswordOK()
-    var session_id string
-
-    session_id = "Failed"
-
-    //TODO: if the credential is not active, login is not allowed
-    //if credential.Emailaddress != nil && credential.CredentialActive == false {
-    //    session_id = "Not Active"
-    //    resp.SetPayload(session_id)
-    //    return resp
-    //}
-
-    if credential.Emailaddress != nil && credential.Password.String() == password {
-                //TODO: Setup session
-                session_id = "Success"
+    if credential.Emailaddress == nil {
+        resp := login.NewGetLoginEmailaddressPasswordOK()
+        resp.SetPayload(error)
+        return resp
     }
 
-    resp.SetPayload(session_id)
+    log.Printf("From DB - email: %s, password: %s Active: %t", credential.Emailaddress.String(), credential.Password.String(), *credential.CredentialActive)
+
+    if credential.Password.String() == password {
+        log.Print("Password Matched")
+        error.Message = "Success"
+    }
+
+    if *credential.CredentialActive == false {
+        log.Print("Account Not Active")
+        error.Message = "Acount Not Active"
+    }
+
+    resp := login.NewGetLoginEmailaddressPasswordOK()
+    resp.SetPayload(error)
     return resp
 }

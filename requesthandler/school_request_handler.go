@@ -4,19 +4,33 @@ import (
 	"github.com/chandanchowdhury/HSPC/dbhandler"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/school"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/chandanchowdhury/HSPC/models"
 )
 
 func HandleSchoolPost(params school.PostSchoolParams) middleware.Responder {
 	//create the school
 	school_id := dbhandler.SchoolCreate(*params.Body)
 
-	school_data := dbhandler.SchoolRead(school_id)
+	if school_id == -1 {
+		resp := school.NewPostSchoolDefault(400)
+		error := new(models.Error)
+		error.Code = -1
+		error.Message = "Failed to create School"
+
+		resp.SetPayload(error)
+
+		return resp
+	}
 
 	// create the response
-	resp := school.NewGetSchoolIDOK()
+	resp := school.NewPostSchoolOK()
+	error := new(models.Error)
+
+	error.Code = school_id
+	error.Message = "Created"
 
 	//set response data
-	resp.SetPayload(&school_data)
+	resp.SetPayload(error)
 
 	//return the response
 	return resp
@@ -26,8 +40,15 @@ func HandleSchoolGet(params school.GetSchoolIDParams) middleware.Responder {
 	//get school details based on the provided id
 	school_data := dbhandler.SchoolRead(params.ID)
 
-	resp := school.NewGetSchoolIDOK()
+	if school_data.SchoolID == 0 {
+		resp := school.NewGetSchoolIDDefault(404)
+		error := &models.Error{Code: -1, Message:"School not found"}
 
+		resp.SetPayload(error)
+		return resp
+	}
+
+	resp := school.NewGetSchoolIDOK()
 	resp.SetPayload(&school_data)
 
 	return resp
@@ -36,31 +57,45 @@ func HandleSchoolGet(params school.GetSchoolIDParams) middleware.Responder {
 func HandleSchoolPut(params school.PutSchoolParams) middleware.Responder {
 	affected_count := dbhandler.SchoolUpdate(*params.School)
 
-	var resp_str string
-	resp_str = "Success"
+	error := new(models.Error)
 
 	if affected_count != 1 {
-		resp_str = "Error"
+		error.Message = "Error: Unexpected number of updates"
+		error.Code = affected_count
+		resp := school.NewPostSchoolDefault(400)
+		resp.SetPayload(error)
+
+		return resp
 	}
 
 	resp := school.NewPutSchoolOK()
-	resp.SetPayload(resp_str)
+	error.Message = "Updated"
+	resp.SetPayload(error)
 
+	//return the response
 	return resp
+
 }
 
 func HandleSchoolDelete(params school.DeleteSchoolIDParams) middleware.Responder {
 	affected_count := dbhandler.SchoolDelete(params.ID)
 
-	var resp_str string
-	resp_str = "Success"
+	error := new(models.Error)
 
 	if affected_count != 1 {
-		resp_str = "Error"
+		error.Message = "Error: Unexpected number of deletes"
+		error.Code = affected_count
+		resp := school.NewDeleteSchoolIDDefault(400)
+		resp.SetPayload(error)
+
+		return resp
 	}
 
+
 	resp := school.NewDeleteSchoolIDOK()
-	resp.SetPayload(resp_str)
+	error.Code = 0
+	error.Message = "Deleted"
+	resp.SetPayload(error)
 
 	return resp
 }
