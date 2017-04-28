@@ -49,7 +49,7 @@ paths:
         200:
           description: Return the Credential ID
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -69,7 +69,7 @@ paths:
         200:
           description: Returns success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -87,7 +87,7 @@ paths:
         - credential
       responses:
         200:
-          description: Get a credential object using emailaddress
+          description: The found Credential
           schema:
             $ref: '#/definitions/Credential'
         default:
@@ -102,7 +102,7 @@ paths:
         200:
           description: Return success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -129,7 +129,7 @@ paths:
         200:
           description: Return a new session
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -148,7 +148,7 @@ paths:
         200:
           description: Get a student object using ID
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -156,7 +156,6 @@ paths:
 # API paths for Address
   /address:
     post:
-      description: create an address
       tags:
         - address
       parameters:
@@ -169,7 +168,7 @@ paths:
         200:
           description: Return the ID of the newly created school
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -209,8 +208,7 @@ paths:
         200:
           description: Returns address ID of the updated address
           schema:
-            type: integer
-            format: int64
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -223,8 +221,7 @@ paths:
         200:
           description: Return ID of the deleted address if successfully deleted
           schema:
-            type: integer
-            format: int64
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -247,7 +244,7 @@ paths:
         200:
           description: Return the ID of the newly created school
           schema:
-            $ref: '#/definitions/School'
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -266,7 +263,7 @@ paths:
         200:
           description: Returns success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -300,7 +297,7 @@ paths:
         200:
           description: Return ID of the deleted school if successfully deleted
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -321,7 +318,7 @@ paths:
         200:
           description: Return the Advisor ID
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -341,7 +338,7 @@ paths:
         200:
           description: Returns success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -374,7 +371,7 @@ paths:
         200:
           description: Return success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -394,7 +391,7 @@ paths:
         200:
           description: Return the Student ID
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -414,7 +411,7 @@ paths:
         200:
           description: Returns success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -447,7 +444,7 @@ paths:
         200:
           description: Return success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -467,7 +464,7 @@ paths:
         200:
           description: Return the Team ID
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -487,7 +484,7 @@ paths:
         200:
           description: Returns success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -520,7 +517,7 @@ paths:
         200:
           description: Return success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -540,7 +537,7 @@ paths:
         200:
           description: Return the Problem ID
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -560,7 +557,7 @@ paths:
         200:
           description: Returns success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -593,7 +590,7 @@ paths:
         200:
           description: Return success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -613,7 +610,7 @@ paths:
         200:
           description: Return the Solution ID
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -633,7 +630,7 @@ paths:
         200:
           description: Returns success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -666,7 +663,7 @@ paths:
         200:
           description: Return success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -694,7 +691,7 @@ paths:
         200:
           description: Return the TeamScore ID
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -714,7 +711,7 @@ paths:
         200:
           description: Returns success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -747,7 +744,7 @@ paths:
         200:
           description: Return success
           schema:
-            type: string
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -960,6 +957,11 @@ definitions:
       - problem_id
       - submit_time
 
+# This model will be used for Success and Failure both.
+# In case of Success,
+#   For Post requests, code will be the newly created ID message will be "Created"
+#   For other requests, code will be zero and message will be "Suucess".
+# In case of Failure, corresponding code and message will be set.
   Error:
     type: object
     properties:
