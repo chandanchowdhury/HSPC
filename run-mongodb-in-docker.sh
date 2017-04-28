@@ -1,5 +1,5 @@
 #!/bin/bash
-docker pull mongodb
+docker pull mongo
 
 MONGO_DB=HSPC
 MONGO_USER=hspc
@@ -22,7 +22,7 @@ mkdir -p $DBPATH
 
 # run MongoDB with required parameters
 docker run -d -t --rm -p 27017:27017 \
-    --name $MONGO_DB \
+    --name $MONGO_DB-Mongo \
     -v $DBPATH:/data/db \
     -e MONGO_INITDB_ROOT_USERNAME=$MONGO_USER \
     -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD \

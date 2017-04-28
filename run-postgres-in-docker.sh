@@ -22,7 +22,7 @@ mkdir -p $DBPATH
 
 # run postgres with required parameters
 docker run -d -t -p 5432:5432 --rm \
-    --name HSPC-postgres \
+    --name $POSTGRES_DB-postgres \
     -e POSTGRES_DB=$POSTGRES_DB \
     -e POSTGRES_USER=$POSTGRES_USER \
     -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
