@@ -19,15 +19,23 @@ func SchoolCreate(school models.School) int64 {
 
     if err != nil {
         log.Print("Error creating prepared statement")
-        log.Print(err)
+        log.Panic(err)
     }
 
     var school_id int64
     err = stmt.QueryRow(school.SchoolName, school.AddressID).Scan(&school_id)
 
+	//log.Print(err)
+	//log.Print(pq.ErrorClass("foreign_key_violation"))
+    //TODO: Check FK constraint violation
+    //if err.Error() ==  pq.ErrorClass("foreign_key_violation").Name() {
+		//log.Print("Foreign Key Violation")
+		//return -1;
+    //}
+
     if err != nil {
         log.Print(err)
-        return 0
+	    return -1
     }
 
     return school_id
@@ -77,18 +85,27 @@ func SchoolUpdate(school models.School) int64 {
         log.Print(err)
     }
 
+	tx, err := db.Begin()
+
     result, err := stmt.Exec(school.SchoolName, school.AddressID, school.SchoolID)
 
     if err != nil {
+	    tx.Rollback()
         log.Print("Error updating school")
         log.Panic(err)
     }
 
     affectedCount, err := result.RowsAffected()
 
-    if affectedCount != 1 {
-        log.Printf("Unexpected number of updates: %d", affectedCount)
+    if affectedCount > 1 {
+	    // rollback the update
+	    tx.Rollback()
+        log.Panic("Unexpected number of updates: %d", affectedCount)
     }
+
+	//commit the update
+	tx.Commit()
+
 
     return affectedCount
 }

@@ -4,7 +4,6 @@ import (
     "log"
     "github.com/chandanchowdhury/HSPC/models"
     "database/sql"
-    "github.com/go-openapi/strfmt"
 )
 
 /**
@@ -19,14 +18,15 @@ func CredentialCreate(credential models.Credential) int64 {
         " VALUES($1, $2) returning credential_id")
     if err != nil {
         log.Print("Error creating prepared statement")
-        log.Print(err)
+        log.Panic(err)
     }
 
     var lastInsertId int64
     err = stmt.QueryRow(credential.Emailaddress, credential.Password).Scan(&lastInsertId)
 
     if err != nil {
-        log.Print(err)
+        log.Print("Error querying credential table")
+        log.Panic(err)
     }
 
     log.Printf("credential_id = %d", lastInsertId)
@@ -34,12 +34,12 @@ func CredentialCreate(credential models.Credential) int64 {
     return lastInsertId
 }
 
-func CredentialRead(emailaddress string) models.Credential {
+func CredentialRead(emailaddress string) *models.Credential {
     log.Print("# Reading Credential")
     log.Printf("emailaddress = %s", emailaddress)
 
     db := getDBConn()
-    stmt, err := db.Prepare("SELECT credential_id, emailaddress, password_hash " +
+    stmt, err := db.Prepare("SELECT credential_id, emailaddress, password_hash, credential_active " +
         "FROM Credential WHERE emailaddress = $1")
     defer stmt.Close()
 
@@ -48,12 +48,16 @@ func CredentialRead(emailaddress string) models.Credential {
         log.Panic(err)
     }
 
-    var credential_id int64
-    var email, pass string
-    err = stmt.QueryRow(emailaddress).Scan(&credential_id, &email, &pass)
+    credential := new(models.Credential)
+    err = stmt.QueryRow(emailaddress).Scan(
+        &credential.CredentialID,
+        &credential.Emailaddress,
+        &credential.Password,
+        &credential.CredentialActive)
 
+    // if no records found, return an empty struct instead of failing
     if err == sql.ErrNoRows {
-        return models.Credential{}
+        return &models.Credential{}
     }
 
     if err != nil {
@@ -61,26 +65,17 @@ func CredentialRead(emailaddress string) models.Credential {
         log.Panic(err)
     }
 
-    log.Printf("DB Read - email: %s password: %s", email, pass)
-
-    //setup the Credential model object
-    var credential = models.Credential{}
-    var e strfmt.Email = strfmt.Email(email)
-    var p strfmt.Password = strfmt.Password(pass)
-    credential.CredentialID = credential_id
-    credential.Emailaddress = &e
-    credential.Password = &p
     return credential
 }
 
-func CredentialUpdate(emailaddress string, password string) int64 {
+func CredentialUpdate(emailaddress string, password string, credential_active bool) int64 {
     db := getDBConn()
 
     log.Print("# Updating Credential")
     log.Printf("emailaddress = %s", emailaddress)
 
     stmt, err := db.Prepare("UPDATE Credential SET emailaddress = $1, " +
-        "password_hash = $2 WHERE emailaddress = $1")
+        "password_hash = $2, credential_active = $3 WHERE emailaddress = $1")
     defer stmt.Close()
 
     if err != nil {
@@ -88,7 +83,7 @@ func CredentialUpdate(emailaddress string, password string) int64 {
         log.Print(err)
     }
 
-    result, err := stmt.Exec(emailaddress, password)
+    result, err := stmt.Exec(emailaddress, password, credential_active)
 
     if err != nil {
         log.Print("Error updating Credential")
