@@ -348,8 +348,8 @@ paths:
       - name: id
         description: ID of the Address
         in: path
-        type: string
-        format: email
+        type: integer
+        format: int64
         required: true
     get:
       tags:
@@ -421,8 +421,8 @@ paths:
       - name: id
         description: ID of the Address
         in: path
-        type: string
-        format: email
+        type: integer
+        format: int64
         required: true
     get:
       tags:
@@ -494,8 +494,8 @@ paths:
       - name: id
         description: ID of the Address
         in: path
-        type: string
-        format: email
+        type: integer
+        format: int64
         required: true
     get:
       tags:
@@ -522,6 +522,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+# TODO: API paths for adding members to a team
 # API paths for Problem
   /problem:
     post:
@@ -567,8 +568,8 @@ paths:
       - name: id
         description: ID of the Address
         in: path
-        type: string
-        format: email
+        type: integer
+        format: int64
         required: true
     get:
       tags:
@@ -640,8 +641,8 @@ paths:
       - name: id
         description: ID of the Address
         in: path
-        type: string
-        format: email
+        type: integer
+        format: int64
         required: true
     get:
       tags:
@@ -721,8 +722,8 @@ paths:
       - name: id
         description: ID of the Address
         in: path
-        type: string
-        format: email
+        type: integer
+        format: int64
         required: true
     get:
       tags:
@@ -913,6 +914,15 @@ definitions:
     type: object
     properties:
       problem_id:
+        type: integer
+        format: int64
+        minimum: 1
+      problem_category:
+        type: string
+        enum:
+          - Advanced
+          - Beginner
+      problem_round:
         type: integer
         format: int64
         minimum: 1
