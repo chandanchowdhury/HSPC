@@ -3,6 +3,7 @@ Maintain the order as they follow they dependency.
 */
 DROP TABLE IF EXISTS parking;
 DROP TABLE IF EXISTS team_score;
+DROP TABLE IF EXISTS teamstudent;
 DROP TABLE IF EXISTS student;
 DROP TABLE IF EXISTS team;
 DROP TABLE IF EXISTS school_advisor;
@@ -12,17 +13,21 @@ DROP TABLE IF EXISTS credential;
 DROP TABLE IF EXISTS address;
 DROP TABLE IF EXISTS session;
 
-
+/**
+  A credential is used for authentication purpose.
+ */
 CREATE TABLE credential (
     credential_id SERIAL NOT NULL PRIMARY KEY
     , emailaddress VARCHAR NOT NULL
     , password_hash VARCHAR
     , credential_active BOOLEAN DEFAULT FALSE
-    , CONSTRAINT EmailAddress_unique
+    , CONSTRAINT credential_EmailAddress_unique
         UNIQUE (emailaddress)
 );
 
-
+/**
+  Address related to School.
+ */
 CREATE TABLE address (
     address_id SERIAL NOT NULL PRIMARY KEY
     , address_country VARCHAR NOT NULL
@@ -33,7 +38,9 @@ CREATE TABLE address (
     , address_line2 VARCHAR
 );
 
-
+/**
+  School details.
+ */
 CREATE TABLE school (
     school_id SERIAL NOT NULL PRIMARY KEY
     , school_name VARCHAR NOT NULL
@@ -42,7 +49,10 @@ CREATE TABLE school (
             FOREIGN KEY(address_id) REFERENCES address(address_id)
 );
 
-
+/**
+  An advisor is connected to one or more school and credential which allows
+  them to login and make changes to data.
+ */
 CREATE TABLE advisor (
     advisor_id SERIAL NOT NULL PRIMARY KEY
     , advisor_name VARCHAR NOT NULL
@@ -51,7 +61,10 @@ CREATE TABLE advisor (
         FOREIGN KEY(credential_id) REFERENCES credential(credential_id)
 );
 
-
+/**
+  Connect an asvisor to one or more school.
+  One School can have only one advisor.
+ */
 CREATE TABLE school_advisor(
   school_id INTEGER NOT NULL PRIMARY KEY
   , advisor_id INTEGER NOT NULL
@@ -60,12 +73,15 @@ CREATE TABLE school_advisor(
       FOREIGN KEY(school_id) REFERENCES school(school_id)
   , CONSTRAINT school_advisor_FK_advisor_id
       FOREIGN KEY(advisor_id) REFERENCES advisor(advisor_id)
-
 );
 
 
 /*
-Division:
+  A Team represents a School.
+  There are limit on how many Teams a School can have but the check done in
+  application.
+
+  Division:
     A - Advanced
     B - Beginner
 */
@@ -80,11 +96,13 @@ CREATE TABLE team (
 
 
 /*
-Grade:
-1 - Freshmen
-2 - Sophomore
-3 - Junior
-4 - Senior
+  A Student is part of a School.
+
+  Grade:
+    1 - Freshmen
+    2 - Sophomore
+    3 - Junior
+    4 - Senior
 */
 CREATE TABLE student (
     student_id SERIAL NOT NULL PRIMARY KEY
@@ -95,6 +113,10 @@ CREATE TABLE student (
         FOREIGN KEY(school_id) REFERENCES school(school_id)
 );
 
+/**
+  One team can have one or more Students.
+  However, one Student is part of only one Team.
+ */
 CREATE TABLE TeamStudent (
   team_id INTEGER NOT NULL
   , student_id INTEGER NOT NULL
@@ -104,17 +126,22 @@ CREATE TABLE TeamStudent (
       FOREIGN KEY (student_id) REFERENCES student(student_id)
 );
 
+/**
+  Record when a Team has successfully solved a Problem.
+  The Problems are stored in MongoDB, so the check is done in application logic.
+ */
 CREATE TABLE team_score (
   team_id INTEGER NOT NULL
   , problem_id INTEGER NOT NULL
+  , submit_ts TIMESTAMP NOT NULL
   , CONSTRAINT Team_Score_FK_team_id
       FOREIGN KEY (team_id) REFERENCES Team(team_id)
 );
 
 
-/*
-TODO: If buses do not need parking validation, do we have to keep track of them in DB?
-*/
+/**
+  Parking permits to allow vehicals to be parked in the Garage.
+ */
 CREATE TABLE parking (
   parking_id SERIAL NOT NULL PRIMARY KEY
   , vehicle_type CHAR(1) NOT NULL
@@ -129,7 +156,9 @@ CREATE TABLE parking (
   Problem and Solution will be stored in MongoDB.
 */
 
-
+/**
+  For keeping track of active sessions.
+ */
 CREATE TABLE Session (
   credential_id SERIAL NOT NULL PRIMARY KEY
   , session_data VARCHAR
