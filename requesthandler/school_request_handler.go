@@ -2,14 +2,14 @@ package requesthandler
 
 import (
 	"github.com/chandanchowdhury/HSPC/dbhandler"
+	"github.com/chandanchowdhury/HSPC/models"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/school"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/chandanchowdhury/HSPC/models"
 )
 
 func HandleSchoolPost(params school.PostSchoolParams) middleware.Responder {
 	//create the school
-	school_id := dbhandler.SchoolCreate(*params.Body)
+	school_id := dbhandler.SchoolCreate(*params.School)
 
 	if school_id == -1 {
 		resp := school.NewPostSchoolDefault(400)
@@ -42,7 +42,7 @@ func HandleSchoolGet(params school.GetSchoolIDParams) middleware.Responder {
 
 	if school_data.SchoolID == 0 {
 		resp := school.NewGetSchoolIDDefault(404)
-		error := &models.Error{Code: -1, Message:"School not found"}
+		error := &models.Error{Code: -1, Message: "School not found"}
 
 		resp.SetPayload(error)
 		return resp
@@ -90,7 +90,6 @@ func HandleSchoolDelete(params school.DeleteSchoolIDParams) middleware.Responder
 
 		return resp
 	}
-
 
 	resp := school.NewDeleteSchoolIDOK()
 	error.Code = 0

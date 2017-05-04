@@ -2,9 +2,9 @@ package requesthandler
 
 import (
 	"github.com/chandanchowdhury/HSPC/dbhandler"
+	"github.com/chandanchowdhury/HSPC/models"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/credential"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/chandanchowdhury/HSPC/models"
 )
 
 func HandleCredentialPost(params credential.PostCredentialParams) middleware.Responder {
@@ -32,7 +32,7 @@ func HandleCredentialGet(params credential.GetCredentialIDParams) middleware.Res
 	//credential not found
 	if credential_data.CredentialID == 0 {
 		resp := credential.NewGetCredentialIDDefault(404)
-		error := &models.Error{Code: -1, Message:"User not found"}
+		error := &models.Error{Code: -1, Message: "User not found"}
 
 		resp.SetPayload(error)
 		return resp

@@ -1,125 +1,126 @@
 package dbhandler
 
 import (
-    "log"
-    "github.com/chandanchowdhury/HSPC/models"
-    "database/sql"
+	"database/sql"
+	"github.com/chandanchowdhury/HSPC/models"
+	"log"
 )
 
 /*
 Advisor
 */
 func AdvisorCreate(advisor models.Advisor) int64 {
-    log.Print("# Creating Advisor")
+	log.Print("# Creating Advisor")
 
-    db := getDBConn()
-    stmt, err := db.Prepare("INSERT INTO advisor(advisor_name, credential_id) " +
-        "VALUES($1, $2) returning advisor_id")
-    defer stmt.Close()
+	db := getDBConn()
+	stmt, err := db.Prepare("INSERT INTO advisor(advisor_name, credential_id) " +
+		"VALUES($1, $2) returning advisor_id")
+	defer stmt.Close()
 
-    if err != nil {
-        log.Print("Error creating prepared statement")
-        log.Print(err)
-    }
+	if err != nil {
+		log.Print("Error creating prepared statement")
+		log.Print(err)
+	}
 
-    var advisor_id int64
-    err = stmt.QueryRow(advisor.AdvisorName, advisor.CredentialID).Scan(&advisor_id)
+	var advisor_id int64
+	err = stmt.QueryRow(advisor.AdvisorName, advisor.CredentialID).Scan(&advisor_id)
 
-    if err != nil {
-        log.Print(err)
-        return 0
-    }
+	if err != nil {
+		log.Print(err)
+		return -1
+	}
 
-    return advisor_id
+	log.Printf("New Advisor ID: %d", advisor_id)
+	return advisor_id
 }
 
 func AdvisorRead(advisor_id int64) models.Advisor {
-    var advisor = models.Advisor{}
+	var advisor = models.Advisor{}
 
-    log.Print("# Reading Advisor")
+	log.Print("# Reading Advisor")
 
-    db := getDBConn()
-    stmt, err := db.Prepare("SELECT advisor_id, advisor_name, credential_id " +
-        "FROM advisor WHERE advior_id = $1")
-    defer stmt.Close()
+	db := getDBConn()
+	stmt, err := db.Prepare("SELECT advisor_id, advisor_name, credential_id " +
+		"FROM advisor WHERE advisor_id = $1")
+	defer stmt.Close()
 
-    if err != nil {
-        log.Print("Error creating prepared statement")
-        log.Print(err)
-    }
+	if err != nil {
+		log.Print("Error creating prepared statement")
+		log.Print(err)
+	}
 
-    err = stmt.QueryRow(advisor_id).Scan(&advisor.AdvisorID, &advisor.AdvisorName, &advisor.CredentialID)
+	err = stmt.QueryRow(advisor_id).Scan(&advisor.AdvisorID, &advisor.AdvisorName, &advisor.CredentialID)
 
-    // if no records found, return an empty struct
-    if err == sql.ErrNoRows {
-        return models.Advisor{}
-    }
+	// if no records found, return an empty struct
+	if err == sql.ErrNoRows {
+		return models.Advisor{}
+	}
 
-    if err != nil {
-        log.Print("Error getting advisor data")
-        log.Panic(err)
-    }
+	if err != nil {
+		log.Print("Error getting advisor data")
+		log.Panic(err)
+	}
 
-    return advisor
+	return advisor
 }
 
 func AdvisorUpdate(advisor models.Advisor) int64 {
-    db := getDBConn()
+	db := getDBConn()
 
-    log.Print("# Updating Advisor")
-    log.Printf("Advisor ID = %d", advisor.AdvisorID)
+	log.Print("# Updating Advisor")
+	log.Printf("Advisor ID = %d", advisor.AdvisorID)
 
-    stmt, err := db.Prepare("UPDATE advisor SET advisor_name = $1, credential_id = $2" +
-        "WHERE advisor_id = $3")
-    defer stmt.Close()
+	stmt, err := db.Prepare("UPDATE advisor SET advisor_name = $1, credential_id = $2" +
+		"WHERE advisor_id = $3")
+	defer stmt.Close()
 
-    if err != nil {
-        log.Print("Error creating prepared statement")
-        log.Print(err)
-    }
+	if err != nil {
+		log.Print("Error creating prepared statement")
+		log.Print(err)
+	}
 
-    result, err := stmt.Exec(advisor.AdvisorName, advisor.CredentialID, advisor.AdvisorID)
+	result, err := stmt.Exec(advisor.AdvisorName, advisor.CredentialID, advisor.AdvisorID)
 
-    if err != nil {
-        log.Print("Error updating advisor")
-        log.Panic(err)
-    }
+	if err != nil {
+		log.Print("Error updating advisor")
+		log.Panic(err)
+	}
 
-    affectedCount, err := result.RowsAffected()
+	affectedCount, err := result.RowsAffected()
 
-    if affectedCount != 1 {
-        log.Printf("Unexpected number of updates: %d", affectedCount)
-    }
+	if affectedCount != 1 {
+		log.Printf("Unexpected number of updates: %d", affectedCount)
+	}
 
-    return affectedCount
+	return affectedCount
 }
 
 func AdvisorDelete(advisor_id int64) int64 {
-    db := getDBConn()
+	db := getDBConn()
 
-    log.Print("# Deleting Advisor")
-    log.Printf("Advisor ID = %d", advisor_id)
+	log.Print("# Deleting Advisor")
+	log.Printf("Advisor ID = %d", advisor_id)
 
-    stmt, err := db.Prepare("DELETE FROM advisor WHERE advisor_id = $1")
-    defer stmt.Close()
+	stmt, err := db.Prepare("DELETE FROM advisor WHERE advisor_id = $1")
+	defer stmt.Close()
 
-    if err != nil {
-        log.Print("Error creating prepared statement")
-        log.Print(err)
-    }
+	if err != nil {
+		log.Print("Error creating prepared statement")
+		log.Print(err)
+	}
 
-    result, err := stmt.Exec(advisor_id)
+	result, err := stmt.Exec(advisor_id)
 
-    if err != nil {
-        log.Print("Delete Failed")
-        log.Panic(err)
-    }
+	if err != nil {
+		log.Print("Delete Failed")
+		log.Panic(err)
+	}
 
-    affectedCount, err := result.RowsAffected()
+	affectedCount, err := result.RowsAffected()
 
-    if affectedCount != 1 {
-        log.Printf("Unexpected number of updates: %d", affectedCount)
-    }
+	if affectedCount != 1 {
+		log.Printf("Unexpected number of updates: %d", affectedCount)
+	}
 
-    return affectedCount
+	return affectedCount
 }
