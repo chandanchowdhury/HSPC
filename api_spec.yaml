@@ -409,7 +409,7 @@ paths:
         - advisor
       responses:
         200:
-          description: Get a advisor object using emailaddress
+          description: Returns list of Advisors
           schema:
             type: array
             items:
@@ -597,31 +597,55 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-# TODO: API paths for adding a student to a team
   /team/{team_id}/add/{student_id}:
-      parameters:
-        - name: team_id
-          description: ID of the Team
-          in: path
-          type: integer
-          format: int64
-          required: true
-        - name: student_id
-          description: ID of the Student
-          in: path
-          type: integer
-          format: int64
-          required: true
-      get:
-        tags:
-          - team
-        responses:
-          201:
-            description: Student added to the Team, no data
-          default:
-            description: Unexpected error
-            schema:
-              $ref: '#/definitions/Error'
+    parameters:
+      - name: team_id
+        description: ID of the Team
+        in: path
+        type: integer
+        format: int64
+        required: true
+      - name: student_id
+        description: ID of the Student
+        in: path
+        type: integer
+        format: int64
+        required: true
+    get:
+      tags:
+        - team
+      responses:
+        201:
+          description: Student added to the Team, no data
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /team/{team_id}/remove/{student_id}:
+    parameters:
+      - name: team_id
+        description: ID of the Team
+        in: path
+        type: integer
+        format: int64
+        required: true
+      - name: student_id
+        description: ID of the Student
+        in: path
+        type: integer
+        format: int64
+        required: true
+    get:
+      tags:
+        - team
+      responses:
+        201:
+          description: Student added to the Team, no data
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
 # API paths for Problem
   /problem:
     post:
