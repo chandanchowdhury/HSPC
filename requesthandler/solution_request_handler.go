@@ -24,12 +24,10 @@ func HandleSolutionPost(params solution.PostSolutionParams) middleware.Responder
 
 	// create the response
 	resp := solution.NewPostSolutionOK()
-	error := new(models.Error)
-
-	error.Message = "Created"
+	solution := dbhandler.SolutionRead(solution_id)
 
 	//set response data
-	resp.SetPayload(error)
+	resp.SetPayload(&solution)
 
 	//return the response
 	return resp

@@ -24,13 +24,10 @@ func HandleAdvisorPost(params advisor.PostAdvisorParams) middleware.Responder {
 
 	// create the response
 	resp := advisor.NewPostAdvisorOK()
-	error := new(models.Error)
-
-	error.Code = advisor_id
-	error.Message = "Created"
+	advisor := dbhandler.AdvisorRead(advisor_id)
 
 	//set response data
-	resp.SetPayload(error)
+	resp.SetPayload(&advisor)
 
 	//return the response
 	return resp

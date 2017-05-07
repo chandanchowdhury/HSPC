@@ -24,13 +24,10 @@ func HandleTeamPost(params team.PostTeamParams) middleware.Responder {
 
 	// create the response
 	resp := team.NewPostTeamOK()
-	error := new(models.Error)
-
-	error.Code = team_id
-	error.Message = "Created"
+	team := dbhandler.TeamRead(team_id)
 
 	//set response data
-	resp.SetPayload(error)
+	resp.SetPayload(&team)
 
 	//return the response
 	return resp

@@ -24,13 +24,10 @@ func HandleStudentPost(params student.PostStudentParams) middleware.Responder {
 
 	// create the response
 	resp := student.NewPostStudentOK()
-	error := new(models.Error)
-
-	error.Code = student_id
-	error.Message = "Created"
+	student := dbhandler.StudentRead(student_id)
 
 	//set response data
-	resp.SetPayload(error)
+	resp.SetPayload(&student)
 
 	//return the response
 	return resp

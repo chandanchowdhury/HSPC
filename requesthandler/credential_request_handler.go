@@ -11,15 +11,22 @@ func HandleCredentialPost(params credential.PostCredentialParams) middleware.Res
 	//create the credential
 	credential_id := dbhandler.CredentialCreate(*params.Body)
 
+	if credential_id == -1 {
+		resp := credential.NewPostCredentialDefault(500)
+		error := new(models.Error)
+		error.Code = -1
+		error.Message = "Error: Failed to create Credential"
+
+		resp.SetPayload(error)
+
+		return resp
+	}
+
 	// create the response
 	resp := credential.NewPostCredentialOK()
-	error := new(models.Error)
-
-	error.Code = credential_id
-	error.Message = "Created"
-
+	credential := dbhandler.CredentialRead(params.Body.Emailaddress.String())
 	//set response data
-	resp.SetPayload(error)
+	resp.SetPayload(credential)
 
 	//return the response
 	return resp

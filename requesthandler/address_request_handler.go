@@ -24,13 +24,10 @@ func HandleAddressPost(params address.PostAddressParams) middleware.Responder {
 
 	// create the response
 	resp := address.NewPostAddressOK()
-	error := new(models.Error)
-
-	error.Code = address_id
-	error.Message = "Created"
+	address := dbhandler.AddressRead(address_id)
 
 	//set response data
-	resp.SetPayload(error)
+	resp.SetPayload(&address)
 
 	//return the response
 	return resp
