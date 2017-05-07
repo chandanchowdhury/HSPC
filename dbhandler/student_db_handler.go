@@ -123,3 +123,42 @@ func StudentDelete(student_id int64) int64 {
 
 	return affectedCount
 }
+
+/**
+	Get all Student who belongs to a School
+ */
+func StudentListBySchool(school_id int64) []*models.Student {
+	log.Print("# Reading Student List for School")
+
+	db := getDBConn()
+	stmt, err := db.Prepare("SELECT student_id, student_name, student_grade, school_id " +
+		"FROM student WHERE school_id = $1")
+	defer stmt.Close()
+
+	if err != nil {
+		log.Print("Error creating prepared statement")
+		log.Panic(err)
+	}
+
+	crsr, err := stmt.Query(school_id)
+
+	// if no records found, return an empty struct
+	if err == sql.ErrNoRows {
+		return []*models.Student{}
+	}
+
+	if err != nil {
+		log.Print("Error getting student data")
+		log.Panic(err)
+	}
+
+	student_list := make([]*models.Student, 0)
+	for crsr.Next() {
+		student := new(models.Student)
+		crsr.Scan(&student.StudentID, &student.StudentName, &student.StudentGrade, &student.SchoolID)
+
+		student_list = append(student_list, student)
+	}
+
+	return student_list
+}

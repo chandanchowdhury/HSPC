@@ -63,7 +63,7 @@ func ProblemRead(problem_id int64) models.Problem {
 	query := getProblemColl().Find(bson.M{"problemid": problem_id})
 
 	result_count, err := query.Count()
-	log.Print("Problem Found: %d", result_count)
+	log.Printf("Problem Found: %d", result_count)
 	if err != nil {
 		log.Print(err)
 		return models.Problem{}
@@ -113,4 +113,39 @@ func ProblemDelete(problem_id int64) bool {
 	}
 
 	return true
+}
+
+func ProblemReadList() []*models.Problem {
+	log.Print("# Reading Problem List")
+
+	query := getProblemColl().Find(bson.M{})
+
+	result_count, err := query.Count()
+	log.Printf("Problem Found: %d", result_count)
+	if err != nil {
+		log.Print(err)
+		return []*models.Problem{}
+	}
+
+	if result_count < 1 {
+		log.Print("Problem not found")
+		return []*models.Problem{}
+	}
+
+	//create the array to hold the list of Problems
+	problem_list := make([]*models.Problem, 0)
+
+	//Get the Iterator for the results
+	i := query.Iter()
+	//loop through the Problems
+	for !i.Done() {
+		problem := new(models.Problem)
+
+		//fetch the Problem details
+		i.Next(&problem)
+
+		problem_list = append(problem_list, problem)
+	}
+
+	return problem_list
 }

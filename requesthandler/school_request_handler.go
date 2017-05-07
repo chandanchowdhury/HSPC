@@ -24,13 +24,10 @@ func HandleSchoolPost(params school.PostSchoolParams) middleware.Responder {
 
 	// create the response
 	resp := school.NewPostSchoolOK()
-	error := new(models.Error)
-
-	error.Code = school_id
-	error.Message = "Created"
+	school := dbhandler.SchoolRead(school_id)
 
 	//set response data
-	resp.SetPayload(error)
+	resp.SetPayload(&school)
 
 	//return the response
 	return resp
@@ -98,3 +95,44 @@ func HandleSchoolDelete(params school.DeleteSchoolIDParams) middleware.Responder
 
 	return resp
 }
+
+func HandleSchoolGetList(params school.GetSchoolParams) middleware.Responder {
+	school_list := dbhandler.SchoolList(params)
+
+	if school_list == nil {
+		error := new(models.Error)
+		error.Code = 500
+		error.Message = "Error: Failed to get school list from DB"
+		resp := school.NewGetSchoolDefault(500)
+		resp.SetPayload(error)
+
+		return resp
+	}
+
+	resp := school.NewGetSchoolOK()
+	resp.SetPayload(school_list)
+
+	return resp
+}
+
+func HandleSchoolGetStudentList(params school.GetSchoolIDStudentsParams) middleware.Responder {
+	student_list := dbhandler.StudentListBySchool(params.ID)
+
+	if student_list == nil {
+		error := new(models.Error)
+		error.Code = 500
+		error.Message = "Error: Failed to get school list from DB"
+		resp := school.NewGetSchoolDefault(500)
+		resp.SetPayload(error)
+
+		return resp
+	}
+
+	resp := school.NewGetSchoolIDStudentsOK()
+	resp.SetPayload(student_list)
+
+	return resp
+}
+
+
+

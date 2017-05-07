@@ -24,13 +24,10 @@ func HandleProblemPost(params problem.PostProblemParams) middleware.Responder {
 
 	// create the response
 	resp := problem.NewPostProblemOK()
-	error := new(models.Error)
-
-	error.Code = problem_id
-	error.Message = "Created"
+	problem := dbhandler.ProblemRead(problem_id)
 
 	//set response data
-	resp.SetPayload(error)
+	resp.SetPayload(&problem)
 
 	//return the response
 	return resp
@@ -91,6 +88,24 @@ func HandleProblemDelete(params problem.DeleteProblemIDParams) middleware.Respon
 	error.Code = 0
 	error.Message = "Deleted"
 	resp.SetPayload(error)
+
+	return resp
+}
+
+func HandleProblemGetList(params problem.GetProblemParams) middleware.Responder {
+	//get problem list
+	problem_list := dbhandler.ProblemReadList()
+
+	if problem_list == nil {
+		resp := problem.NewGetProblemIDDefault(404)
+		error := &models.Error{Code: -1, Message: "Problem not found"}
+
+		resp.SetPayload(error)
+		return resp
+	}
+
+	resp := problem.NewGetProblemOK()
+	resp.SetPayload(problem_list)
 
 	return resp
 }

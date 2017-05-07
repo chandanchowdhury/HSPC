@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/chandanchowdhury/HSPC/models"
 	"log"
+	"github.com/chandanchowdhury/HSPC/restapi/operations/school"
 )
 
 /*
@@ -42,7 +43,7 @@ func SchoolCreate(school models.School) int64 {
 }
 
 func SchoolRead(school_id int64) models.School {
-	log.Print("# Reading Address")
+	log.Print("# Reading School")
 
 	db := getDBConn()
 	stmt, err := db.Prepare("SELECT school_id, school_name, address_id " +
@@ -137,4 +138,43 @@ func SchoolDelete(school_id int64) int64 {
 	}
 
 	return affectedCount
+}
+
+func SchoolList(params school.GetSchoolParams) []*models.School {
+	log.Print("# Reading School List")
+
+	db := getDBConn()
+	stmt, err := db.Prepare("SELECT school_id, school_name, address_id FROM school")
+	defer stmt.Close()
+
+	if err != nil {
+		log.Print("Error creating prepared statement")
+		log.Panic(err)
+	}
+
+	crsr, err := stmt.Query()
+
+	// if no records found, return an empty struct
+	if err == sql.ErrNoRows {
+		return []*models.School{}
+	}
+
+	if err != nil {
+		log.Print("Error getting school data")
+		log.Panic(err)
+	}
+
+	// create an array of size zero
+	school_list := make([]*models.School, 0)
+	//till there are records
+	for crsr.Next() {
+		// create a new object to hold the data
+		school := new(models.School)
+		// fetch the next record into the new object
+		crsr.Scan(&school.SchoolID, &school.SchoolName, &school.AddressID)
+		//append to the list
+		school_list = append(school_list, school)
+	}
+
+	return school_list
 }
