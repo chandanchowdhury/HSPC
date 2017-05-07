@@ -47,9 +47,9 @@ paths:
             $ref: '#/definitions/Credential'
       responses:
         200:
-          description: Return the Credential ID
+          description: Return the newly created Credential
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/Credential'
         default:
           description: Unexpected error
           schema:
@@ -166,9 +166,9 @@ paths:
             $ref: '#/definitions/Address'
       responses:
         200:
-          description: Return the ID of the newly created school
+          description: Return the the newly created Address
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/Address'
         default:
           description: Unexpected error
           schema:
@@ -242,9 +242,9 @@ paths:
             $ref: '#/definitions/School'
       responses:
         200:
-          description: Return the ID of the newly created school
+          description: Return the the newly created School
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/School'
         default:
           description: Unexpected error
           schema:
@@ -264,6 +264,21 @@ paths:
           description: Returns success
           schema:
             $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      description: Return list of all schools
+      tags:
+        - school
+      responses:
+        200:
+          description: Return School list
+          schema:
+              type: array
+              items:
+                $ref: '#/definitions/School'
         default:
           description: Unexpected error
           schema:
@@ -302,6 +317,52 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /school/{id}/students:
+    parameters:
+      - name: id
+        description: ID of the School
+        in: path
+        type: integer
+        format: int64
+        required: true
+    get:
+      description: Given a school id, return the list of Students the school has
+      tags:
+        - school
+      responses:
+        200:
+          description: Return the list of Students for the School
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Student'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /school/{id}/teams:
+    parameters:
+      - name: id
+        description: ID of the School
+        in: path
+        type: integer
+        format: int64
+        required: true
+    get:
+      description: Given a school id, return the list of Teams the school has
+      tags:
+        - school
+      responses:
+        200:
+          description: Returns the list of Teams for the School
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Team'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
 # API paths for Advisor
   /advisor:
@@ -316,9 +377,9 @@ paths:
             $ref: '#/definitions/Advisor'
       responses:
         200:
-          description: Return the Advisor ID
+          description: Return the newly created Advisor
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/Advisor'
         default:
           description: Unexpected error
           schema:
@@ -339,6 +400,20 @@ paths:
           description: Returns success
           schema:
             $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - advisor
+      responses:
+        200:
+          description: Get a advisor object using emailaddress
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Advisor'
         default:
           description: Unexpected error
           schema:
@@ -389,9 +464,9 @@ paths:
             $ref: '#/definitions/Student'
       responses:
         200:
-          description: Return the Student ID
+          description: Return the newly created Student
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/Student'
         default:
           description: Unexpected error
           schema:
@@ -462,9 +537,9 @@ paths:
             $ref: '#/definitions/Team'
       responses:
         200:
-          description: Return the Team ID
+          description: Return the newly created Team
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/Team'
         default:
           description: Unexpected error
           schema:
@@ -522,7 +597,31 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-# TODO: API paths for adding members to a team
+# TODO: API paths for adding a student to a team
+  /team/{team_id}/add/{student_id}:
+      parameters:
+        - name: team_id
+          description: ID of the Team
+          in: path
+          type: integer
+          format: int64
+          required: true
+        - name: student_id
+          description: ID of the Student
+          in: path
+          type: integer
+          format: int64
+          required: true
+      get:
+        tags:
+          - team
+        responses:
+          201:
+            description: Student added to the Team, no data
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
 # API paths for Problem
   /problem:
     post:
@@ -536,9 +635,9 @@ paths:
             $ref: '#/definitions/Problem'
       responses:
         200:
-          description: Return the Problem ID
+          description: Return the newly created Problem
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/Problem'
         default:
           description: Unexpected error
           schema:
@@ -563,10 +662,24 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+    get:
+      tags:
+        - problem
+      responses:
+        200:
+          description: List of Problems
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Problem'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /problem/{id}:
     parameters:
       - name: id
-        description: ID of the Address
+        description: ID of the Problem
         in: path
         type: integer
         format: int64
@@ -596,6 +709,28 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /problem/{id}/solutions:
+    parameters:
+      - name: id
+        description: ID of the Address
+        in: path
+        type: integer
+        format: int64
+        required: true
+    get:
+      tags:
+        - problem
+      responses:
+        200:
+          description: The Solution related to a Problem
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Solution'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 # API paths for Solution
   /solution:
     post:
@@ -609,9 +744,9 @@ paths:
             $ref: '#/definitions/Solution'
       responses:
         200:
-          description: Return the Solution ID
+          description: Return the newly created Solution
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/Solution'
         default:
           description: Unexpected error
           schema:
@@ -671,14 +806,6 @@ paths:
             $ref: '#/definitions/Error'
 # API paths for TeamScore
   /teamscore:
-    #get:
-    #  tags: teamscore
-    #  response:
-    #    200:
-    #      description: Retrun the list of all TeamScore
-    #      schema:
-    #        array:
-    #          $ref: '#/definitions/TeamScore'
     post:
       tags:
         - teamscore
@@ -690,9 +817,9 @@ paths:
             $ref: '#/definitions/TeamScore'
       responses:
         200:
-          description: Return the TeamScore ID
+          description: Return the newly created TeamScore
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/TeamScore'
         default:
           description: Unexpected error
           schema:
@@ -713,6 +840,20 @@ paths:
           description: Returns success
           schema:
             $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - teamscore
+      responses:
+        200:
+          description: Retrun the list of all TeamScore
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TeamScore'
         default:
           description: Unexpected error
           schema:
@@ -896,8 +1037,8 @@ definitions:
       team_division:
         type: string
         enum:
-          - B # for Beginner
-          - A # for Advance
+          - Advance
+          - Beginner
       team_members:
         type: array
         items:
