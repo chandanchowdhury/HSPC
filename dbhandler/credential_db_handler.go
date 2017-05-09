@@ -25,7 +25,6 @@ func CredentialCreate(credential models.Credential) int64 {
 	err = stmt.QueryRow(credential.Emailaddress, credential.Password).Scan(&lastInsertId)
 
 	if err != nil {
-		log.Print("Error querying credential table")
 		log.Panic(err)
 	}
 
@@ -39,6 +38,7 @@ func CredentialRead(emailaddress string) *models.Credential {
 	log.Printf("emailaddress = %s", emailaddress)
 
 	db := getDBConn()
+
 	stmt, err := db.Prepare("SELECT credential_id, emailaddress, password_hash, credential_active " +
 		"FROM Credential WHERE emailaddress = $1")
 	defer stmt.Close()
@@ -86,14 +86,17 @@ func CredentialUpdate(emailaddress string, password string, credential_active bo
 	result, err := stmt.Exec(emailaddress, password, credential_active)
 
 	if err != nil {
-		log.Print("Error updating Credential")
-		log.Print(err)
+		if isForeignKeyError(err) {
+			return -2
+		}
+
+		log.Panic(err)
 	}
 
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
-		log.Printf("Unexpected number of updates: %d", affectedCount)
+		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
 	return affectedCount
@@ -117,13 +120,18 @@ func CredentialDelete(emailaddress string) int64 {
 
 	if err != nil {
 		log.Print("Error deleting from Credential")
+
+		if isForeignKeyError(err) {
+			return -2
+		}
+
 		log.Print(err)
 	}
 
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
-		log.Printf("Unexpected number of updates: %d", affectedCount)
+		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
 	return affectedCount

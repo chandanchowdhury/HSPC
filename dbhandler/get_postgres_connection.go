@@ -3,6 +3,7 @@ package dbhandler
 import (
 	"database/sql"
 	"fmt"
+	"github.com/lib/pq"
 	"log"
 )
 
@@ -11,6 +12,8 @@ const (
 	DB_USER     = "hspc"
 	DB_PASSWORD = "HSPC-Password"
 	DB_NAME     = "postgres"
+
+	foreignKeyViolationErrorCode = pq.ErrorCode("23503")
 )
 
 func getDBConn() *sql.DB {
@@ -22,4 +25,18 @@ func getDBConn() *sql.DB {
 		log.Fatal(err)
 	}
 	return db
+}
+
+func isForeignKeyError(err error) bool {
+
+	if pgErr, isPGErr := err.(*pq.Error); isPGErr {
+		log.Printf("PostgreSQL Error Code: %s", pgErr.Code)
+		if pgErr.Code == foreignKeyViolationErrorCode {
+			// handle foreign_key_violation errors here
+			log.Print("Foreign Key Violation")
+			return true
+		}
+	}
+
+	return false
 }

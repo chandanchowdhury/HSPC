@@ -26,17 +26,12 @@ func SchoolCreate(school models.School) int64 {
 	var school_id int64
 	err = stmt.QueryRow(school.SchoolName, school.AddressID).Scan(&school_id)
 
-	//log.Print(err)
-	//log.Print(pq.ErrorClass("foreign_key_violation"))
-	//TODO: Check FK constraint violation
-	//if err.Error() ==  pq.ErrorClass("foreign_key_violation").Name() {
-	//log.Print("Foreign Key Violation")
-	//return -1;
-	//}
-
 	if err != nil {
-		log.Print(err)
-		return -1
+		if isForeignKeyError(err) {
+			return -2
+		}
+
+		log.Panic(err)
 	}
 
 	return school_id
@@ -52,7 +47,7 @@ func SchoolRead(school_id int64) models.School {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	var school = models.School{}
@@ -72,10 +67,10 @@ func SchoolRead(school_id int64) models.School {
 }
 
 func SchoolUpdate(school models.School) int64 {
-	db := getDBConn()
-
 	log.Print("# Updating School")
 	log.Printf("School ID = %d", school.SchoolID)
+
+	db := getDBConn()
 
 	stmt, err := db.Prepare("UPDATE school SET school_name = $1, " +
 		"address_id = $2 WHERE school_id = $3")
@@ -83,16 +78,18 @@ func SchoolUpdate(school models.School) int64 {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
-	tx, err := db.Begin()
-
+	//tx, err := db.Begin()
 	result, err := stmt.Exec(school.SchoolName, school.AddressID, school.SchoolID)
 
 	if err != nil {
-		tx.Rollback()
-		log.Print("Error updating school")
+		//tx.Rollback()
+		if isForeignKeyError(err) {
+			return -2
+		}
+
 		log.Panic(err)
 	}
 
@@ -100,28 +97,28 @@ func SchoolUpdate(school models.School) int64 {
 
 	if affectedCount > 1 {
 		// rollback the update
-		tx.Rollback()
-		log.Panic("Unexpected number of updates: %d", affectedCount)
+		//tx.Rollback()
+		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
 	//commit the update
-	tx.Commit()
+	//tx.Commit()
 
 	return affectedCount
 }
 
 func SchoolDelete(school_id int64) int64 {
-	db := getDBConn()
-
 	log.Print("# Deleting School")
 	log.Printf("School ID = %d", school_id)
+
+	db := getDBConn()
 
 	stmt, err := db.Prepare("DELETE FROM school WHERE school_id = $1")
 	defer stmt.Close()
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	result, err := stmt.Exec(school_id)
@@ -134,7 +131,7 @@ func SchoolDelete(school_id int64) int64 {
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
-		log.Printf("Unexpected number of updates: %d", affectedCount)
+		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
 	return affectedCount

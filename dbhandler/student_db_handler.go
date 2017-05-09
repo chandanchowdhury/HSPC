@@ -2,12 +2,14 @@ package dbhandler
 
 import (
 	"database/sql"
-	"github.com/chandanchowdhury/HSPC/models"
 	"log"
+
+	"github.com/chandanchowdhury/HSPC/models"
 )
 
-/*
-Student
+/**
+Create a Student
+
 */
 func StudentCreate(student models.Student) int64 {
 	log.Print("# Creating Student")
@@ -19,35 +21,39 @@ func StudentCreate(student models.Student) int64 {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	var student_id int64
 	err = stmt.QueryRow(student.StudentName, student.StudentGrade, student.SchoolID).Scan(&student_id)
 
 	if err != nil {
-		log.Print(err)
-		return 0
+		if isForeignKeyError(err) {
+			return -2
+		}
+
+		log.Panic(err)
 	}
 
 	return student_id
 }
 
 func StudentRead(student_id int64) models.Student {
-	var student = models.Student{}
-
 	log.Print("# Reading Student")
+	log.Printf("Student ID = %d", student_id)
 
 	db := getDBConn()
+
 	stmt, err := db.Prepare("SELECT student_id, student_name, student_grade, school_id " +
 		"FROM student WHERE student_id = $1")
 	defer stmt.Close()
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
+	var student = models.Student{}
 	err = stmt.QueryRow(student_id).Scan(&student.StudentID, &student.StudentName, &student.StudentGrade, &student.SchoolID)
 
 	// if no records found, return an empty struct
@@ -64,10 +70,10 @@ func StudentRead(student_id int64) models.Student {
 }
 
 func StudentUpdate(student models.Student) int64 {
-	db := getDBConn()
-
 	log.Print("# Updating Student")
 	log.Printf("Student ID = %d", student.StudentID)
+
+	db := getDBConn()
 
 	stmt, err := db.Prepare("UPDATE student SET student_name = $1, student_grade = $2, school_id = $3" +
 		"WHERE student_id = $4")
@@ -75,62 +81,73 @@ func StudentUpdate(student models.Student) int64 {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	result, err := stmt.Exec(student.StudentName, student.StudentGrade, student.SchoolID, student.StudentID)
 
 	if err != nil {
 		log.Print("Error updating student")
+
+		if isForeignKeyError(err) {
+			return -2
+		}
+
 		log.Panic(err)
 	}
 
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
-		log.Printf("Unexpected number of updates: %d", affectedCount)
+		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
 	return affectedCount
 }
 
 func StudentDelete(student_id int64) int64 {
-	db := getDBConn()
-
 	log.Print("# Deleting Student")
 	log.Printf("Student ID = %d", student_id)
+
+	db := getDBConn()
 
 	stmt, err := db.Prepare("DELETE FROM student WHERE student_id = $1")
 	defer stmt.Close()
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	result, err := stmt.Exec(student_id)
 
 	if err != nil {
 		log.Print("Delete Failed")
+
+		if isForeignKeyError(err) {
+			return -2
+		}
+
 		log.Panic(err)
 	}
 
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
-		log.Printf("Unexpected number of updates: %d", affectedCount)
+		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
 	return affectedCount
 }
 
 /**
-Get all Student who belongs to a School
+StudentListBySchool Finds and returns all Student who belongs to a School
 */
 func StudentListBySchool(school_id int64) []*models.Student {
-	log.Print("# Reading Student List for School")
+	log.Print("# Reading Student List for School: %d", school_id)
 
 	db := getDBConn()
+
 	stmt, err := db.Prepare("SELECT student_id, student_name, student_grade, school_id " +
 		"FROM student WHERE school_id = $1")
 	defer stmt.Close()

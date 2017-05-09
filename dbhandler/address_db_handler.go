@@ -29,7 +29,7 @@ func AddressCreate(address models.Address) int64 {
 		address.City, address.Line1, address.Line2).Scan(&address_id)
 
 	if err != nil {
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	return address_id
@@ -87,14 +87,19 @@ func AddressUpdate(address models.Address) int64 {
 		address.City, address.Line1, address.Line2, address.AddressID)
 
 	if err != nil {
-		log.Print("Error updating")
+		log.Print("Address Update Failed")
+
+		if isForeignKeyError(err) {
+			return -2
+		}
+
 		log.Panic(err)
 	}
 
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
-		log.Printf("Unexpected number of updates: %d", affectedCount)
+		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
 	return affectedCount
@@ -117,14 +122,19 @@ func AddressDelete(address_id int64) int64 {
 	result, err := stmt.Exec(address_id)
 
 	if err != nil {
-		log.Print("Delete Failed")
+		log.Print("Address Delete Failed")
+
+		if isForeignKeyError(err) {
+			return -2
+		}
+
 		log.Panic(err)
 	}
 
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
-		log.Printf("Unexpected number of updates: %d", affectedCount)
+		log.Panicf("Unexpected number of deletes: %d", affectedCount)
 	}
 
 	return affectedCount
