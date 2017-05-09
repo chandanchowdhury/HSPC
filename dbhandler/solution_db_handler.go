@@ -57,7 +57,7 @@ func SolutionRead(solution_id int64) models.Solution {
 	query := getSolutionColl().Find(bson.M{"solutionid": solution_id})
 
 	result_count, err := query.Count()
-	log.Print("Solution Found: %d", result_count)
+	log.Printf("Solution Found: %d", result_count)
 	if err != nil {
 		log.Print(err)
 		return models.Solution{}
