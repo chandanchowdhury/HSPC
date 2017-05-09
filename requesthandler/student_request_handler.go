@@ -11,11 +11,16 @@ func HandleStudentPost(params student.PostStudentParams) middleware.Responder {
 	//create the student
 	student_id := dbhandler.StudentCreate(*params.Student)
 
-	if student_id == -1 {
+	if student_id < 0 {
 		resp := student.NewPostStudentDefault(400)
 		error := new(models.Error)
 		error.Code = -1
 		error.Message = "Failed to create Student"
+
+		if student_id == -2 {
+			error.Message = "Related data error"
+			error.Fields = "School"
+		}
 
 		resp.SetPayload(error)
 
@@ -56,8 +61,13 @@ func HandleStudentPut(params student.PutStudentParams) middleware.Responder {
 
 	error := new(models.Error)
 
-	if affected_count != 1 {
+	if affected_count < 0 {
 		error.Message = "Error: Unexpected number of updates"
+
+		if affected_count == -2 {
+			error.Message = "Related data error"
+		}
+
 		error.Code = affected_count
 		resp := student.NewPostStudentDefault(400)
 		resp.SetPayload(error)
@@ -77,8 +87,13 @@ func HandleStudentDelete(params student.DeleteStudentIDParams) middleware.Respon
 
 	error := new(models.Error)
 
-	if affected_count != 1 {
+	if affected_count < 0 {
 		error.Message = "Error: Unexpected number of deletes"
+
+		if affected_count == -2 {
+			error.Message = "Related data error"
+		}
+
 		error.Code = affected_count
 		resp := student.NewDeleteStudentIDDefault(400)
 		resp.SetPayload(error)
