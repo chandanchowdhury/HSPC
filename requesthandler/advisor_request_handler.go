@@ -95,3 +95,12 @@ func HandleAdvisorDelete(params advisor.DeleteAdvisorIDParams) middleware.Respon
 
 	return resp
 }
+
+func HandleAdvisorReadAll(params advisor.GetAdvisorParams) middleware.Responder {
+	advisors := dbhandler.AdvisorReadAll()
+
+	resp := advisor.NewGetAdvisorOK()
+	resp.SetPayload(advisors)
+
+	return resp
+}
