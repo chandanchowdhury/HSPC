@@ -9,7 +9,7 @@ import (
 
 func HandleCredentialPost(params credential.PostCredentialParams) middleware.Responder {
 	//create the credential
-	credential_id := dbhandler.CredentialCreate(*params.Body)
+	credential_id := dbhandler.CredentialCreate(*params.Credential)
 
 	if credential_id == -1 {
 		resp := credential.NewPostCredentialDefault(500)
@@ -24,7 +24,7 @@ func HandleCredentialPost(params credential.PostCredentialParams) middleware.Res
 
 	// create the response
 	resp := credential.NewPostCredentialOK()
-	credential := dbhandler.CredentialRead(params.Body.Emailaddress.String())
+	credential := dbhandler.CredentialRead(params.Credential.Emailaddress.String())
 	//set response data
 	resp.SetPayload(credential)
 
@@ -53,7 +53,7 @@ func HandleCredentialGet(params credential.GetCredentialIDParams) middleware.Res
 }
 
 func HandleCredentialPut(params credential.PutCredentialParams) middleware.Responder {
-	affected_count := dbhandler.CredentialUpdate(params.Body.Emailaddress.String(), params.Body.Password.String(), *params.Body.CredentialActive)
+	affected_count := dbhandler.CredentialUpdate(params.Credential.Emailaddress.String(), params.Credential.Password.String(), *params.Credential.CredentialActive)
 
 	error := new(models.Error)
 
