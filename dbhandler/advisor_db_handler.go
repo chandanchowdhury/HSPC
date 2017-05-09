@@ -26,8 +26,11 @@ func AdvisorCreate(advisor models.Advisor) int64 {
 	err = stmt.QueryRow(advisor.AdvisorName, advisor.CredentialID).Scan(&advisor_id)
 
 	if err != nil {
-		log.Print(err)
-		return -1
+		if isForeignKeyError(err) {
+			return -2
+		}
+
+		log.Panic(err)
 	}
 
 	log.Printf("New Advisor ID: %d", advisor_id)
@@ -65,10 +68,10 @@ func AdvisorRead(advisor_id int64) models.Advisor {
 }
 
 func AdvisorUpdate(advisor models.Advisor) int64 {
-	db := getDBConn()
-
 	log.Print("# Updating Advisor")
 	log.Printf("Advisor ID = %d", advisor.AdvisorID)
+
+	db := getDBConn()
 
 	stmt, err := db.Prepare("UPDATE advisor SET advisor_name = $1, credential_id = $2" +
 		"WHERE advisor_id = $3")
@@ -83,23 +86,28 @@ func AdvisorUpdate(advisor models.Advisor) int64 {
 
 	if err != nil {
 		log.Print("Error updating advisor")
+
+		if isForeignKeyError(err) {
+			return -2
+		}
+
 		log.Panic(err)
 	}
 
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
-		log.Printf("Unexpected number of updates: %d", affectedCount)
+		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
 	return affectedCount
 }
 
 func AdvisorDelete(advisor_id int64) int64 {
-	db := getDBConn()
-
 	log.Print("# Deleting Advisor")
 	log.Printf("Advisor ID = %d", advisor_id)
+
+	db := getDBConn()
 
 	stmt, err := db.Prepare("DELETE FROM advisor WHERE advisor_id = $1")
 	defer stmt.Close()
@@ -112,15 +120,51 @@ func AdvisorDelete(advisor_id int64) int64 {
 	result, err := stmt.Exec(advisor_id)
 
 	if err != nil {
-		log.Print("Delete Failed")
+		log.Print(err)
+
+		if isForeignKeyError(err) {
+			return -2
+		}
+
 		log.Panic(err)
 	}
 
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
-		log.Printf("Unexpected number of updates: %d", affectedCount)
+		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
 	return affectedCount
+}
+
+func AdvisorReadAll() []*models.Advisor {
+	log.Print("# Reading All Advisors")
+
+	db := getDBConn()
+
+	stmt, err := db.Prepare("SELECT advisor_id, advisor_name, credential_id " +
+		"FROM advisor")
+	defer stmt.Close()
+
+	if err != nil {
+		log.Print("Error creating prepared statement")
+		log.Print(err)
+	}
+
+	crsr, err := stmt.Query()
+
+	if err != nil {
+		log.Print("Error getting advisor data")
+		log.Panic(err)
+	}
+
+	advisors := make([]*models.Advisor, 0)
+	for crsr.Next() {
+		var advisor = models.Advisor{}
+		crsr.Scan(&advisor.AdvisorID, &advisor.AdvisorName, &advisor.CredentialID)
+		advisors = append(advisors, &advisor)
+	}
+
+	return advisors
 }
