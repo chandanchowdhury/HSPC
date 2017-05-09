@@ -29,17 +29,12 @@ func TeamCreate(team models.Team) int64 {
 	var team_id int64
 	err = stmt.QueryRow(team.TeamName, team.TeamDivision, team.SchoolID).Scan(&team_id)
 
-	//log.Print(err)
-	//log.Print(pq.ErrorClass("foreign_key_violation"))
-	//TODO: Check FK constraint violation
-	//if err.Error() ==  pq.ErrorClass("foreign_key_violation").Name() {
-	//log.Print("Foreign Key Violation")
-	//return -1;
-	//}
-
 	if err != nil {
-		log.Print(err)
-		return -1
+		if isForeignKeyError(err) {
+			return -2
+		}
+
+		log.Panic(err)
 	}
 
 	//if TeamMember is not empty
@@ -57,57 +52,18 @@ func TeamCreate(team models.Team) int64 {
 	return team_id
 }
 
-/*
-   Add a Student to a team
-*/
-func TeamAddMember(team_id int64, student_id int64) bool {
-
-	log.Print("# Add member to a Team")
-
-	db := getDBConn()
-	stmt, err := db.Prepare("INSERT INTO TeamStudent(team_id, student_id) " +
-		"VALUES($1, $2)")
-	defer stmt.Close()
-
-	if err != nil {
-		log.Print("Error creating prepared statement")
-		log.Panic(err)
-		return false
-	}
-
-	result, err := stmt.Exec(team_id, student_id)
-
-	if err != nil {
-		log.Print(err)
-		return false
-	}
-
-	affectedRows, err := result.RowsAffected()
-	if affectedRows != 1 {
-		log.Print("Unexpected number of inserts")
-		return false
-	}
-
-	//TODO: Check FK constraint violation
-	//if err.Error() ==  pq.ErrorClass("foreign_key_violation").Name() {
-	//log.Print("Foreign Key Violation")
-	//return -1;
-	//}
-
-	return true
-}
-
 func TeamRead(team_id int64) models.Team {
-	log.Print("# Reading Address")
+	log.Printf("# Reading TeamID: %d", team_id)
 
 	db := getDBConn()
+
 	stmt, err := db.Prepare("SELECT team_id, team_name, team_division, school_id " +
 		"FROM team WHERE team_id = $1")
 	defer stmt.Close()
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	var team = models.Team{}
@@ -129,51 +85,10 @@ func TeamRead(team_id int64) models.Team {
 	return team
 }
 
-func TeamReadMembers(team_id int64) []int64 {
-	var student_ids []int64
-
-	log.Print("# Reading Address")
-
-	db := getDBConn()
-	stmt, err := db.Prepare("SELECT team_id, student_id " +
-		"FROM TeamStudent WHERE team_id = $1")
-	defer stmt.Close()
-
-	if err != nil {
-		log.Print("Error creating prepared statement")
-		log.Print(err)
-	}
-
-	crsr, err := stmt.Query(team_id)
-
-	if err != nil {
-		log.Print("Error getting team data")
-		log.Panic(err)
-	}
-
-	// if no records found, return an empty struct
-	//if err == sql.ErrNoRows {
-	//    return student_ids
-	//}
-
-	var s_id int64
-	for crsr.Next() {
-		//NOTE: Possibility of bug from UI handling
-		if len(student_ids) == 0 {
-			student_ids = make([]int64, 1, MAX_STUDENT_PER_TEAM)
-		}
-		crsr.Scan(&s_id)
-		student_ids = append(student_ids, s_id)
-	}
-
-	return student_ids
-}
-
 func TeamUpdate(team models.Team) int64 {
-	db := getDBConn()
+	log.Printf("Updating TeamID = %d", team.TeamID)
 
-	log.Print("# Updating Team")
-	log.Printf("Team ID = %d", team.TeamID)
+	db := getDBConn()
 
 	stmt, err := db.Prepare("UPDATE team SET team_name = $1, " +
 		"team_division = $2, school_id = $3 WHERE team_id = $4")
@@ -181,107 +96,65 @@ func TeamUpdate(team models.Team) int64 {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	//transaction begin
-	tx, err := db.Begin()
+	//tx, err := db.Begin()
 
 	result, err := stmt.Exec(team.TeamName, team.TeamDivision, team.SchoolID, team.TeamID)
 
 	if err != nil {
-		tx.Rollback()
+		//tx.Rollback()
 		log.Print("Error updating team")
+
+		if isForeignKeyError(err) {
+			return -2
+		}
+
 		log.Panic(err)
 	}
 
 	affectedCount, err := result.RowsAffected()
-
 	//we should update only one record
 	if affectedCount > 1 {
 		// rollback the update
-		tx.Rollback()
-		log.Panic("Unexpected number of updates: %d", affectedCount)
+		//tx.Rollback()
+		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
 	//commit the update
-	tx.Commit()
+	//tx.Commit()
 
 	return affectedCount
 }
 
-func TeamMemberUpdate(team_id int64, student_ids []int64) bool {
-	db := getDBConn()
-
-	log.Print("# Update Team Membrs")
-	log.Printf("Team ID = %d", team_id)
-
-	//first delete all entries
-	delete_stmt, err := db.Prepare("DELETE FROM TeamStudent WHERE team_id = $1")
-	defer delete_stmt.Close()
-
-	if err != nil {
-		log.Print("Error creating prepared statement")
-		log.Panic(err)
-	}
-
-	insert_stmt, err := db.Prepare("DELETE FROM TeamStudent WHERE team_id = $1")
-	defer insert_stmt.Close()
-
-	if err != nil {
-		log.Print("Error creating prepared statement")
-		log.Panic(err)
-	}
-
-	//transaction begin
-	tx, err := db.Begin()
-
-	_, err = delete_stmt.Exec(team_id)
-
-	if err != nil {
-		tx.Rollback()
-		log.Print("Delete Failed")
-		log.Panic(err)
-	}
-
-	for _, s_id := range student_ids {
-		success := TeamAddMember(team_id, s_id)
-
-		if !success {
-			tx.Rollback()
-			log.Panic("Error adding student to team for TeamMemberUdate")
-		}
-	}
-
-	//commit the deletion
-	tx.Commit()
-
-	//then re-add all members
-	return true
-}
-
 func TeamDelete(team_id int64) int64 {
-	db := getDBConn()
+	log.Printf("Deleting Team ID = %d", team_id)
 
-	log.Print("# Deleting Team")
-	log.Printf("Team ID = %d", team_id)
+	db := getDBConn()
 
 	stmt, err := db.Prepare("DELETE FROM team WHERE team_id = $1")
 	defer stmt.Close()
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	//transaction begin
-	tx, err := db.Begin()
+	//tx, err := db.Begin()
 
 	result, err := stmt.Exec(team_id)
 
 	if err != nil {
-		tx.Rollback()
+		//tx.Rollback()
 		log.Print("Delete Failed")
+
+		if isForeignKeyError(err) {
+			return -2
+		}
+
 		log.Panic(err)
 	}
 
@@ -289,12 +162,12 @@ func TeamDelete(team_id int64) int64 {
 
 	//we should update only one record
 	if affectedCount != 1 {
-		tx.Rollback()
-		log.Printf("Unexpected number of updates: %d", affectedCount)
+		//tx.Rollback()
+		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
 	//commit the deletion
-	tx.Commit()
+	//tx.Commit()
 
 	return affectedCount
 }
