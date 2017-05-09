@@ -125,8 +125,8 @@ func StudentDelete(student_id int64) int64 {
 }
 
 /**
-	Get all Student who belongs to a School
- */
+Get all Student who belongs to a School
+*/
 func StudentListBySchool(school_id int64) []*models.Student {
 	log.Print("# Reading Student List for School")
 

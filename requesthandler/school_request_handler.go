@@ -133,6 +133,3 @@ func HandleSchoolGetStudentList(params school.GetSchoolIDStudentsParams) middlew
 
 	return resp
 }
-
-
-

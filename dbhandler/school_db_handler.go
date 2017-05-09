@@ -3,8 +3,8 @@ package dbhandler
 import (
 	"database/sql"
 	"github.com/chandanchowdhury/HSPC/models"
-	"log"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/school"
+	"log"
 )
 
 /*

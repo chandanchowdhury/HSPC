@@ -7,23 +7,23 @@ import (
 	"github.com/chandanchowdhury/HSPC/restapi/operations/address"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/advisor"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/credential"
+	"github.com/chandanchowdhury/HSPC/restapi/operations/login"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/problem"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/school"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/solution"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/student"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/team"
-	"github.com/chandanchowdhury/HSPC/restapi/operations/login"
 )
 
 /**
-	This function when called inside configureAPI() function in
-	 configure_hspc.go will override all NotImplemented calls with actual
-	 valid calls to handle the request.
+This function when called inside configureAPI() function in
+ configure_hspc.go will override all NotImplemented calls with actual
+ valid calls to handle the request.
 
-	Just add below line before return in configureAPI()
+Just add below line before return in configureAPI()
 
-	requesthandler.Override_configure_hspc(api)
- */
+requesthandler.Override_configure_hspc(api)
+*/
 func Override_configure_hspc(api *operations.HspcAPI) {
 
 	api.AddressDeleteAddressIDHandler = address.DeleteAddressIDHandlerFunc(func(params address.DeleteAddressIDParams) middleware.Responder {
