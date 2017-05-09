@@ -37,17 +37,18 @@ paths:
 # API paths for Credential
   /credential:
     post:
+      description: Create Credential
       tags:
         - credential
       parameters:
-        - name: body
+        - name: credential
           in: body
           required: true
           schema:
             $ref: '#/definitions/Credential'
       responses:
         200:
-          description: Return the newly created Credential
+          description: Returns the newly created Credential
           schema:
             $ref: '#/definitions/Credential'
         default:
@@ -55,11 +56,11 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      description: Update credential
+      description: Update Credential
       tags:
         - credential
       parameters:
-        - name: body
+        - name: credential
           in: body
           required: true
           description: Updated Credential object
@@ -67,7 +68,7 @@ paths:
             $ref: '#/definitions/Credential'
       responses:
         200:
-          description: Returns success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -77,17 +78,18 @@ paths:
   /credential/{id}:
     parameters:
       - name: id
-        description: ID of the Address
+        description: CredentialID of the Credential
         in: path
         type: string
         format: email
         required: true
     get:
+      description: Find Credential using email address
       tags:
         - credential
       responses:
         200:
-          description: The found Credential
+          description: Returns the Credential
           schema:
             $ref: '#/definitions/Credential'
         default:
@@ -95,12 +97,12 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      description: Given an emailaddress, delete the credential
+      description: Given an emailaddress, delete the Credential
       tags:
         - credential
       responses:
         200:
-          description: Return success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -108,6 +110,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 # API paths for Login
+# TODO: Test/Validate login and logout functions
   /login/{emailaddress}/{password}:
     get:
       tags:
@@ -146,7 +149,7 @@ paths:
           required: true
       responses:
         200:
-          description: Get a student object using ID
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -156,6 +159,7 @@ paths:
 # API paths for Address
   /address:
     post:
+      description: Create Address
       tags:
         - address
       parameters:
@@ -166,7 +170,7 @@ paths:
             $ref: '#/definitions/Address'
       responses:
         200:
-          description: Return the the newly created Address
+          description: Returns the newly created Address
           schema:
             $ref: '#/definitions/Address'
         default:
@@ -174,18 +178,18 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      description: Update address
+      description: Update Address
       tags:
         - address
       parameters:
         - name: address
-          description: address object
+          description: Address object
           in: body
           schema:
             $ref: '#/definitions/Address'
       responses:
         200:
-          description: Returns address ID of the updated address
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -195,18 +199,18 @@ paths:
   /address/{id}:
     parameters:
       - name: id
-        description: ID of the Address
+        description: AddressID of the Address
         in: path
         type: integer
         format: int64
         required: true
     get:
-      description: Given a address id, return the details
+      description: Find Address using AddressID
       tags:
         - address
       responses:
         200:
-          description: Address Information
+          description: Returns Address
           schema:
             $ref: '#/definitions/Address'
         default:
@@ -214,12 +218,12 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      description: Given a address id, delete the address
+      description: Delete Address using AddressID
       tags:
         - address
       responses:
         200:
-          description: Return ID of the deleted address if successfully deleted
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -230,19 +234,19 @@ paths:
 # API paths for School
   /school:
     post:
-      description: Create a new school
+      description: Create School
       tags:
         - school
       parameters:
         - name: school
           in: body
-          description: school object
+          description: School object
           required: true
           schema:
             $ref: '#/definitions/School'
       responses:
         200:
-          description: Return the the newly created School
+          description: Return the newly created School
           schema:
             $ref: '#/definitions/School'
         default:
@@ -250,7 +254,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      description: Update school
+      description: Update School
       tags:
         - school
       parameters:
@@ -261,7 +265,7 @@ paths:
             $ref: '#/definitions/School'
       responses:
         200:
-          description: Returns success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -269,12 +273,12 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     get:
-      description: Return list of all schools
+      description: Return list of all Schools
       tags:
         - school
       responses:
         200:
-          description: Return School list
+          description: Returns School list
           schema:
               type: array
               items:
@@ -286,18 +290,18 @@ paths:
   /school/{id}:
     parameters:
       - name: id
-        description: ID of the School
+        description: SchoolID of the School
         in: path
         type: integer
         format: int64
         required: true
     get:
-      description: Given a school id, return the details
+      description: Find School using SchoolID
       tags:
         - school
       responses:
         200:
-          description: School Information
+          description: Returns School
           schema:
             $ref: '#/definitions/School'
         default:
@@ -305,12 +309,12 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      description: Given a school id, delete the school
+      description: Delete School using SchoolID
       tags:
         - school
       responses:
         200:
-          description: Return ID of the deleted school if successfully deleted
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -320,18 +324,18 @@ paths:
   /school/{id}/students:
     parameters:
       - name: id
-        description: ID of the School
+        description: SchoolID of the School
         in: path
         type: integer
         format: int64
         required: true
     get:
-      description: Given a school id, return the list of Students the school has
+      description: Find all Students in a School
       tags:
         - school
       responses:
         200:
-          description: Return the list of Students for the School
+          description: Returns the list of Students for the School
           schema:
             type: array
             items:
@@ -343,13 +347,13 @@ paths:
   /school/{id}/teams:
     parameters:
       - name: id
-        description: ID of the School
+        description: SchoolID of the School
         in: path
         type: integer
         format: int64
         required: true
     get:
-      description: Given a school id, return the list of Teams the school has
+      description:  Find all Teams in a School
       tags:
         - school
       responses:
@@ -367,6 +371,7 @@ paths:
 # API paths for Advisor
   /advisor:
     post:
+      description: Create Advisor
       tags:
         - advisor
       parameters:
@@ -385,7 +390,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      description: Update advisor
+      description: Update Advisor
       tags:
         - advisor
       parameters:
@@ -397,7 +402,7 @@ paths:
             $ref: '#/definitions/Advisor'
       responses:
         200:
-          description: Returns success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -405,6 +410,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     get:
+      description: Find all Advisors
       tags:
         - advisor
       responses:
@@ -427,11 +433,12 @@ paths:
         format: int64
         required: true
     get:
+      description: Find Advisor using AdvisorID
       tags:
         - advisor
       responses:
         200:
-          description: Get a advisor object using emailaddress
+          description: Returns Advisor
           schema:
             $ref: '#/definitions/Advisor'
         default:
@@ -454,6 +461,7 @@ paths:
 # API paths for Student
   /student:
     post:
+      description: Create Student
       tags:
         - student
       parameters:
@@ -484,7 +492,7 @@ paths:
             $ref: '#/definitions/Student'
       responses:
         200:
-          description: Returns success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -494,17 +502,18 @@ paths:
   /student/{id}:
     parameters:
       - name: id
-        description: ID of the Address
+        description: StudentID of the Student
         in: path
         type: integer
         format: int64
         required: true
     get:
+      description: Find Student using StudentID
       tags:
         - student
       responses:
         200:
-          description: Get a student object using ID
+          description: Returns Student
           schema:
             $ref: '#/definitions/Student'
         default:
@@ -527,6 +536,7 @@ paths:
 # API paths for Team
   /team:
     post:
+      description: Create Team
       tags:
         - team
       parameters:
@@ -557,7 +567,7 @@ paths:
             $ref: '#/definitions/Team'
       responses:
         200:
-          description: Returns success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -573,11 +583,12 @@ paths:
         format: int64
         required: true
     get:
+      description: Find Team using TeamID
       tags:
         - team
       responses:
         200:
-          description: Get a team object using ID
+          description: Returns Team
           schema:
             $ref: '#/definitions/Team'
         default:
@@ -612,6 +623,7 @@ paths:
         format: int64
         required: true
     get:
+      description: Add Student to a Team
       tags:
         - team
       responses:
@@ -636,11 +648,12 @@ paths:
         format: int64
         required: true
     get:
+      description: Remove Student from Team
       tags:
         - team
       responses:
         201:
-          description: Student added to the Team, no data
+          description: Student removed from the Team, no data
         default:
           description: Unexpected error
           schema:
@@ -649,6 +662,7 @@ paths:
 # API paths for Problem
   /problem:
     post:
+      description: Create Problem
       tags:
         - problem
       parameters:
@@ -679,7 +693,7 @@ paths:
             $ref: '#/definitions/Problem'
       responses:
         200:
-          description: Returns success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -687,11 +701,12 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     get:
+      description: List of all Problems
       tags:
         - problem
       responses:
         200:
-          description: List of Problems
+          description: Returns list of all Problems
           schema:
             type: array
             items:
@@ -703,17 +718,18 @@ paths:
   /problem/{id}:
     parameters:
       - name: id
-        description: ID of the Problem
+        description: ProblemID of the Problem
         in: path
         type: integer
         format: int64
         required: true
     get:
+      description: Find Problem using ProblemID
       tags:
         - problem
       responses:
         200:
-          description: Get a problem object using ID
+          description: Returns Problem
           schema:
             $ref: '#/definitions/Problem'
         default:
@@ -721,12 +737,12 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      description: Given an problem ID, delete the problem
+      description: Delete Problem using ProblemID
       tags:
         - problem
       responses:
         200:
-          description: Return success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -736,17 +752,18 @@ paths:
   /problem/{id}/solutions:
     parameters:
       - name: id
-        description: ID of the Address
+        description: SolutionID of the Solution
         in: path
         type: integer
         format: int64
         required: true
     get:
+      description: Find all Solutions to a Problem
       tags:
         - problem
       responses:
         200:
-          description: The Solution related to a Problem
+          description: Returns list of Solutions to a Problem
           schema:
             type: array
             items:
@@ -758,6 +775,7 @@ paths:
 # API paths for Solution
   /solution:
     post:
+      description: Create Solution
       tags:
         - solution
       parameters:
@@ -788,7 +806,7 @@ paths:
             $ref: '#/definitions/Solution'
       responses:
         200:
-          description: Returns success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -798,17 +816,18 @@ paths:
   /solution/{id}:
     parameters:
       - name: id
-        description: ID of the Address
+        description: SolutionID of the Solution
         in: path
         type: integer
         format: int64
         required: true
     get:
+      description: Find Solution using SolutionID
       tags:
         - solution
       responses:
         200:
-          description: Get a solution object using ID
+          description: Return Solution
           schema:
             $ref: '#/definitions/Solution'
         default:
@@ -816,12 +835,12 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      description: Given an solution ID, delete the solution
+      description: Delete Solution using SolutionID
       tags:
         - solution
       responses:
         200:
-          description: Return success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -831,6 +850,7 @@ paths:
 # API paths for TeamScore
   /teamscore:
     post:
+      description: Create TeamScore
       tags:
         - teamscore
       parameters:
@@ -861,7 +881,7 @@ paths:
             $ref: '#/definitions/TeamScore'
       responses:
         200:
-          description: Returns success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -869,6 +889,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     get:
+      description: Find all TeamScores
       tags:
         - teamscore
       responses:
@@ -891,11 +912,12 @@ paths:
         format: int64
         required: true
     get:
+      description: Find TeamScore using TeamScoreID
       tags:
         - teamscore
       responses:
         200:
-          description: Get a teamscore object using ID
+          description: Returns TeamScore
           schema:
             $ref: '#/definitions/TeamScore'
         default:
@@ -903,12 +925,12 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      description: Given an teamscore ID, delete the teamscore
+      description: Delete TeamScore using TeamScoreID
       tags:
         - teamscore
       responses:
         200:
-          description: Return success
+          description: Returns Success/Failure message with code
           schema:
             $ref: '#/definitions/Error'
         default:
