@@ -138,4 +138,8 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 	api.SchoolGetSchoolIDStudentsHandler = school.GetSchoolIDStudentsHandlerFunc(func(params school.GetSchoolIDStudentsParams) middleware.Responder {
 		return HandleSchoolGetStudentList(params)
 	})
+	// List all Advisors
+	api.AdvisorGetAdvisorHandler = advisor.GetAdvisorHandlerFunc(func(params advisor.GetAdvisorParams) middleware.Responder {
+		return HandleAdvisorReadAll(params)
+	})
 }
