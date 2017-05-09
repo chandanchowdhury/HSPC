@@ -577,7 +577,7 @@ paths:
   /team/{id}:
     parameters:
       - name: id
-        description: ID of the Address
+        description: TeamID of the Team
         in: path
         type: integer
         format: int64
@@ -654,6 +654,29 @@ paths:
       responses:
         201:
           description: Student removed from the Team, no data
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /team/{id}/students:
+    parameters:
+      - name: id
+        description: TeamID of the Team
+        in: path
+        type: integer
+        format: int64
+        required: true
+    get:
+      description: Find Students in a Team
+      tags:
+        - team
+      responses:
+        200:
+          description: Returns List of Students in a Team
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Student'
         default:
           description: Unexpected error
           schema:
