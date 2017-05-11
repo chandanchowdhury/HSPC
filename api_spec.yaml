@@ -2,6 +2,9 @@
 # http://editor.swagger.io/#!/
 ####
 ---
+# TODO:
+# * Use parameter definitions
+---
 swagger: '2.0'
 info:
   title: HSPC API
@@ -75,14 +78,9 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /credential/{id}:
+  /credential/{emailaddress}:
     parameters:
-      - name: id
-        description: CredentialID of the Credential
-        in: path
-        type: string
-        format: email
-        required: true
+      - $ref: '#/parameters/emailaddress'
     get:
       description: Find Credential using email address
       tags:
@@ -1196,3 +1194,40 @@ definitions:
         type: string
       fields:
         type: string
+
+parameters:
+  emailaddress:
+    name: emailaddress
+    description: Emailaddress of the Credential
+    in: path
+    type: string
+    format: email
+    required: true
+  school_id:
+    name: school_id
+    description: SchoolID
+    in: path
+    type: integer
+    format: int64
+    required: true
+  advisor_id:
+    name: advisor_id
+    description: AdvisorID
+    in: path
+    type: integer
+    format: int64
+    required: true
+  team_id:
+    name: team_id
+    description: TeamID
+    in: path
+    type: integer
+    format: int64
+    required: true
+  student_id:
+    name: student_id
+    description: StudentID
+    in: path
+    type: integer
+    format: int64
+    required: true
