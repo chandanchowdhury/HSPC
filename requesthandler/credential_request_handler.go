@@ -17,7 +17,7 @@ func HandleCredentialPost(params credential.PostCredentialParams) middleware.Res
 		error.Code = credential_id
 		error.Message = "Error: Failed to create Credential"
 
-		if credential_id == 0 {
+		if credential_id == -1 {
 			error.Message = "Credential already exists"
 		}
 
@@ -61,15 +61,21 @@ func HandleCredentialPut(params credential.PutCredentialParams) middleware.Respo
 
 	error := new(models.Error)
 
-	if affected_count != 1 {
+	if affected_count <= 0 {
 		error.Message = "Error: Unexpected number of updates"
 		error.Code = affected_count
 		resp := credential.NewPutCredentialDefault(400)
 
-		//no rows updated
-		if affected_count == 0 {
+		switch affected_count {
+		case 0:
 			error.Message = "Warn: no records found for update"
 			resp.SetStatusCode(404)
+		case -1:
+			error.Message = "Update will cause duplicate record"
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
 		}
 
 		resp.SetPayload(error)
@@ -94,10 +100,14 @@ func HandleCredentialDelete(params credential.DeleteCredentialEmailaddressParams
 		error.Code = affected_count
 		resp := credential.NewDeleteCredentialEmailaddressDefault(400)
 
-		//no rows deleted
-		if affected_count == 0 {
-			error.Message = "Warn: no records found for delete"
+		switch affected_count {
+		case 0:
+			error.Message = "Warn: no records found for update"
 			resp.SetStatusCode(404)
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
 		}
 
 		resp.SetPayload(error)

@@ -2,15 +2,16 @@ package dbhandler
 
 import (
 	"database/sql"
-	"github.com/chandanchowdhury/HSPC/models"
 	"log"
+
+	"github.com/chandanchowdhury/HSPC/models"
 )
 
 /*
 Advisor
 */
 func AdvisorCreate(advisor models.Advisor) int64 {
-	log.Print("# Creating Advisor")
+	log.Print("Creating Advisor")
 
 	db := getDBConn()
 	stmt, err := db.Prepare("INSERT INTO advisor(advisor_name, credential_id) " +
@@ -19,13 +20,17 @@ func AdvisorCreate(advisor models.Advisor) int64 {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	var advisor_id int64
 	err = stmt.QueryRow(advisor.AdvisorName, advisor.CredentialID).Scan(&advisor_id)
 
 	if err != nil {
+		if isDuplicateKeyError(err) {
+			return -1
+		}
+
 		if isForeignKeyError(err) {
 			return -2
 		}
@@ -38,9 +43,7 @@ func AdvisorCreate(advisor models.Advisor) int64 {
 }
 
 func AdvisorRead(advisor_id int64) models.Advisor {
-	var advisor = models.Advisor{}
-
-	log.Print("# Reading Advisor")
+	log.Printf("Reading Advisor ID = %d", advisor_id)
 
 	db := getDBConn()
 	stmt, err := db.Prepare("SELECT advisor_id, advisor_name, credential_id " +
@@ -49,9 +52,10 @@ func AdvisorRead(advisor_id int64) models.Advisor {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
+	var advisor = models.Advisor{}
 	err = stmt.QueryRow(advisor_id).Scan(&advisor.AdvisorID, &advisor.AdvisorName, &advisor.CredentialID)
 
 	// if no records found, return an empty struct
@@ -68,8 +72,7 @@ func AdvisorRead(advisor_id int64) models.Advisor {
 }
 
 func AdvisorUpdate(advisor models.Advisor) int64 {
-	log.Print("# Updating Advisor")
-	log.Printf("Advisor ID = %d", advisor.AdvisorID)
+	log.Printf("Updating Advisor ID = %d", advisor.AdvisorID)
 
 	db := getDBConn()
 
@@ -79,13 +82,17 @@ func AdvisorUpdate(advisor models.Advisor) int64 {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	result, err := stmt.Exec(advisor.AdvisorName, advisor.CredentialID, advisor.AdvisorID)
 
 	if err != nil {
 		log.Print("Error updating advisor")
+
+		if isDuplicateKeyError(err) {
+			return -1
+		}
 
 		if isForeignKeyError(err) {
 			return -2
@@ -97,6 +104,11 @@ func AdvisorUpdate(advisor models.Advisor) int64 {
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
+		// if no records updated, just inform the caller
+		if affectedCount == 0 {
+			return 0
+		}
+
 		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
@@ -104,8 +116,7 @@ func AdvisorUpdate(advisor models.Advisor) int64 {
 }
 
 func AdvisorDelete(advisor_id int64) int64 {
-	log.Print("# Deleting Advisor")
-	log.Printf("Advisor ID = %d", advisor_id)
+	log.Printf("Deleting Advisor ID = %d", advisor_id)
 
 	db := getDBConn()
 
@@ -114,13 +125,13 @@ func AdvisorDelete(advisor_id int64) int64 {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	result, err := stmt.Exec(advisor_id)
 
 	if err != nil {
-		log.Print(err)
+		log.Panic(err)
 
 		if isForeignKeyError(err) {
 			return -2
@@ -132,6 +143,11 @@ func AdvisorDelete(advisor_id int64) int64 {
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
+		// if no records updated, just inform the caller
+		if affectedCount == 0 {
+			return 0
+		}
+
 		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
@@ -149,7 +165,7 @@ func AdvisorReadAll() []*models.Advisor {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	crsr, err := stmt.Query()

@@ -11,15 +11,18 @@ func HandleStudentPost(params student.PostStudentParams) middleware.Responder {
 	//create the student
 	student_id := dbhandler.StudentCreate(*params.Student)
 
-	if student_id < 0 {
+	if student_id <= 0 {
 		resp := student.NewPostStudentDefault(400)
 		error := new(models.Error)
-		error.Code = -1
-		error.Message = "Failed to create Student"
+		error.Code = student_id
 
-		if student_id == -2 {
+		switch student_id {
+		case -1:
+			error.Message = "Duplicate error"
+		case -2:
 			error.Message = "Related data error"
-			error.Fields = "School"
+		default:
+			error.Message = "Error: Unexpected error"
 		}
 
 		resp.SetPayload(error)
@@ -61,15 +64,22 @@ func HandleStudentPut(params student.PutStudentParams) middleware.Responder {
 
 	error := new(models.Error)
 
-	if affected_count < 0 {
-		error.Message = "Error: Unexpected number of updates"
-
-		if affected_count == -2 {
-			error.Message = "Related data error"
-		}
-
+	if affected_count <= 0 {
 		error.Code = affected_count
 		resp := student.NewPostStudentDefault(400)
+
+		switch affected_count {
+		case 0:
+			error.Message = "Warn: no records found for update"
+			resp.SetStatusCode(404)
+		case -1:
+			error.Message = "Update will cause duplicate record"
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
+		}
+
 		resp.SetPayload(error)
 
 		return resp
@@ -87,22 +97,26 @@ func HandleStudentDelete(params student.DeleteStudentIDParams) middleware.Respon
 
 	error := new(models.Error)
 
-	if affected_count < 0 {
-		error.Message = "Error: Unexpected number of deletes"
-
-		if affected_count == -2 {
-			error.Message = "Related data error"
-		}
-
+	if affected_count <= 0 {
 		error.Code = affected_count
 		resp := student.NewDeleteStudentIDDefault(400)
+
+		switch affected_count {
+		case 0:
+			error.Message = "Warn: no records found for update"
+			resp.SetStatusCode(404)
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
+		}
+
 		resp.SetPayload(error)
 
 		return resp
 	}
 
 	resp := student.NewDeleteStudentIDOK()
-	error.Code = 0
 	error.Message = "Deleted"
 	resp.SetPayload(error)
 

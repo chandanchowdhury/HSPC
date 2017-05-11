@@ -17,7 +17,7 @@ func HandleAddressPost(params address.PostAddressParams) middleware.Responder {
 		error.Code = address_id
 		error.Message = "Failed to create Address"
 
-		if address_id == 0 {
+		if address_id == -1 {
 			error.Message = "Address already exists"
 		}
 
@@ -61,14 +61,20 @@ func HandleAddressPut(params address.PutAddressParams) middleware.Responder {
 	error := new(models.Error)
 
 	if affected_count != 1 {
-		error.Message = "Error: Unexpected number of updates"
+		error.Message = "Error: Unexpected error"
 		error.Code = affected_count
 		resp := address.NewPostAddressDefault(400)
 
-		//no rows updated
-		if affected_count == 0 {
+		switch affected_count {
+		case 0:
 			error.Message = "Warn: no records found for update"
 			resp.SetStatusCode(404)
+		case -1:
+			error.Message = "Update will cause duplicate record"
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
 		}
 
 		resp.SetPayload(error)
@@ -89,14 +95,17 @@ func HandleAddressDelete(params address.DeleteAddressIDParams) middleware.Respon
 	error := new(models.Error)
 
 	if affected_count != 1 {
-		error.Message = "Error: Unexpected number of deletes"
 		error.Code = affected_count
 		resp := address.NewDeleteAddressIDDefault(400)
 
-		//no rows deleted
-		if affected_count == 0 {
-			error.Message = "Warn: no records found for delete"
+		switch affected_count {
+		case 0:
+			error.Message = "Warn: no records found for update"
 			resp.SetStatusCode(404)
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
 		}
 
 		resp.SetPayload(error)
@@ -105,7 +114,6 @@ func HandleAddressDelete(params address.DeleteAddressIDParams) middleware.Respon
 	}
 
 	resp := address.NewDeleteAddressIDOK()
-	error.Code = 0
 	error.Message = "Deleted"
 	resp.SetPayload(error)
 

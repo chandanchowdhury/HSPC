@@ -14,7 +14,7 @@ const (
 Team
 */
 func TeamCreate(team models.Team) int64 {
-	log.Print("# Creating Team")
+	log.Print("Creating Team")
 
 	db := getDBConn()
 	stmt, err := db.Prepare("INSERT INTO team(team_name, team_division, school_id) " +
@@ -30,6 +30,10 @@ func TeamCreate(team models.Team) int64 {
 	err = stmt.QueryRow(team.TeamName, team.TeamDivision, team.SchoolID).Scan(&team_id)
 
 	if err != nil {
+		if isDuplicateKeyError(err) {
+			return -1
+		}
+
 		if isForeignKeyError(err) {
 			return -2
 		}
@@ -48,6 +52,8 @@ func TeamCreate(team models.Team) int64 {
 			}
 		}
 	}
+
+	log.Printf("New team_id = %d", team_id)
 
 	return team_id
 }
@@ -108,6 +114,10 @@ func TeamUpdate(team models.Team) int64 {
 		//tx.Rollback()
 		log.Print("Error updating team")
 
+		if isDuplicateKeyError(err) {
+			return -1
+		}
+
 		if isForeignKeyError(err) {
 			return -2
 		}
@@ -117,9 +127,15 @@ func TeamUpdate(team models.Team) int64 {
 
 	affectedCount, err := result.RowsAffected()
 	//we should update only one record
-	if affectedCount > 1 {
+	if affectedCount != 1 {
 		// rollback the update
 		//tx.Rollback()
+
+		// if no records updated, just inform the caller
+		if affectedCount == 0 {
+			return 0
+		}
+
 		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
@@ -163,6 +179,12 @@ func TeamDelete(team_id int64) int64 {
 	//we should update only one record
 	if affectedCount != 1 {
 		//tx.Rollback()
+
+		// if no records updated, just inform the caller
+		if affectedCount == 0 {
+			return 0
+		}
+
 		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 

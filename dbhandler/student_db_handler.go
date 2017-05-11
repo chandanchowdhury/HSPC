@@ -12,7 +12,7 @@ Create a Student
 
 */
 func StudentCreate(student models.Student) int64 {
-	log.Print("# Creating Student")
+	log.Print("Creating Student")
 
 	db := getDBConn()
 	stmt, err := db.Prepare("INSERT INTO student(student_name, student_grade, school_id) " +
@@ -28,6 +28,10 @@ func StudentCreate(student models.Student) int64 {
 	err = stmt.QueryRow(student.StudentName, student.StudentGrade, student.SchoolID).Scan(&student_id)
 
 	if err != nil {
+		if isDuplicateKeyError(err) {
+			return -1
+		}
+
 		if isForeignKeyError(err) {
 			return -2
 		}
@@ -35,12 +39,13 @@ func StudentCreate(student models.Student) int64 {
 		log.Panic(err)
 	}
 
+	log.Printf("New student_id = %d", student_id)
+
 	return student_id
 }
 
 func StudentRead(student_id int64) models.Student {
-	log.Print("# Reading Student")
-	log.Printf("Student ID = %d", student_id)
+	log.Printf("Reading Student ID = %d", student_id)
 
 	db := getDBConn()
 
@@ -70,8 +75,7 @@ func StudentRead(student_id int64) models.Student {
 }
 
 func StudentUpdate(student models.Student) int64 {
-	log.Print("# Updating Student")
-	log.Printf("Student ID = %d", student.StudentID)
+	log.Printf("Updating Student ID = %d", student.StudentID)
 
 	db := getDBConn()
 
@@ -89,6 +93,10 @@ func StudentUpdate(student models.Student) int64 {
 	if err != nil {
 		log.Print("Error updating student")
 
+		if isDuplicateKeyError(err) {
+			return -1
+		}
+
 		if isForeignKeyError(err) {
 			return -2
 		}
@@ -99,6 +107,11 @@ func StudentUpdate(student models.Student) int64 {
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
+		// if no records updated, just inform the caller
+		if affectedCount == 0 {
+			return 0
+		}
+
 		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
@@ -106,8 +119,7 @@ func StudentUpdate(student models.Student) int64 {
 }
 
 func StudentDelete(student_id int64) int64 {
-	log.Print("# Deleting Student")
-	log.Printf("Student ID = %d", student_id)
+	log.Printf("Deleting Student ID = %d", student_id)
 
 	db := getDBConn()
 
@@ -134,6 +146,11 @@ func StudentDelete(student_id int64) int64 {
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
+		// if no records updated, just inform the caller
+		if affectedCount == 0 {
+			return 0
+		}
+
 		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
@@ -144,7 +161,7 @@ func StudentDelete(student_id int64) int64 {
 StudentListBySchool Finds and returns all Student who belongs to a School
 */
 func StudentListBySchool(school_id int64) []*models.Student {
-	log.Print("# Reading Student List for School: %d", school_id)
+	log.Print("Reading Student List for School ID = %d", school_id)
 
 	db := getDBConn()
 

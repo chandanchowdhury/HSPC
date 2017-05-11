@@ -2,16 +2,17 @@ package dbhandler
 
 import (
 	"database/sql"
+	"log"
+
 	"github.com/chandanchowdhury/HSPC/models"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/school"
-	"log"
 )
 
 /*
 School
 */
 func SchoolCreate(school models.School) int64 {
-	log.Print("# Creating School")
+	log.Print("Creating School")
 
 	db := getDBConn()
 	stmt, err := db.Prepare("INSERT INTO school(school_name, address_id) " +
@@ -27,6 +28,10 @@ func SchoolCreate(school models.School) int64 {
 	err = stmt.QueryRow(school.SchoolName, school.AddressID).Scan(&school_id)
 
 	if err != nil {
+		if isDuplicateKeyError(err) {
+			return -1
+		}
+
 		if isForeignKeyError(err) {
 			return -2
 		}
@@ -34,11 +39,12 @@ func SchoolCreate(school models.School) int64 {
 		log.Panic(err)
 	}
 
+	log.Printf("New school_id = %d", school_id)
 	return school_id
 }
 
 func SchoolRead(school_id int64) models.School {
-	log.Print("# Reading School")
+	log.Printf("Reading school_id = %d", school_id)
 
 	db := getDBConn()
 	stmt, err := db.Prepare("SELECT school_id, school_name, address_id " +
@@ -67,8 +73,7 @@ func SchoolRead(school_id int64) models.School {
 }
 
 func SchoolUpdate(school models.School) int64 {
-	log.Print("# Updating School")
-	log.Printf("School ID = %d", school.SchoolID)
+	log.Printf("Updating School ID = %d", school.SchoolID)
 
 	db := getDBConn()
 
@@ -86,6 +91,10 @@ func SchoolUpdate(school models.School) int64 {
 
 	if err != nil {
 		//tx.Rollback()
+		if isDuplicateKeyError(err) {
+			return -1
+		}
+
 		if isForeignKeyError(err) {
 			return -2
 		}
@@ -96,6 +105,11 @@ func SchoolUpdate(school models.School) int64 {
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount > 1 {
+		// if no records updated, just inform the caller
+		if affectedCount == 0 {
+			return 0
+		}
+
 		// rollback the update
 		//tx.Rollback()
 		log.Panicf("Unexpected number of updates: %d", affectedCount)
@@ -108,8 +122,7 @@ func SchoolUpdate(school models.School) int64 {
 }
 
 func SchoolDelete(school_id int64) int64 {
-	log.Print("# Deleting School")
-	log.Printf("School ID = %d", school_id)
+	log.Printf("Deleting School ID = %d", school_id)
 
 	db := getDBConn()
 
@@ -124,13 +137,21 @@ func SchoolDelete(school_id int64) int64 {
 	result, err := stmt.Exec(school_id)
 
 	if err != nil {
+		if isForeignKeyError(err) {
+			return -2
+		}
+
 		log.Print("Delete Failed")
 		log.Panic(err)
 	}
 
 	affectedCount, err := result.RowsAffected()
-
 	if affectedCount != 1 {
+		// if no records updated, just inform the caller
+		if affectedCount == 0 {
+			return 0
+		}
+
 		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 

@@ -11,11 +11,19 @@ func HandleAdvisorPost(params advisor.PostAdvisorParams) middleware.Responder {
 	//create the advisor
 	advisor_id := dbhandler.AdvisorCreate(*params.Advisor)
 
-	if advisor_id == -1 {
+	if advisor_id <= 0 {
 		resp := advisor.NewPostAdvisorDefault(400)
 		error := new(models.Error)
-		error.Code = -1
-		error.Message = "Failed to create Advisor"
+		error.Code = advisor_id
+
+		switch advisor_id {
+		case -1:
+			error.Message = "Duplicate error"
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
+		}
 
 		resp.SetPayload(error)
 
@@ -62,6 +70,18 @@ func HandleAdvisorPut(params advisor.PutAdvisorParams) middleware.Responder {
 		resp := advisor.NewPostAdvisorDefault(400)
 		resp.SetPayload(error)
 
+		switch affected_count {
+		case 0:
+			error.Message = "Warn: no records found for update"
+			resp.SetStatusCode(404)
+		case -1:
+			error.Message = "Update will cause duplicate record"
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
+		}
+
 		return resp
 	}
 
@@ -85,11 +105,20 @@ func HandleAdvisorDelete(params advisor.DeleteAdvisorIDParams) middleware.Respon
 		resp := advisor.NewDeleteAdvisorIDDefault(400)
 		resp.SetPayload(error)
 
+		switch affected_count {
+		case 0:
+			error.Message = "Warn: no records found for update"
+			resp.SetStatusCode(404)
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
+		}
+
 		return resp
 	}
 
 	resp := advisor.NewDeleteAdvisorIDOK()
-	error.Code = 0
 	error.Message = "Deleted"
 	resp.SetPayload(error)
 

@@ -23,7 +23,7 @@ func AddressCreate(address models.Address) int64 {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	var address_id int64
@@ -31,6 +31,8 @@ func AddressCreate(address models.Address) int64 {
 		address.City, address.Line1, address.Line2).Scan(&address_id)
 
 	if err != nil {
+		//if the address already exists, instead of returning error
+		// return the existing address
 		if isDuplicateKeyError(err) {
 			addr := FindAddress(address.Zipcode, address.Line1)
 			return addr.AddressID
@@ -53,7 +55,7 @@ func AddressRead(address_id int64) models.Address {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	var address = models.Address{}
@@ -87,7 +89,7 @@ func AddressUpdate(address models.Address) int64 {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	result, err := stmt.Exec(address.Country, address.Zipcode, address.State,
@@ -97,6 +99,10 @@ func AddressUpdate(address models.Address) int64 {
 		log.Print("Address Update Failed")
 
 		if isForeignKeyError(err) {
+			return -1
+		}
+
+		if isDuplicateKeyError(err) {
 			return -2
 		}
 
@@ -128,7 +134,7 @@ func AddressDelete(address_id int64) int64 {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	result, err := stmt.Exec(address_id)
@@ -137,7 +143,7 @@ func AddressDelete(address_id int64) int64 {
 		log.Print("Address Delete Failed")
 
 		if isForeignKeyError(err) {
-			return -2
+			return -1
 		}
 
 		log.Panic(err)
@@ -174,7 +180,7 @@ func FindAddress(address_zip *string, address_line1 *string) models.Address {
 
 	if err != nil {
 		log.Print("Error creating prepared statement")
-		log.Print(err)
+		log.Panic(err)
 	}
 
 	var address = models.Address{}

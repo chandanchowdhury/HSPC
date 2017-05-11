@@ -27,7 +27,7 @@ func CredentialCreate(credential models.Credential) int64 {
 
 	if err != nil {
 		if isDuplicateKeyError(err) {
-			return 0
+			return -1
 		}
 
 		log.Panic(err)
@@ -92,6 +92,10 @@ func CredentialUpdate(emailaddress string, password string, credential_active bo
 
 	if err != nil {
 		if isForeignKeyError(err) {
+			return -1
+		}
+
+		if isDuplicateKeyError(err) {
 			return -2
 		}
 

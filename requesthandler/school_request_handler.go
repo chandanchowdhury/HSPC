@@ -11,11 +11,20 @@ func HandleSchoolPost(params school.PostSchoolParams) middleware.Responder {
 	//create the school
 	school_id := dbhandler.SchoolCreate(*params.School)
 
-	if school_id == -1 {
+	if school_id <= 0 {
 		resp := school.NewPostSchoolDefault(400)
 		error := new(models.Error)
 		error.Code = -1
 		error.Message = "Failed to create School"
+
+		switch school_id {
+		case -1:
+			error.Message = "School already exists"
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
+		}
 
 		resp.SetPayload(error)
 
@@ -56,10 +65,23 @@ func HandleSchoolPut(params school.PutSchoolParams) middleware.Responder {
 
 	error := new(models.Error)
 
-	if affected_count != 1 {
-		error.Message = "Error: Unexpected number of updates"
+	if affected_count <= 0 {
+		error.Message = "Error: Unexpected error"
 		error.Code = affected_count
 		resp := school.NewPostSchoolDefault(400)
+
+		switch affected_count {
+		case 0:
+			error.Message = "Warn: no records found for update"
+			resp.SetStatusCode(404)
+		case -1:
+			error.Message = "Update will cause duplicate record"
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
+		}
+
 		resp.SetPayload(error)
 
 		return resp
@@ -79,10 +101,21 @@ func HandleSchoolDelete(params school.DeleteSchoolIDParams) middleware.Responder
 
 	error := new(models.Error)
 
-	if affected_count != 1 {
-		error.Message = "Error: Unexpected number of deletes"
+	if affected_count <= 0 {
+		error.Message = "Error: Unexpected error"
 		error.Code = affected_count
 		resp := school.NewDeleteSchoolIDDefault(400)
+
+		switch affected_count {
+		case 0:
+			error.Message = "Warn: no records found for update"
+			resp.SetStatusCode(404)
+		case -2:
+			error.Message = "Related data error"
+		default:
+			error.Message = "Error: Unexpected error"
+		}
+
 		resp.SetPayload(error)
 
 		return resp
