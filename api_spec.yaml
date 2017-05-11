@@ -975,7 +975,7 @@ definitions:
       emailaddress:
         type: string
         format: email
-        pattern: "([\\w+\\d+\\.\\_\\-]+@\\w+(\\.\\w+)+){1}"
+        pattern: "\\b([\\w+\\d+\\.\\_\\-]+@\\w+(\\.\\w+)+){1}\\b"
       password:
         type: string
         format: password
@@ -1001,7 +1001,7 @@ definitions:
       zipcode:
         type: string
         description: Zip code
-        pattern: "[1-9]\\d{4}"
+        pattern: "\\b([1-9]{1}\\d\\d\\d\\d){1}\\b"
       state:
         type: string
         description: State
