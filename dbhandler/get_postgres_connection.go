@@ -13,7 +13,8 @@ const (
 	DB_PASSWORD = "HSPC-Password"
 	DB_NAME     = "postgres"
 
-	foreignKeyViolationErrorCode = pq.ErrorCode("23503")
+	foreignKeyViolationErrorCode   = pq.ErrorCode("23503")
+	duplicateKeyViolationErrorCode = pq.ErrorCode("23505")
 )
 
 func getDBConn() *sql.DB {
@@ -34,6 +35,20 @@ func isForeignKeyError(err error) bool {
 		if pgErr.Code == foreignKeyViolationErrorCode {
 			// handle foreign_key_violation errors here
 			log.Print("Foreign Key Violation")
+			return true
+		}
+	}
+
+	return false
+}
+
+func isDuplicateKeyError(err error) bool {
+
+	if pgErr, isPGErr := err.(*pq.Error); isPGErr {
+		log.Printf("PostgreSQL Error Code: %s", pgErr.Code)
+		if pgErr.Code == duplicateKeyViolationErrorCode {
+			// handle foreign_key_violation errors here
+			log.Print("Duplicate Key Violation")
 			return true
 		}
 	}

@@ -2,8 +2,9 @@ package dbhandler
 
 import (
 	"database/sql"
-	"github.com/chandanchowdhury/HSPC/models"
 	"log"
+
+	"github.com/chandanchowdhury/HSPC/models"
 )
 
 /**
@@ -25,6 +26,10 @@ func CredentialCreate(credential models.Credential) int64 {
 	err = stmt.QueryRow(credential.Emailaddress, credential.Password).Scan(&lastInsertId)
 
 	if err != nil {
+		if isDuplicateKeyError(err) {
+			return 0
+		}
+
 		log.Panic(err)
 	}
 
@@ -96,6 +101,11 @@ func CredentialUpdate(emailaddress string, password string, credential_active bo
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
+		// if no records updated, just inform the caller
+		if affectedCount == 0 {
+			return 0
+		}
+
 		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
@@ -131,6 +141,11 @@ func CredentialDelete(emailaddress string) int64 {
 	affectedCount, err := result.RowsAffected()
 
 	if affectedCount != 1 {
+		// if no records updated, just inform the caller
+		if affectedCount == 0 {
+			return 0
+		}
+
 		log.Panicf("Unexpected number of updates: %d", affectedCount)
 	}
 
