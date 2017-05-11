@@ -976,6 +976,7 @@ definitions:
       emailaddress:
         type: string
         format: email
+        pattern: "([\\w+\\d+\\.\\_\\-]+@\\w+(\\.\\w+)+){1}"
       password:
         type: string
         format: password
@@ -1001,6 +1002,7 @@ definitions:
       zipcode:
         type: string
         description: Zip code
+        pattern: "[1-9]\\d{4}"
       state:
         type: string
         description: State
@@ -1035,10 +1037,6 @@ definitions:
       address_id:
         type: integer
         format: int64
-      advisor_id:
-        type: integer
-        format: int64
-        minimum: 1
       school_advisor_active:
         type: boolean
         description: When an advisor selects herself as a school representative, it has to be approved by admin
@@ -1099,6 +1097,8 @@ definitions:
         minimum: 1
       team_name:
         type: string
+        minLength: 1
+        maxLength: 20 # difficult print more than 20 char name in A4 sheet
       school_id:
         type: integer
         format: int64
@@ -1166,6 +1166,10 @@ definitions:
         format: int64
         minimum: 1
       problem_id:
+        type: integer
+        format: int64
+        minimum: 1
+      score_earned:
         type: integer
         format: int64
         minimum: 1
