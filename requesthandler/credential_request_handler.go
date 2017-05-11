@@ -36,20 +36,20 @@ func HandleCredentialPost(params credential.PostCredentialParams) middleware.Res
 	return resp
 }
 
-func HandleCredentialGet(params credential.GetCredentialIDParams) middleware.Responder {
+func HandleCredentialGet(params credential.GetCredentialEmailaddressParams) middleware.Responder {
 	//get credential details based on the provided id
-	credential_data := dbhandler.CredentialRead(params.ID.String())
+	credential_data := dbhandler.CredentialRead(params.Emailaddress.String())
 
 	//credential not found
 	if credential_data.CredentialID == 0 {
-		resp := credential.NewGetCredentialIDDefault(404)
+		resp := credential.NewGetCredentialEmailaddressDefault(404)
 		error := &models.Error{Code: -1, Message: "User not found"}
 
 		resp.SetPayload(error)
 		return resp
 	}
 
-	resp := credential.NewGetCredentialIDOK()
+	resp := credential.NewGetCredentialEmailaddressOK()
 
 	resp.SetPayload(credential_data)
 
@@ -84,15 +84,15 @@ func HandleCredentialPut(params credential.PutCredentialParams) middleware.Respo
 	return resp
 }
 
-func HandleCredentialDelete(params credential.DeleteCredentialIDParams) middleware.Responder {
-	affected_count := dbhandler.CredentialDelete(params.ID.String())
+func HandleCredentialDelete(params credential.DeleteCredentialEmailaddressParams) middleware.Responder {
+	affected_count := dbhandler.CredentialDelete(params.Emailaddress.String())
 
 	error := new(models.Error)
 
 	if affected_count != 1 {
 		error.Message = "Error: Unexpected number of deletes"
 		error.Code = affected_count
-		resp := credential.NewDeleteCredentialIDDefault(400)
+		resp := credential.NewDeleteCredentialEmailaddressDefault(400)
 
 		//no rows deleted
 		if affected_count == 0 {
@@ -106,7 +106,7 @@ func HandleCredentialDelete(params credential.DeleteCredentialIDParams) middlewa
 	}
 
 	error.Message = "Deleted"
-	resp := credential.NewDeleteCredentialIDOK()
+	resp := credential.NewDeleteCredentialEmailaddressOK()
 	resp.SetPayload(error)
 
 	return resp

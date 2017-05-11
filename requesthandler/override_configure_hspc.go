@@ -32,7 +32,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 	api.AdvisorDeleteAdvisorIDHandler = advisor.DeleteAdvisorIDHandlerFunc(func(params advisor.DeleteAdvisorIDParams) middleware.Responder {
 		return HandleAdvisorDelete(params)
 	})
-	api.CredentialDeleteCredentialIDHandler = credential.DeleteCredentialIDHandlerFunc(func(params credential.DeleteCredentialIDParams) middleware.Responder {
+	api.CredentialDeleteCredentialEmailaddressHandler = credential.DeleteCredentialEmailaddressHandlerFunc(func(params credential.DeleteCredentialEmailaddressParams) middleware.Responder {
 		return HandleCredentialDelete(params)
 	})
 	api.ProblemDeleteProblemIDHandler = problem.DeleteProblemIDHandlerFunc(func(params problem.DeleteProblemIDParams) middleware.Responder {
@@ -56,7 +56,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 	api.AdvisorGetAdvisorIDHandler = advisor.GetAdvisorIDHandlerFunc(func(params advisor.GetAdvisorIDParams) middleware.Responder {
 		return HandleAdvisorGet(params)
 	})
-	api.CredentialGetCredentialIDHandler = credential.GetCredentialIDHandlerFunc(func(params credential.GetCredentialIDParams) middleware.Responder {
+	api.CredentialGetCredentialEmailaddressHandler = credential.GetCredentialEmailaddressHandlerFunc(func(params credential.GetCredentialEmailaddressParams) middleware.Responder {
 		return HandleCredentialGet(params)
 	})
 	api.LoginGetLoginEmailaddressPasswordHandler = login.GetLoginEmailaddressPasswordHandlerFunc(func(params login.GetLoginEmailaddressPasswordParams) middleware.Responder {
