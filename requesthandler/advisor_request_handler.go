@@ -107,7 +107,7 @@ func HandleAdvisorDelete(params advisor.DeleteAdvisorIDParams) middleware.Respon
 
 		switch affected_count {
 		case 0:
-			error.Message = "Warn: no records found for update"
+			error.Message = "Warn: no records found for delete"
 			resp.SetStatusCode(404)
 		case -2:
 			error.Message = "Related data error"
