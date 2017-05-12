@@ -7,7 +7,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 )
 
-func HandleStudentPost(params student.PostStudentParams) middleware.Responder {
+func HandleStudentPost(params student.PostStudentParams, principal interface{}) middleware.Responder {
 	//create the student
 	student_id := dbhandler.StudentCreate(*params.Student)
 
@@ -41,7 +41,7 @@ func HandleStudentPost(params student.PostStudentParams) middleware.Responder {
 	return resp
 }
 
-func HandleStudentGet(params student.GetStudentIDParams) middleware.Responder {
+func HandleStudentGet(params student.GetStudentIDParams, principal interface{}) middleware.Responder {
 	//get student details based on the provided id
 	student_data := dbhandler.StudentRead(params.ID)
 
@@ -59,7 +59,7 @@ func HandleStudentGet(params student.GetStudentIDParams) middleware.Responder {
 	return resp
 }
 
-func HandleStudentPut(params student.PutStudentParams) middleware.Responder {
+func HandleStudentPut(params student.PutStudentParams, principal interface{}) middleware.Responder {
 	affected_count := dbhandler.StudentUpdate(*params.Student)
 
 	error := new(models.Error)
@@ -92,7 +92,7 @@ func HandleStudentPut(params student.PutStudentParams) middleware.Responder {
 	return resp
 }
 
-func HandleStudentDelete(params student.DeleteStudentIDParams) middleware.Responder {
+func HandleStudentDelete(params student.DeleteStudentIDParams, principal interface{}) middleware.Responder {
 	affected_count := dbhandler.StudentDelete(params.ID)
 
 	error := new(models.Error)

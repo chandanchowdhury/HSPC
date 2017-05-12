@@ -7,7 +7,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 )
 
-func HandleTeamPost(params team.PostTeamParams) middleware.Responder {
+func HandleTeamPost(params team.PostTeamParams, principal interface{}) middleware.Responder {
 	//create the team
 	team_id := dbhandler.TeamCreate(*params.Team)
 
@@ -44,7 +44,7 @@ func HandleTeamPost(params team.PostTeamParams) middleware.Responder {
 	return resp
 }
 
-func HandleTeamGet(params team.GetTeamIDParams) middleware.Responder {
+func HandleTeamGet(params team.GetTeamIDParams, principal interface{}) middleware.Responder {
 	//get team details based on the provided id
 	team_data := dbhandler.TeamRead(params.ID)
 
@@ -62,7 +62,7 @@ func HandleTeamGet(params team.GetTeamIDParams) middleware.Responder {
 	return resp
 }
 
-func HandleTeamPut(params team.PutTeamParams) middleware.Responder {
+func HandleTeamPut(params team.PutTeamParams, principal interface{}) middleware.Responder {
 	affected_count := dbhandler.TeamUpdate(*params.Team)
 
 	error := new(models.Error)
@@ -95,7 +95,7 @@ func HandleTeamPut(params team.PutTeamParams) middleware.Responder {
 	return resp
 }
 
-func HandleTeamDelete(params team.DeleteTeamIDParams) middleware.Responder {
+func HandleTeamDelete(params team.DeleteTeamIDParams, principal interface{}) middleware.Responder {
 	affected_count := dbhandler.TeamDelete(params.ID)
 
 	error := new(models.Error)

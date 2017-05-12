@@ -72,8 +72,11 @@ func SchoolDeleteAdvisor(school_id int64, advisor_id int64) bool {
 	return true
 }
 
-func SchoolReadAdvisors(school_id int64) []int64 {
-	log.Print("# Reading School Advisors")
+/**
+Given a school_id, get the advisor for the School.
+*/
+func SchoolReadAdvisor(school_id int64) int64 {
+	log.Print("# Reading School Advisor")
 	log.Printf("School ID = %d", school_id)
 
 	db := getDBConn()
@@ -87,19 +90,13 @@ func SchoolReadAdvisors(school_id int64) []int64 {
 		log.Panic(err)
 	}
 
-	crsr, err := stmt.Query(school_id)
+	var advisor_id int64
+	err = stmt.QueryRow(school_id).Scan(&advisor_id)
 
 	if err != nil {
 		log.Print("Error getting team data")
 		log.Panic(err)
 	}
 
-	advisor_ids := make([]int64, 0)
-	var a_id int64
-	for crsr.Next() {
-		crsr.Scan(&a_id)
-		advisor_ids = append(advisor_ids, a_id)
-	}
-
-	return advisor_ids
+	return advisor_id
 }

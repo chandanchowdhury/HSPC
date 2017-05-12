@@ -161,7 +161,7 @@ func StudentDelete(student_id int64) int64 {
 StudentListBySchool Finds and returns all Student who belongs to a School
 */
 func StudentListBySchool(school_id int64) []*models.Student {
-	log.Print("Reading Student List for School ID = %d", school_id)
+	log.Printf("Reading Student List for School ID = %d", school_id)
 
 	db := getDBConn()
 

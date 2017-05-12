@@ -38,7 +38,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 
 		log.Printf("From DB - email: %s, password: %s Active: %t", credential.Emailaddress.String(), credential.Password.String(), *credential.CredentialActive)
 
-		if credential.Password.String() == pass {
+		if credential.Password.String() == pass && *credential.CredentialActive == true {
 			log.Print("Password Matched")
 			return user, nil
 		}
@@ -77,10 +77,10 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		return HandleSolutionDelete(params)
 	})
 	api.StudentDeleteStudentIDHandler = student.DeleteStudentIDHandlerFunc(func(params student.DeleteStudentIDParams, principal interface{}) middleware.Responder {
-		return HandleStudentDelete(params)
+		return HandleStudentDelete(params, principal)
 	})
 	api.TeamDeleteTeamIDHandler = team.DeleteTeamIDHandlerFunc(func(params team.DeleteTeamIDParams, principal interface{}) middleware.Responder {
-		return HandleTeamDelete(params)
+		return HandleTeamDelete(params, principal)
 	})
 	api.AddressGetAddressIDHandler = address.GetAddressIDHandlerFunc(func(params address.GetAddressIDParams, principal interface{}) middleware.Responder {
 		return HandleAddressGet(params)
@@ -104,10 +104,10 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		return HandleSolutionGet(params)
 	})
 	api.StudentGetStudentIDHandler = student.GetStudentIDHandlerFunc(func(params student.GetStudentIDParams, principal interface{}) middleware.Responder {
-		return HandleStudentGet(params)
+		return HandleStudentGet(params, principal)
 	})
 	api.TeamGetTeamIDHandler = team.GetTeamIDHandlerFunc(func(params team.GetTeamIDParams, principal interface{}) middleware.Responder {
-		return HandleTeamGet(params)
+		return HandleTeamGet(params, principal)
 	})
 	api.AddressPostAddressHandler = address.PostAddressHandlerFunc(func(params address.PostAddressParams, principal interface{}) middleware.Responder {
 		return HandleAddressPost(params)
@@ -128,10 +128,10 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		return HandleSolutionPost(params)
 	})
 	api.StudentPostStudentHandler = student.PostStudentHandlerFunc(func(params student.PostStudentParams, principal interface{}) middleware.Responder {
-		return HandleStudentPost(params)
+		return HandleStudentPost(params, principal)
 	})
 	api.TeamPostTeamHandler = team.PostTeamHandlerFunc(func(params team.PostTeamParams, principal interface{}) middleware.Responder {
-		return HandleTeamPost(params)
+		return HandleTeamPost(params, principal)
 	})
 	api.AddressPutAddressHandler = address.PutAddressHandlerFunc(func(params address.PutAddressParams, principal interface{}) middleware.Responder {
 		return HandleAddressPut(params)
@@ -152,10 +152,10 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		return HandleSolutionPut(params)
 	})
 	api.StudentPutStudentHandler = student.PutStudentHandlerFunc(func(params student.PutStudentParams, principal interface{}) middleware.Responder {
-		return HandleStudentPut(params)
+		return HandleStudentPut(params, principal)
 	})
 	api.TeamPutTeamHandler = team.PutTeamHandlerFunc(func(params team.PutTeamParams, principal interface{}) middleware.Responder {
-		return HandleTeamPut(params)
+		return HandleTeamPut(params, principal)
 	})
 	// List of all Schools
 	api.SchoolGetSchoolHandler = school.GetSchoolHandlerFunc(func(params school.GetSchoolParams, principal interface{}) middleware.Responder {
@@ -168,7 +168,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 	})
 	// List of all Students for a School
 	api.SchoolGetSchoolIDStudentsHandler = school.GetSchoolIDStudentsHandlerFunc(func(params school.GetSchoolIDStudentsParams, principal interface{}) middleware.Responder {
-		return HandleSchoolGetStudentList(params)
+		return HandleSchoolGetStudentList(params, principal)
 	})
 	// List all Advisors
 	api.AdvisorGetAdvisorHandler = advisor.GetAdvisorHandlerFunc(func(params advisor.GetAdvisorParams, principal interface{}) middleware.Responder {

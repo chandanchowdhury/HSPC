@@ -184,3 +184,33 @@ func AdvisorReadAll() []*models.Advisor {
 
 	return advisors
 }
+
+func AdvisorReadByEmail(email string) models.Advisor {
+	log.Printf("Reading Advisor with email = %d", email)
+
+	db := getDBConn()
+	//join Advisor and Credential to get Advisor details using email
+	stmt, err := db.Prepare("SELECT advisor_id, advisor_name, a.credential_id " +
+		"FROM credential c, advisor a WHERE emailaddress = $1 AND c.credential_id = a.credential_id")
+	defer stmt.Close()
+
+	if err != nil {
+		log.Print("Error creating prepared statement")
+		log.Panic(err)
+	}
+
+	var advisor = models.Advisor{}
+	err = stmt.QueryRow(email).Scan(&advisor.AdvisorID, &advisor.AdvisorName, &advisor.CredentialID)
+
+	// if no records found, return an empty struct
+	if err == sql.ErrNoRows {
+		return models.Advisor{}
+	}
+
+	if err != nil {
+		log.Print("Error getting advisor data")
+		log.Panic(err)
+	}
+
+	return advisor
+}

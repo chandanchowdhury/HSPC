@@ -5,6 +5,7 @@ import (
 	"github.com/chandanchowdhury/HSPC/models"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/school"
 	"github.com/go-openapi/runtime/middleware"
+	"log"
 )
 
 func HandleSchoolPost(params school.PostSchoolParams) middleware.Responder {
@@ -148,14 +149,48 @@ func HandleSchoolGetList(params school.GetSchoolParams) middleware.Responder {
 	return resp
 }
 
-func HandleSchoolGetStudentList(params school.GetSchoolIDStudentsParams) middleware.Responder {
+func HandleSchoolGetStudentList(params school.GetSchoolIDStudentsParams, principal interface{}) middleware.Responder {
+	log.Printf("SchoolStudentList principal = %s", principal)
+
+	//Only School advisor or admin should get the list of students
+
+	//try to convert the interface to string
+	email, isEmail := principal.(string)
+
+	if isEmail == false {
+		//incorrect principal provided, fail
+		error := new(models.Error)
+		error.Code = 401
+		error.Message = "Error: Invalid Principal Provided"
+		resp := school.NewGetSchoolIDStudentsDefault(401)
+		resp.SetPayload(error)
+
+		return resp
+	}
+
+	// Get the Advisor detail using the principal
+	advisor := dbhandler.AdvisorReadByEmail(email)
+
+	//get the school advisor
+	school_advisor := dbhandler.SchoolReadAdvisor(params.ID)
+
+	if advisor.AdvisorID != school_advisor {
+		error := new(models.Error)
+		error.Code = 403
+		error.Message = "Error: Advisor Not Approved For School"
+		resp := school.NewGetSchoolIDStudentsDefault(403)
+		resp.SetPayload(error)
+
+		return resp
+	}
+
 	student_list := dbhandler.StudentListBySchool(params.ID)
 
 	if student_list == nil {
 		error := new(models.Error)
 		error.Code = 500
 		error.Message = "Error: Failed to get school list from DB"
-		resp := school.NewGetSchoolDefault(500)
+		resp := school.NewGetSchoolIDStudentsDefault(500)
 		resp.SetPayload(error)
 
 		return resp
