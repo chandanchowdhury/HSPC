@@ -32,7 +32,7 @@ func HandleProblemGet(params problem.GetProblemIDParams) middleware.Responder {
 	//get problem details based on the provided id
 	problem_data := dbhandler.ProblemRead(params.ID)
 
-	if *problem_data.ProblemID == 0 {
+	if problem_data.ProblemID == nil {
 		resp := problem.NewGetProblemIDDefault(404)
 		error := &models.Error{Code: -1, Message: "Problem not found"}
 

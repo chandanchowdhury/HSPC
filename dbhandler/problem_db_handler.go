@@ -1,10 +1,11 @@
 package dbhandler
 
 import (
+	"log"
+
 	"github.com/chandanchowdhury/HSPC/models"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 )
 
 //TODO: Read from config file
@@ -28,7 +29,33 @@ func getProblemColl() *mgo.Collection {
 
 	hspc_DB := session.DB("HSPC")
 
-	return hspc_DB.C(Problem_Collection_Name)
+	//if the collection not already exits
+	colls, err := hspc_DB.CollectionNames()
+	problem_coll_exists := false
+	for _, c := range colls {
+		if c == Problem_Collection_Name {
+			problem_coll_exists = true
+		}
+	}
+
+	problem_coll := hspc_DB.C(Problem_Collection_Name)
+
+	if !problem_coll_exists {
+		index := mgo.Index{
+			Key:        []string{"problemid"},
+			Unique:     true,
+			DropDups:   true,
+			Background: true, // See notes.
+			Sparse:     true,
+		}
+		err := problem_coll.EnsureIndex(index)
+
+		if err != nil {
+			log.Panic("Error creating index")
+		}
+	}
+
+	return problem_coll
 }
 
 /*
