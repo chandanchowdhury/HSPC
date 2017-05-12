@@ -28,8 +28,10 @@ info:
 securityDefinitions:
   UserSecurityBasic:
     type: basic
+    description: UserSecurity is for Advisors for maintaining Teams and Students
   AdminSecurityBasic:
     type: basic
+    description: AdminSecurity is for organisers who will maintain the system
 
 security:
   - AdminSecurityBasic: []
