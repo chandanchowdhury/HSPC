@@ -384,7 +384,63 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
+  /school/{id}/advisor:
+    parameters:
+      - name: id
+        description: SchoolID of the School
+        in: path
+        type: integer
+        format: int64
+        required: true
+    get:
+      description: Find the Advisor for a School
+      tags:
+        - school
+      responses:
+        200:
+          description: Returns Advisor
+          schema:
+              $ref: '#/definitions/Advisor'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /school/{school_id}/advisor/{advisor_id}:
+      parameters:
+        - name: school_id
+          description: SchoolID of the School
+          in: path
+          type: integer
+          format: int64
+          required: true
+        - name: advisor_id
+          description: AdvisorID of the School
+          in: path
+          type: integer
+          format: int64
+          required: true
+      put:
+        description: Set the Advisor for a School
+        tags:
+          - school
+        responses:
+          204:
+            description: Success
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+      delete:
+        description: Remove the Advisor for a School
+        tags:
+          - school
+        responses:
+          204:
+            description: Success
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
 # API paths for Advisor
   /advisor:
     post:
@@ -666,7 +722,7 @@ paths:
       security:
         - UserSecurityBasic: []
       responses:
-        201:
+        204:
           description: Student added to the Team, no data
         default:
           description: Unexpected error
@@ -693,7 +749,7 @@ paths:
       security:
         - UserSecurityBasic: []
       responses:
-        201:
+        204:
           description: Student removed from the Team, no data
         default:
           description: Unexpected error
