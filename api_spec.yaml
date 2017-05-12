@@ -17,15 +17,23 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
+
 # the domain of the service
 # TODO: Enable in production
 # host: hspc.cs.ksu.com
+
 # security definitions
-#securityDefinitions:
-#  api_key:
-#    type: apiKey
-#    name: api_key
-#    in: header
+# UserSecurity is for Advisors for maintaining Teams and Students
+# AdminSecurity is for organizors who will maintain the system
+securityDefinitions:
+  UserSecurityBasic:
+    type: basic
+  AdminSecurityBasic:
+    type: basic
+
+security:
+  - AdminSecurityBasic: []
+
 # array of all schemes that your API supports
 schemes:
   # TODO: Disable HTTP and enable HTTPS when implementing in production
@@ -275,6 +283,8 @@ paths:
       description: Return list of all Schools
       tags:
         - school
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Returns School list
@@ -298,6 +308,8 @@ paths:
       description: Find School using SchoolID
       tags:
         - school
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Returns School
@@ -332,6 +344,8 @@ paths:
       description: Find all Students in a School
       tags:
         - school
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Returns the list of Students for the School
@@ -355,6 +369,8 @@ paths:
       description:  Find all Teams in a School
       tags:
         - school
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Returns the list of Teams for the School
@@ -399,6 +415,8 @@ paths:
           description: Updated Advisor object
           schema:
             $ref: '#/definitions/Advisor'
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -435,6 +453,8 @@ paths:
       description: Find Advisor using AdvisorID
       tags:
         - advisor
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Returns Advisor
@@ -469,6 +489,8 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/Student'
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Return the newly created Student
@@ -489,6 +511,8 @@ paths:
           description: Updated Student object
           schema:
             $ref: '#/definitions/Student'
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -510,6 +534,8 @@ paths:
       description: Find Student using StudentID
       tags:
         - student
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Returns Student
@@ -523,6 +549,8 @@ paths:
       description: Given an student ID, delete the student
       tags:
         - student
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Return success
@@ -544,6 +572,8 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/Team'
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Return the newly created Team
@@ -564,6 +594,8 @@ paths:
           description: Updated Team object
           schema:
             $ref: '#/definitions/Team'
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -585,6 +617,8 @@ paths:
       description: Find Team using TeamID
       tags:
         - team
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Returns Team
@@ -598,6 +632,8 @@ paths:
       description: Given an team ID, delete the team
       tags:
         - team
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Return success
@@ -625,6 +661,8 @@ paths:
       description: Add Student to a Team
       tags:
         - team
+      security:
+        - UserSecurityBasic: []
       responses:
         201:
           description: Student added to the Team, no data
@@ -650,6 +688,8 @@ paths:
       description: Remove Student from Team
       tags:
         - team
+      security:
+        - UserSecurityBasic: []
       responses:
         201:
           description: Student removed from the Team, no data
@@ -669,6 +709,8 @@ paths:
       description: Find Students in a Team
       tags:
         - team
+      security:
+        - UserSecurityBasic: []
       responses:
         200:
           description: Returns List of Students in a Team

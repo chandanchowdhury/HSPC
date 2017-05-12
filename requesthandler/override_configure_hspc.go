@@ -1,8 +1,9 @@
 package requesthandler
 
 import (
-	"github.com/go-openapi/runtime/middleware"
+	"log"
 
+	"github.com/chandanchowdhury/HSPC/dbhandler"
 	"github.com/chandanchowdhury/HSPC/restapi/operations"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/address"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/advisor"
@@ -13,6 +14,8 @@ import (
 	"github.com/chandanchowdhury/HSPC/restapi/operations/solution"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/student"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/team"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime/middleware"
 )
 
 /**
@@ -24,122 +27,151 @@ Just add below line before return in configureAPI()
 
 requesthandler.Override_configure_hspc(api)
 */
+//
 func Override_configure_hspc(api *operations.HspcAPI) {
 
-	api.AddressDeleteAddressIDHandler = address.DeleteAddressIDHandlerFunc(func(params address.DeleteAddressIDParams) middleware.Responder {
-		return HandleAddressDelete(params)
+	// Applies when the Authorization header is set with the Basic scheme
+	api.UserSecurityBasicAuth = func(user string, pass string) (interface{}, error) {
+		log.Print("Authenticating User = %s", user)
+
+		credential := dbhandler.CredentialRead(user)
+
+		log.Printf("From DB - email: %s, password: %s Active: %t", credential.Emailaddress.String(), credential.Password.String(), *credential.CredentialActive)
+
+		if credential.Password.String() == pass {
+			log.Print("Password Matched")
+			return user, nil
+		}
+
+		return nil, errors.Unauthenticated("api.hspc.ksu.edu")
+	}
+
+	// Applies when the Authorization header is set with the Basic scheme
+	api.AdminSecurityBasicAuth = func(user string, pass string) (interface{}, error) {
+		log.Print("Authenticating Admin = %s", user)
+
+		//TODO: improvmenet required
+		if user == "hspc" && pass == "hspc" {
+			return "HSPC", nil
+		}
+
+		return nil, errors.Unauthenticated("api.hspc.cs.ksu.edu")
+	}
+
+	api.AddressDeleteAddressIDHandler = address.DeleteAddressIDHandlerFunc(func(params address.DeleteAddressIDParams, principal interface{}) middleware.Responder {
+		return HandleAddressDelete(params, principal)
 	})
-	api.AdvisorDeleteAdvisorIDHandler = advisor.DeleteAdvisorIDHandlerFunc(func(params advisor.DeleteAdvisorIDParams) middleware.Responder {
+	api.AdvisorDeleteAdvisorIDHandler = advisor.DeleteAdvisorIDHandlerFunc(func(params advisor.DeleteAdvisorIDParams, principal interface{}) middleware.Responder {
 		return HandleAdvisorDelete(params)
 	})
-	api.CredentialDeleteCredentialEmailaddressHandler = credential.DeleteCredentialEmailaddressHandlerFunc(func(params credential.DeleteCredentialEmailaddressParams) middleware.Responder {
+	api.CredentialDeleteCredentialEmailaddressHandler = credential.DeleteCredentialEmailaddressHandlerFunc(func(params credential.DeleteCredentialEmailaddressParams, principal interface{}) middleware.Responder {
 		return HandleCredentialDelete(params)
 	})
-	api.ProblemDeleteProblemIDHandler = problem.DeleteProblemIDHandlerFunc(func(params problem.DeleteProblemIDParams) middleware.Responder {
+	api.ProblemDeleteProblemIDHandler = problem.DeleteProblemIDHandlerFunc(func(params problem.DeleteProblemIDParams, principal interface{}) middleware.Responder {
 		return HandleProblemDelete(params)
 	})
-	api.SchoolDeleteSchoolIDHandler = school.DeleteSchoolIDHandlerFunc(func(params school.DeleteSchoolIDParams) middleware.Responder {
+	api.SchoolDeleteSchoolIDHandler = school.DeleteSchoolIDHandlerFunc(func(params school.DeleteSchoolIDParams, principal interface{}) middleware.Responder {
 		return HandleSchoolDelete(params)
 	})
-	api.SolutionDeleteSolutionIDHandler = solution.DeleteSolutionIDHandlerFunc(func(params solution.DeleteSolutionIDParams) middleware.Responder {
+	api.SolutionDeleteSolutionIDHandler = solution.DeleteSolutionIDHandlerFunc(func(params solution.DeleteSolutionIDParams, principal interface{}) middleware.Responder {
 		return HandleSolutionDelete(params)
 	})
-	api.StudentDeleteStudentIDHandler = student.DeleteStudentIDHandlerFunc(func(params student.DeleteStudentIDParams) middleware.Responder {
+	api.StudentDeleteStudentIDHandler = student.DeleteStudentIDHandlerFunc(func(params student.DeleteStudentIDParams, principal interface{}) middleware.Responder {
 		return HandleStudentDelete(params)
 	})
-	api.TeamDeleteTeamIDHandler = team.DeleteTeamIDHandlerFunc(func(params team.DeleteTeamIDParams) middleware.Responder {
+	api.TeamDeleteTeamIDHandler = team.DeleteTeamIDHandlerFunc(func(params team.DeleteTeamIDParams, principal interface{}) middleware.Responder {
 		return HandleTeamDelete(params)
 	})
-	api.AddressGetAddressIDHandler = address.GetAddressIDHandlerFunc(func(params address.GetAddressIDParams) middleware.Responder {
+	api.AddressGetAddressIDHandler = address.GetAddressIDHandlerFunc(func(params address.GetAddressIDParams, principal interface{}) middleware.Responder {
 		return HandleAddressGet(params)
 	})
-	api.AdvisorGetAdvisorIDHandler = advisor.GetAdvisorIDHandlerFunc(func(params advisor.GetAdvisorIDParams) middleware.Responder {
+	api.AdvisorGetAdvisorIDHandler = advisor.GetAdvisorIDHandlerFunc(func(params advisor.GetAdvisorIDParams, principal interface{}) middleware.Responder {
 		return HandleAdvisorGet(params)
 	})
-	api.CredentialGetCredentialEmailaddressHandler = credential.GetCredentialEmailaddressHandlerFunc(func(params credential.GetCredentialEmailaddressParams) middleware.Responder {
+	api.CredentialGetCredentialEmailaddressHandler = credential.GetCredentialEmailaddressHandlerFunc(func(params credential.GetCredentialEmailaddressParams, principal interface{}) middleware.Responder {
 		return HandleCredentialGet(params)
 	})
-	api.LoginGetLoginEmailaddressPasswordHandler = login.GetLoginEmailaddressPasswordHandlerFunc(func(params login.GetLoginEmailaddressPasswordParams) middleware.Responder {
+	api.LoginGetLoginEmailaddressPasswordHandler = login.GetLoginEmailaddressPasswordHandlerFunc(func(params login.GetLoginEmailaddressPasswordParams, principal interface{}) middleware.Responder {
 		return HandleLogin(params)
 	})
-	api.ProblemGetProblemIDHandler = problem.GetProblemIDHandlerFunc(func(params problem.GetProblemIDParams) middleware.Responder {
+	api.ProblemGetProblemIDHandler = problem.GetProblemIDHandlerFunc(func(params problem.GetProblemIDParams, principal interface{}) middleware.Responder {
 		return HandleProblemGet(params)
 	})
-	api.SchoolGetSchoolIDHandler = school.GetSchoolIDHandlerFunc(func(params school.GetSchoolIDParams) middleware.Responder {
+	api.SchoolGetSchoolIDHandler = school.GetSchoolIDHandlerFunc(func(params school.GetSchoolIDParams, principal interface{}) middleware.Responder {
 		return HandleSchoolGet(params)
 	})
-	api.SolutionGetSolutionIDHandler = solution.GetSolutionIDHandlerFunc(func(params solution.GetSolutionIDParams) middleware.Responder {
+	api.SolutionGetSolutionIDHandler = solution.GetSolutionIDHandlerFunc(func(params solution.GetSolutionIDParams, principal interface{}) middleware.Responder {
 		return HandleSolutionGet(params)
 	})
-	api.StudentGetStudentIDHandler = student.GetStudentIDHandlerFunc(func(params student.GetStudentIDParams) middleware.Responder {
+	api.StudentGetStudentIDHandler = student.GetStudentIDHandlerFunc(func(params student.GetStudentIDParams, principal interface{}) middleware.Responder {
 		return HandleStudentGet(params)
 	})
-	api.TeamGetTeamIDHandler = team.GetTeamIDHandlerFunc(func(params team.GetTeamIDParams) middleware.Responder {
+	api.TeamGetTeamIDHandler = team.GetTeamIDHandlerFunc(func(params team.GetTeamIDParams, principal interface{}) middleware.Responder {
 		return HandleTeamGet(params)
 	})
-	api.AddressPostAddressHandler = address.PostAddressHandlerFunc(func(params address.PostAddressParams) middleware.Responder {
+	api.AddressPostAddressHandler = address.PostAddressHandlerFunc(func(params address.PostAddressParams, principal interface{}) middleware.Responder {
 		return HandleAddressPost(params)
 	})
-	api.AdvisorPostAdvisorHandler = advisor.PostAdvisorHandlerFunc(func(params advisor.PostAdvisorParams) middleware.Responder {
+	api.AdvisorPostAdvisorHandler = advisor.PostAdvisorHandlerFunc(func(params advisor.PostAdvisorParams, principal interface{}) middleware.Responder {
 		return HandleAdvisorPost(params)
 	})
-	api.CredentialPostCredentialHandler = credential.PostCredentialHandlerFunc(func(params credential.PostCredentialParams) middleware.Responder {
+	api.CredentialPostCredentialHandler = credential.PostCredentialHandlerFunc(func(params credential.PostCredentialParams, principal interface{}) middleware.Responder {
 		return HandleCredentialPost(params)
 	})
-	api.ProblemPostProblemHandler = problem.PostProblemHandlerFunc(func(params problem.PostProblemParams) middleware.Responder {
+	api.ProblemPostProblemHandler = problem.PostProblemHandlerFunc(func(params problem.PostProblemParams, principal interface{}) middleware.Responder {
 		return HandleProblemPost(params)
 	})
-	api.SchoolPostSchoolHandler = school.PostSchoolHandlerFunc(func(params school.PostSchoolParams) middleware.Responder {
+	api.SchoolPostSchoolHandler = school.PostSchoolHandlerFunc(func(params school.PostSchoolParams, principal interface{}) middleware.Responder {
 		return HandleSchoolPost(params)
 	})
-	api.SolutionPostSolutionHandler = solution.PostSolutionHandlerFunc(func(params solution.PostSolutionParams) middleware.Responder {
+	api.SolutionPostSolutionHandler = solution.PostSolutionHandlerFunc(func(params solution.PostSolutionParams, principal interface{}) middleware.Responder {
 		return HandleSolutionPost(params)
 	})
-	api.StudentPostStudentHandler = student.PostStudentHandlerFunc(func(params student.PostStudentParams) middleware.Responder {
+	api.StudentPostStudentHandler = student.PostStudentHandlerFunc(func(params student.PostStudentParams, principal interface{}) middleware.Responder {
 		return HandleStudentPost(params)
 	})
-	api.TeamPostTeamHandler = team.PostTeamHandlerFunc(func(params team.PostTeamParams) middleware.Responder {
+	api.TeamPostTeamHandler = team.PostTeamHandlerFunc(func(params team.PostTeamParams, principal interface{}) middleware.Responder {
 		return HandleTeamPost(params)
 	})
-	api.AddressPutAddressHandler = address.PutAddressHandlerFunc(func(params address.PutAddressParams) middleware.Responder {
+	api.AddressPutAddressHandler = address.PutAddressHandlerFunc(func(params address.PutAddressParams, principal interface{}) middleware.Responder {
 		return HandleAddressPut(params)
 	})
-	api.AdvisorPutAdvisorHandler = advisor.PutAdvisorHandlerFunc(func(params advisor.PutAdvisorParams) middleware.Responder {
+	api.AdvisorPutAdvisorHandler = advisor.PutAdvisorHandlerFunc(func(params advisor.PutAdvisorParams, principal interface{}) middleware.Responder {
 		return HandleAdvisorPut(params)
 	})
-	api.CredentialPutCredentialHandler = credential.PutCredentialHandlerFunc(func(params credential.PutCredentialParams) middleware.Responder {
+	api.CredentialPutCredentialHandler = credential.PutCredentialHandlerFunc(func(params credential.PutCredentialParams, principal interface{}) middleware.Responder {
 		return HandleCredentialPut(params)
 	})
-	api.ProblemPutProblemHandler = problem.PutProblemHandlerFunc(func(params problem.PutProblemParams) middleware.Responder {
+	api.ProblemPutProblemHandler = problem.PutProblemHandlerFunc(func(params problem.PutProblemParams, principal interface{}) middleware.Responder {
 		return HandleProblemPut(params)
 	})
-	api.SchoolPutSchoolHandler = school.PutSchoolHandlerFunc(func(params school.PutSchoolParams) middleware.Responder {
+	api.SchoolPutSchoolHandler = school.PutSchoolHandlerFunc(func(params school.PutSchoolParams, principal interface{}) middleware.Responder {
 		return HandleSchoolPut(params)
 	})
-	api.SolutionPutSolutionHandler = solution.PutSolutionHandlerFunc(func(params solution.PutSolutionParams) middleware.Responder {
+	api.SolutionPutSolutionHandler = solution.PutSolutionHandlerFunc(func(params solution.PutSolutionParams, principal interface{}) middleware.Responder {
 		return HandleSolutionPut(params)
 	})
-	api.StudentPutStudentHandler = student.PutStudentHandlerFunc(func(params student.PutStudentParams) middleware.Responder {
+	api.StudentPutStudentHandler = student.PutStudentHandlerFunc(func(params student.PutStudentParams, principal interface{}) middleware.Responder {
 		return HandleStudentPut(params)
 	})
-	api.TeamPutTeamHandler = team.PutTeamHandlerFunc(func(params team.PutTeamParams) middleware.Responder {
+	api.TeamPutTeamHandler = team.PutTeamHandlerFunc(func(params team.PutTeamParams, principal interface{}) middleware.Responder {
 		return HandleTeamPut(params)
 	})
 	// List of all Schools
-	api.SchoolGetSchoolHandler = school.GetSchoolHandlerFunc(func(params school.GetSchoolParams) middleware.Responder {
+	api.SchoolGetSchoolHandler = school.GetSchoolHandlerFunc(func(params school.GetSchoolParams, principal interface{}) middleware.Responder {
 		return HandleSchoolGetList(params)
 	})
 
 	// List of all Problems
-	api.ProblemGetProblemHandler = problem.GetProblemHandlerFunc(func(params problem.GetProblemParams) middleware.Responder {
+	api.ProblemGetProblemHandler = problem.GetProblemHandlerFunc(func(params problem.GetProblemParams, principal interface{}) middleware.Responder {
 		return HandleProblemGetList(params)
 	})
 	// List of all Students for a School
-	api.SchoolGetSchoolIDStudentsHandler = school.GetSchoolIDStudentsHandlerFunc(func(params school.GetSchoolIDStudentsParams) middleware.Responder {
+	api.SchoolGetSchoolIDStudentsHandler = school.GetSchoolIDStudentsHandlerFunc(func(params school.GetSchoolIDStudentsParams, principal interface{}) middleware.Responder {
 		return HandleSchoolGetStudentList(params)
 	})
 	// List all Advisors
-	api.AdvisorGetAdvisorHandler = advisor.GetAdvisorHandlerFunc(func(params advisor.GetAdvisorParams) middleware.Responder {
+	api.AdvisorGetAdvisorHandler = advisor.GetAdvisorHandlerFunc(func(params advisor.GetAdvisorParams, principal interface{}) middleware.Responder {
 		return HandleAdvisorReadAll(params)
 	})
 }

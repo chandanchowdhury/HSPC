@@ -89,7 +89,7 @@ func HandleAddressPut(params address.PutAddressParams) middleware.Responder {
 	return resp
 }
 
-func HandleAddressDelete(params address.DeleteAddressIDParams) middleware.Responder {
+func HandleAddressDelete(params address.DeleteAddressIDParams, principal interface{}) middleware.Responder {
 	affected_count := dbhandler.AddressDelete(params.ID)
 
 	error := new(models.Error)
