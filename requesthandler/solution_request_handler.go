@@ -11,11 +11,15 @@ func HandleSolutionPost(params solution.PostSolutionParams) middleware.Responder
 	//create the solution
 	solution_id := dbhandler.SolutionCreate(*params.Solution)
 
-	if solution_id == -1 {
+	if solution_id <= 0 {
 		resp := solution.NewPostSolutionDefault(400)
 		error := new(models.Error)
-		error.Code = -1
+		error.Code = solution_id
 		error.Message = "Failed to create Solution"
+
+		if solution_id == -2 {
+			error.Message = "ProblemID does not exists"
+		}
 
 		resp.SetPayload(error)
 
@@ -37,7 +41,7 @@ func HandleSolutionGet(params solution.GetSolutionIDParams) middleware.Responder
 	//get solution details based on the provided id
 	solution_data := dbhandler.SolutionRead(params.ID)
 
-	if solution_data.SolutionID == 0 {
+	if *solution_data.SolutionID == 0 {
 		resp := solution.NewGetSolutionIDDefault(404)
 		error := &models.Error{Code: -1, Message: "Solution not found"}
 
@@ -52,11 +56,11 @@ func HandleSolutionGet(params solution.GetSolutionIDParams) middleware.Responder
 }
 
 func HandleSolutionPut(params solution.PutSolutionParams) middleware.Responder {
-	success := dbhandler.SolutionUpdate(*params.Solution)
+	code := dbhandler.SolutionUpdate(*params.Solution)
 
 	error := new(models.Error)
 
-	if !success {
+	if code <= 0 {
 		error.Message = "Error: Unexpected number of updates"
 		resp := solution.NewPostSolutionDefault(400)
 		resp.SetPayload(error)
@@ -72,11 +76,11 @@ func HandleSolutionPut(params solution.PutSolutionParams) middleware.Responder {
 }
 
 func HandleSolutionDelete(params solution.DeleteSolutionIDParams) middleware.Responder {
-	success := dbhandler.SolutionDelete(params.ID)
+	code := dbhandler.SolutionDelete(params.ID)
 
 	error := new(models.Error)
 
-	if !success {
+	if code <= 0 {
 		error.Message = "Error: Unexpected number of deletes"
 		resp := solution.NewDeleteSolutionIDDefault(400)
 		resp.SetPayload(error)

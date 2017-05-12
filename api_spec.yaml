@@ -1182,7 +1182,10 @@ definitions:
       problem_desc:
         type: string
     required:
+      - problem_id
       - problem_desc
+      - problem_category
+      - problem_round
 
   Solution:
     type: object
@@ -1198,6 +1201,7 @@ definitions:
         format: int64
         minimum: 1
     required:
+      - solution_id
       - solution_desc
       - problem_id
 

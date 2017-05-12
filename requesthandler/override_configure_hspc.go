@@ -182,4 +182,9 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 	api.AdvisorGetAdvisorHandler = advisor.GetAdvisorHandlerFunc(func(params advisor.GetAdvisorParams, principal interface{}) middleware.Responder {
 		return HandleAdvisorReadAll(params)
 	})
+
+	//List all solutions for a problem
+	api.ProblemGetProblemIDSolutionsHandler = problem.GetProblemIDSolutionsHandlerFunc(func(params problem.GetProblemIDSolutionsParams, principal interface{}) middleware.Responder {
+		return HandleGetProblemIDSolutions(params)
+	})
 }

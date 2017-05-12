@@ -31,35 +31,37 @@ func getSolutionColl() *mgo.Collection {
 Solution
 */
 func SolutionCreate(solution models.Solution) int64 {
-	log.Print("# Creating Solution")
-	log.Printf("Solution ID = %d", solution.SolutionID)
+	log.Printf("Creating Solution ID = %d for Problem ID = %d", *solution.SolutionID, *solution.ProblemID)
+
+	//make sure the Problem exists
+	problem_data := ProblemRead(*solution.ProblemID)
+
+	if problem_data.ProblemID == nil {
+		log.Print("ProblemID does not exists")
+		return -2
+	}
 
 	coll := getSolutionColl()
-
-	//TODO: How to automatically set _id which is different from solutionid
 
 	err := coll.Insert(solution)
 
 	if err != nil {
-		log.Print(err)
+		log.Panic(err)
 		return -1
 	}
 
-	//TODO: return the ID of the newly inserted Solution
-	return solution.SolutionID
+	return *solution.SolutionID
 }
 
 func SolutionRead(solution_id int64) models.Solution {
-	log.Print("# Reading Solution")
-	log.Printf("Solution ID = %d", solution_id)
+	log.Printf("Reading Solution ID = %d", solution_id)
 
-	//query := getSolutionColl().FindId(solution_id)
 	query := getSolutionColl().Find(bson.M{"solutionid": solution_id})
 
 	result_count, err := query.Count()
 	log.Printf("Solution Found: %d", result_count)
 	if err != nil {
-		log.Print(err)
+		log.Panic(err)
 		return models.Solution{}
 	}
 
@@ -79,32 +81,72 @@ func SolutionRead(solution_id int64) models.Solution {
 	return solution
 }
 
-func SolutionUpdate(solution models.Solution) bool {
-	log.Print("# Updating Solution")
-	log.Printf("Solution ID = %d", solution.SolutionID)
+func SolutionUpdate(solution models.Solution) int64 {
+	log.Printf("Updating Solution ID = %d", solution.SolutionID)
+
+	//make sure the Problem exists
+	problem_data := ProblemRead(*solution.ProblemID)
+
+	if *problem_data.ProblemID == 0 {
+		log.Print("Problem does not exists for the Solution")
+		return -2
+	}
 
 	err := getSolutionColl().Update(bson.M{"solutionid": solution.SolutionID}, solution)
 
 	if err != nil {
 		log.Print("Failed updating Solution")
-		log.Print(err)
-		return false
+		log.Panic(err)
+		return -1
 	}
 
-	return true
+	return 1
 }
 
-func SolutionDelete(solution_id int64) bool {
-	log.Print("# Deleting Solution")
-	log.Printf("Solution ID = %d", solution_id)
+func SolutionDelete(solution_id int64) int64 {
+	log.Printf("Deleting Solution ID = %d", solution_id)
 
 	err := getSolutionColl().Remove(bson.M{"solutionid": solution_id})
 
 	if err != nil {
 		log.Print("Failed deleting Solution")
-		log.Print(err)
-		return false
+		log.Panic(err)
+		return -1
 	}
 
-	return true
+	return 1
+}
+
+/**
+Given an ProblemID find all related solutions.
+*/
+func SolutionForProblem(problem_id int64) []*models.Solution {
+	log.Printf("Reading Solutions for Problem ID = %d", problem_id)
+
+	query := getSolutionColl().Find(bson.M{"problemid": problem_id})
+
+	result_count, err := query.Count()
+	log.Printf("Solution Found: %d", result_count)
+	if err != nil {
+		log.Panic(err)
+		return []*models.Solution{}
+	}
+
+	//create the array to hold the list of solutions
+	solution_list := make([]*models.Solution, 0)
+
+	//Get the Iterator for the results
+	i := query.Iter()
+	//loop through the solutions
+	for !i.Done() {
+		solution := new(models.Solution)
+
+		//fetch the solution details
+		i.Next(&solution)
+
+		solution_list = append(solution_list, solution)
+	}
+
+	return solution_list
+
 }

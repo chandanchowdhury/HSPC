@@ -33,40 +33,39 @@ func getProblemColl() *mgo.Collection {
 
 /*
 Problem
+
+For experiment purpose, create return an model.Error instead of error code. We want to see if that helps
+in reducing the logic at requesthandler side.
 */
-func ProblemCreate(problem models.Problem) int64 {
-	log.Print("# Creating Problem")
-	log.Printf("Problem ID = %d", problem.ProblemID)
+func ProblemCreate(problem models.Problem) models.Error {
+	log.Printf("Creating Problem ID = %d", problem.ProblemID)
+
+	error := models.Error{}
 
 	coll := getProblemColl()
-
-	//TODO: How to automatically set _id which is different from problemid
-	//problem_json, err := bson.Marshal(problem)
-	//log.Print(string(problem_json))
 
 	err := coll.Insert(problem)
 
 	if err != nil {
-		log.Print(err)
-		return -1
+		log.Panic(err)
+		error.Message = err.Error()
+		return error
 	}
 
-	//TODO: return the ID of the newly inserted Problem
-	return problem.ProblemID
+	error.Code = *problem.ProblemID
+
+	return error
 }
 
 func ProblemRead(problem_id int64) models.Problem {
-	log.Print("# Reading Problem")
-	log.Printf("Problem ID = %d", problem_id)
+	log.Printf("Reading Problem ID = %d", problem_id)
 
-	//query := getProblemColl().FindId(problem_id)
 	query := getProblemColl().Find(bson.M{"problemid": problem_id})
 
 	result_count, err := query.Count()
 	log.Printf("Problem Found: %d", result_count)
 	if err != nil {
-		log.Print(err)
-		return models.Problem{}
+		log.Panic(err)
 	}
 
 	if result_count < 1 {
@@ -85,50 +84,55 @@ func ProblemRead(problem_id int64) models.Problem {
 	return problem
 }
 
-func ProblemUpdate(problem models.Problem) bool {
-	log.Print("# Updating Problem")
-	log.Printf("Problem ID = %d", problem.ProblemID)
+func ProblemUpdate(problem models.Problem) int64 {
+	log.Printf("Updating Problem ID = %d", problem.ProblemID)
 
 	err := getProblemColl().Update(bson.M{"problemid": problem.ProblemID}, problem)
 
 	if err != nil {
 		log.Print("Failed updating Problem")
-		log.Print(err)
-		return false
+		log.Panic(err)
+		return -1
 	}
 
-	return true
+	return 1
 }
 
-func ProblemDelete(problem_id int64) bool {
-	log.Print("# Deleting Problem")
-	log.Printf("Problem ID = %d", problem_id)
+func ProblemDelete(problem_id int64) int64 {
+	log.Printf("Deleting Problem ID = %d", problem_id)
+
+	//make sure no Solution exists
+	solution_list := SolutionForProblem(problem_id)
+
+	if len(solution_list) > 0 {
+		return -2
+	}
 
 	err := getProblemColl().Remove(bson.M{"problemid": problem_id})
 
 	if err != nil {
 		log.Print("Failed deleting Problem")
-		log.Print(err)
-		return false
+		log.Panic(err)
+		return -1
 	}
 
-	return true
+	return 1
 }
 
 func ProblemReadList() []*models.Problem {
-	log.Print("# Reading Problem List")
+	log.Print("Reading Problem List")
 
 	query := getProblemColl().Find(bson.M{})
 
 	result_count, err := query.Count()
 	log.Printf("Problem Found: %d", result_count)
 	if err != nil {
-		log.Print(err)
+		log.Panic(err)
 		return []*models.Problem{}
 	}
 
 	if result_count < 1 {
-		log.Print("Problem not found")
+		log.Print("Empty Problem List")
 		return []*models.Problem{}
 	}
 
