@@ -36,6 +36,10 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 
 		credential := dbhandler.CredentialRead(user)
 
+		if credential.CredentialID == 0 {
+			return nil, errors.Unauthenticated("api.hspc.ksu.edu")
+		}
+
 		log.Printf("From DB - email: %s, password: %s Active: %t", credential.Emailaddress.String(), credential.Password.String(), *credential.CredentialActive)
 
 		if credential.Password.String() == pass && *credential.CredentialActive == true {
@@ -48,9 +52,13 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 
 	// Applies when the Authorization header is set with the Basic scheme
 	api.AdminSecurityBasicAuth = func(user string, pass string) (interface{}, error) {
-		log.Print("Authenticating Admin = %s", user)
+		//TODO: improvement required
+		log.Printf("Authenticating Admin = %s", user)
 
-		//TODO: improvmenet required
+		if user != "hspc" {
+			return nil, errors.Unauthenticated("admin level access")
+		}
+
 		if user == "hspc" && pass == "hspc" {
 			return "HSPC", nil
 		}
