@@ -6,6 +6,7 @@ import (
 	"github.com/chandanchowdhury/HSPC/models"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"strings"
 )
 
 //TODO: Read from config file
@@ -70,7 +71,7 @@ For experiment purpose, create return an model.Error instead of error code. We w
 in reducing the logic at requesthandler side.
 */
 func ProblemCreate(problem models.Problem) models.Error {
-	log.Printf("Creating Problem ID = %d", problem.ProblemID)
+	log.Printf("Creating Problem ID = %d", *problem.ProblemID)
 
 	error := models.Error{}
 
@@ -79,6 +80,11 @@ func ProblemCreate(problem models.Problem) models.Error {
 	err := coll.Insert(problem)
 
 	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key") {
+			error.Message = "Duplicate ProblemID"
+			return error
+		}
+
 		log.Panic(err)
 		error.Message = err.Error()
 		return error
@@ -117,11 +123,15 @@ func ProblemRead(problem_id int64) models.Problem {
 }
 
 func ProblemUpdate(problem models.Problem) int64 {
-	log.Printf("Updating Problem ID = %d", problem.ProblemID)
+	log.Printf("Updating Problem ID = %d", *problem.ProblemID)
 
 	err := getProblemColl().Update(bson.M{"problemid": problem.ProblemID}, problem)
 
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return -2
+		}
+
 		log.Print("Failed updating Problem")
 		log.Panic(err)
 		return -1
@@ -137,12 +147,16 @@ func ProblemDelete(problem_id int64) int64 {
 	solution_list := SolutionForProblem(problem_id)
 
 	if len(solution_list) > 0 {
-		return -2
+		return -3
 	}
 
 	err := getProblemColl().Remove(bson.M{"problemid": problem_id})
 
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return -2
+		}
+
 		log.Print("Failed deleting Problem")
 		log.Panic(err)
 		return -1

@@ -5,6 +5,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
+	"strings"
 )
 
 const (
@@ -125,6 +126,11 @@ func SolutionUpdate(solution models.Solution) int64 {
 	err := getSolutionColl().Update(bson.M{"solutionid": solution.SolutionID}, solution)
 
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			log.Print("Trying to update non-existing Solution: %d", solution.SolutionID)
+			return 0
+		}
+
 		log.Print("Failed updating Solution")
 		log.Panic(err)
 		return -1
@@ -139,6 +145,11 @@ func SolutionDelete(solution_id int64) int64 {
 	err := getSolutionColl().Remove(bson.M{"solutionid": solution_id})
 
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			log.Print("Trying to delete non-existing Solution: %d", solution_id)
+			return 0
+		}
+
 		log.Print("Failed deleting Solution")
 		log.Panic(err)
 		return -1

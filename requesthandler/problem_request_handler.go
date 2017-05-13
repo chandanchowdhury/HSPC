@@ -54,6 +54,12 @@ func HandleProblemPut(params problem.PutProblemParams) middleware.Responder {
 	if code <= 0 {
 		error.Message = "Error: update failed"
 		resp := problem.NewPostProblemDefault(400)
+
+		if code == -2 {
+			error.Message = "ProblemID Not Found"
+			resp.SetStatusCode(404)
+		}
+
 		resp.SetPayload(error)
 
 		return resp
@@ -74,6 +80,16 @@ func HandleProblemDelete(params problem.DeleteProblemIDParams) middleware.Respon
 	if code <= 0 {
 		error.Message = "Error: Unexpected number of deletes"
 		resp := problem.NewDeleteProblemIDDefault(400)
+
+		if code == -2 {
+			error.Message = "ProbelmID Not Found"
+			resp.SetStatusCode(404)
+		}
+
+		if code == -3 {
+			error.Message = "Will not delete, Dependent Solution Exists"
+		}
+
 		resp.SetPayload(error)
 
 		return resp

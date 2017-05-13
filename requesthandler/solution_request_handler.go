@@ -41,9 +41,10 @@ func HandleSolutionGet(params solution.GetSolutionIDParams) middleware.Responder
 	//get solution details based on the provided id
 	solution_data := dbhandler.SolutionRead(params.ID)
 
-	if *solution_data.SolutionID == 0 {
+	if solution_data.SolutionID == nil {
 		resp := solution.NewGetSolutionIDDefault(404)
-		error := &models.Error{Code: -1, Message: "Solution not found"}
+		error := &models.Error{}
+		error.Message = "Solution not found"
 
 		resp.SetPayload(error)
 		return resp
@@ -63,6 +64,12 @@ func HandleSolutionPut(params solution.PutSolutionParams) middleware.Responder {
 	if code <= 0 {
 		error.Message = "Error: Unexpected number of updates"
 		resp := solution.NewPostSolutionDefault(400)
+
+		if code == 0 {
+			error.Message = "Warn: Solution does not exists"
+			resp.SetStatusCode(404)
+		}
+
 		resp.SetPayload(error)
 
 		return resp
@@ -83,6 +90,11 @@ func HandleSolutionDelete(params solution.DeleteSolutionIDParams) middleware.Res
 	if code <= 0 {
 		error.Message = "Error: Unexpected number of deletes"
 		resp := solution.NewDeleteSolutionIDDefault(400)
+
+		if code == 0 {
+			error.Message = "Warn: Solution does not exists"
+			resp.SetStatusCode(404)
+		}
 		resp.SetPayload(error)
 
 		return resp
