@@ -14,7 +14,11 @@ const (
 func getSolutionColl() *mgo.Collection {
 	session, err := mgo.Dial(MONGO_DB_HOST)
 
-	admindb := session.DB("admin")
+	if err != nil {
+		log.Fatalf("Error Connecting to MongoDB: %s", err.Error())
+	}
+
+	admindb := session.DB(MONGO_AUTH_DB)
 
 	err = admindb.Login(MONGO_DB_USER, MONGO_DB_PASSWORD)
 
@@ -24,7 +28,33 @@ func getSolutionColl() *mgo.Collection {
 
 	hspc_DB := session.DB("HSPC")
 
-	return hspc_DB.C(Solution_Collection_Name)
+	//if the collection not already exits
+	colls, err := hspc_DB.CollectionNames()
+	solution_coll_exists := false
+	for _, c := range colls {
+		if c == Solution_Collection_Name {
+			solution_coll_exists = true
+		}
+	}
+
+	solution_coll := hspc_DB.C(Solution_Collection_Name)
+
+	if !solution_coll_exists {
+		index := mgo.Index{
+			Key:        []string{"solutionid"},
+			Unique:     true,
+			DropDups:   true,
+			Background: true, // See notes.
+			Sparse:     true,
+		}
+		err := solution_coll.EnsureIndex(index)
+
+		if err != nil {
+			log.Panic("Error creating index")
+		}
+	}
+
+	return solution_coll
 }
 
 /*

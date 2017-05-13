@@ -22,9 +22,17 @@ func getDBConn() *sql.DB {
 		DB_USER, DB_PASSWORD, DB_NAME)
 	db, err := sql.Open("postgres", dbinfo)
 	if err != nil {
-		log.Print("Error connecting DB")
+		log.Print("Error opening DB Connection")
 		log.Fatal(err)
 	}
+	//check if the DB server is alive
+	err = db.Ping()
+	if err != nil {
+		log.Printf("Error connecting to DB: %s", err.Error())
+		//if DB server is not alive, we cannot do anything, hence die die die...
+		log.Fatal(err)
+	}
+
 	return db
 }
 

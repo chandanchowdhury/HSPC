@@ -12,6 +12,7 @@ import (
 const (
 	MONGO_DB_HOST           = "localhost"
 	MONGO_DB_USER           = "hspc"
+	MONGO_AUTH_DB           = "admin"
 	MONGO_DB_PASSWORD       = "HSPC-Password"
 	Problem_Collection_Name = "Problems"
 )
@@ -19,7 +20,11 @@ const (
 func getProblemColl() *mgo.Collection {
 	session, err := mgo.Dial(MONGO_DB_HOST)
 
-	admindb := session.DB("admin")
+	if err != nil {
+		log.Fatalf("Error Connecting to MongoDB: %s", err.Error())
+	}
+
+	admindb := session.DB(MONGO_AUTH_DB)
 
 	err = admindb.Login(MONGO_DB_USER, MONGO_DB_PASSWORD)
 

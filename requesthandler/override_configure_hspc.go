@@ -32,7 +32,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 
 	// Applies when the Authorization header is set with the Basic scheme
 	api.UserSecurityBasicAuth = func(user string, pass string) (interface{}, error) {
-		log.Print("Authenticating User = %s", user)
+		log.Printf("Authenticating User = %s", user)
 
 		credential := dbhandler.CredentialRead(user)
 
@@ -186,5 +186,18 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 	//List all solutions for a problem
 	api.ProblemGetProblemIDSolutionsHandler = problem.GetProblemIDSolutionsHandlerFunc(func(params problem.GetProblemIDSolutionsParams, principal interface{}) middleware.Responder {
 		return HandleGetProblemIDSolutions(params)
+	})
+
+	// Get Team members
+	api.TeamGetTeamIDStudentsHandler = team.GetTeamIDStudentsHandlerFunc(func(params team.GetTeamIDStudentsParams, principal interface{}) middleware.Responder {
+		return HandleGetTeamStudents(params, principal)
+	})
+	//Add Team member
+	api.TeamGetTeamTeamIDAddStudentIDHandler = team.GetTeamTeamIDAddStudentIDHandlerFunc(func(params team.GetTeamTeamIDAddStudentIDParams, principal interface{}) middleware.Responder {
+		return HandleTeamAddStudent(params, principal)
+	})
+	//Remove Team member
+	api.TeamGetTeamTeamIDRemoveStudentIDHandler = team.GetTeamTeamIDRemoveStudentIDHandlerFunc(func(params team.GetTeamTeamIDRemoveStudentIDParams, principal interface{}) middleware.Responder {
+		return HandleTeamRemoveStudent(params, principal)
 	})
 }
