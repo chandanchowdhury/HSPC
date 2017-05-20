@@ -311,6 +311,7 @@ paths:
       tags:
         - school
       security:
+        - AdminSecurityBasic: []
         - UserSecurityBasic: []
       responses:
         200:
@@ -502,7 +503,7 @@ paths:
   /advisor/{id}:
     parameters:
       - name: id
-        description: ID of the Address
+        description: ID of the Advisor
         in: path
         type: integer
         format: int64
@@ -531,6 +532,31 @@ paths:
           description: Return success
           schema:
             $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /advisor/{id}/schools:
+    parameters:
+      - name: id
+        description: ID of the Advisor
+        in: path
+        type: integer
+        format: int64
+        required: true
+    get:
+      description: Find all Schools for AdvisorID
+      tags:
+        - advisor
+      security:
+        - UserSecurityBasic: []
+      responses:
+        200:
+          description: Returns list of Schools
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/School'
         default:
           description: Unexpected error
           schema:

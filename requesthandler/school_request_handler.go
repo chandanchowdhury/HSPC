@@ -1,12 +1,43 @@
 package requesthandler
 
 import (
+	"log"
+
 	"github.com/chandanchowdhury/HSPC/dbhandler"
 	"github.com/chandanchowdhury/HSPC/models"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/school"
 	"github.com/go-openapi/runtime/middleware"
-	"log"
 )
+
+/**
+Check if the Advisor has access to the School
+ */
+func checkAdvisorAccessSchool(principal interface{}, school_id int64) bool {
+	//Only School advisor or admin should get the list of Teams
+
+	//try to convert the interface to string
+	email, isEmail := principal.(string)
+
+	if isEmail == false {
+		return false
+	}
+
+	log.Printf("Checking Advisor = %s access for School = %d", email, school_id)
+
+	// Get the Advisor detail using the principal
+	advisor := dbhandler.AdvisorReadByEmail(email)
+
+	//get the school advisor
+	school_advisor := dbhandler.SchoolReadAdvisor(school_id)
+
+	if advisor.AdvisorID == school_advisor {
+		log.Print("Access Allowed")
+		return true
+	}
+
+	log.Print("Access NOT Allowed")
+	return false
+}
 
 func HandleSchoolPost(params school.PostSchoolParams) middleware.Responder {
 	//create the school
@@ -152,29 +183,8 @@ func HandleSchoolGetList(params school.GetSchoolParams) middleware.Responder {
 func HandleSchoolGetStudentList(params school.GetSchoolIDStudentsParams, principal interface{}) middleware.Responder {
 	log.Printf("SchoolStudentList principal = %s", principal)
 
-	//Only School advisor or admin should get the list of students
-
-	//try to convert the interface to string
-	email, isEmail := principal.(string)
-
-	if isEmail == false {
-		//incorrect principal provided, fail
-		error := new(models.Error)
-		error.Code = 401
-		error.Message = "Error: Invalid Principal Provided"
-		resp := school.NewGetSchoolIDStudentsDefault(401)
-		resp.SetPayload(error)
-
-		return resp
-	}
-
-	// Get the Advisor detail using the principal
-	advisor := dbhandler.AdvisorReadByEmail(email)
-
-	//get the school advisor
-	school_advisor := dbhandler.SchoolReadAdvisor(params.ID)
-
-	if advisor.AdvisorID != school_advisor {
+	//Only School advisor
+	if result := checkAdvisorAccessSchool(principal, params.ID); result == false {
 		error := new(models.Error)
 		error.Code = 403
 		error.Message = "Error: Advisor Not Approved For School"
@@ -199,5 +209,78 @@ func HandleSchoolGetStudentList(params school.GetSchoolIDStudentsParams, princip
 	resp := school.NewGetSchoolIDStudentsOK()
 	resp.SetPayload(student_list)
 
+	return resp
+}
+
+func HandleSchoolGetTeamList(params school.GetSchoolIDTeamsParams, principal interface{}) middleware.Responder {
+	log.Printf("SchoolTeamList SchooldID = %d", params.ID)
+
+	//Only School advisor
+	if result := checkAdvisorAccessSchool(principal, params.ID); result == false {
+		error := new(models.Error)
+		error.Code = 403
+		error.Message = "Error: Advisor Not Approved For School"
+		resp := school.NewGetSchoolIDTeamsDefault(403)
+		resp.SetPayload(error)
+
+		return resp
+	}
+
+	//Get the list of team_ids
+	team_id_list := dbhandler.TeamListForSchool(params.ID)
+
+	if team_id_list == nil {
+		error := new(models.Error)
+		error.Code = 500
+		error.Message = "Error: Failed to get school list from DB"
+		resp := school.NewGetSchoolIDTeamsDefault(500)
+		resp.SetPayload(error)
+
+		return resp
+	}
+
+	//from the list of team_ids, create the list of Teams
+	teams := make([]*models.Team, 0)
+
+	for _, tid := range team_id_list {
+		team := dbhandler.TeamRead(tid)
+		teams = append(teams, &team)
+	}
+
+	resp := school.NewGetSchoolIDTeamsOK()
+	resp.SetPayload(teams)
+
+	return resp
+}
+
+/**
+Add an Advisor to a School
+ */
+func SchoolAddAdvisor(params school.PutSchoolSchoolIDAdvisorAdvisorIDParams, principal interface{}) middleware.Responder {
+	log.Printf("Set Advisor = %d for School = %d", params.AdvisorID, params.SchoolID)
+
+	//try to set the advisor for the school
+	if dbhandler.SchoolAddAdvisor(params.SchoolID, params.AdvisorID) {
+		resp := school.NewPutSchoolSchoolIDAdvisorAdvisorIDNoContent()
+		return resp
+	}
+
+	resp := school.NewPutSchoolSchoolIDAdvisorAdvisorIDDefault(400)
+	return resp
+}
+
+/**
+Remove an Advisor to a School
+ */
+func SchoolRemoveAdvisor(params school.DeleteSchoolSchoolIDAdvisorAdvisorIDParams, principal interface{}) middleware.Responder {
+	log.Printf("Remove Advisor = %d for School = %d", params.AdvisorID, params.SchoolID)
+
+	//try to set the advisor for the school
+	if dbhandler.SchoolDeleteAdvisor(params.SchoolID, params.AdvisorID) {
+		resp := school.NewDeleteSchoolSchoolIDAdvisorAdvisorIDNoContent()
+		return resp
+	}
+
+	resp := school.NewDeleteSchoolSchoolIDAdvisorAdvisorIDDefault(400)
 	return resp
 }

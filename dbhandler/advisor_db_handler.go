@@ -186,7 +186,7 @@ func AdvisorReadAll() []*models.Advisor {
 }
 
 func AdvisorReadByEmail(email string) models.Advisor {
-	log.Printf("Reading Advisor with email = %d", email)
+	log.Printf("Reading Advisor with email = %s", email)
 
 	db := getDBConn()
 	//join Advisor and Credential to get Advisor details using email

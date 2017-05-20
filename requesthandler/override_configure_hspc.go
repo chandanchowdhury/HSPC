@@ -165,29 +165,51 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 	api.TeamPutTeamHandler = team.PutTeamHandlerFunc(func(params team.PutTeamParams, principal interface{}) middleware.Responder {
 		return HandleTeamPut(params, principal)
 	})
+
+	// --- School ---
 	// List of all Schools
 	api.SchoolGetSchoolHandler = school.GetSchoolHandlerFunc(func(params school.GetSchoolParams, principal interface{}) middleware.Responder {
 		return HandleSchoolGetList(params)
+	})
+	// List of all Students for a School
+	api.SchoolGetSchoolIDStudentsHandler = school.GetSchoolIDStudentsHandlerFunc(func(params school.GetSchoolIDStudentsParams, principal interface{}) middleware.Responder {
+		return HandleSchoolGetStudentList(params, principal)
+	})
+	//List all Teams for a School
+	api.SchoolGetSchoolIDTeamsHandler = school.GetSchoolIDTeamsHandlerFunc(func(params school.GetSchoolIDTeamsParams, principal interface{}) middleware.Responder {
+		return HandleSchoolGetTeamList(params, principal)
+	})
+	// Add School Advisor
+	api.SchoolPutSchoolSchoolIDAdvisorAdvisorIDHandler = school.PutSchoolSchoolIDAdvisorAdvisorIDHandlerFunc(func(params school.PutSchoolSchoolIDAdvisorAdvisorIDParams, principal interface{}) middleware.Responder {
+		return SchoolAddAdvisor(params, principal)
+	})
+
+	// Remove School Advisor
+	api.SchoolDeleteSchoolSchoolIDAdvisorAdvisorIDHandler = school.DeleteSchoolSchoolIDAdvisorAdvisorIDHandlerFunc(func(params school.DeleteSchoolSchoolIDAdvisorAdvisorIDParams, principal interface{}) middleware.Responder {
+		return SchoolRemoveAdvisor(params, principal)
+	})
+
+
+	// --- Advisor ---
+	// List all Advisors
+	api.AdvisorGetAdvisorHandler = advisor.GetAdvisorHandlerFunc(func(params advisor.GetAdvisorParams, principal interface{}) middleware.Responder {
+		return HandleAdvisorReadAll(params)
+	})
+	// List all Schools for Advisor
+	api.AdvisorGetAdvisorIDSchoolsHandler = advisor.GetAdvisorIDSchoolsHandlerFunc(func(params advisor.GetAdvisorIDSchoolsParams, principal interface{}) middleware.Responder {
+		return HandleAdvisorListSchool(params, principal)
 	})
 
 	// List of all Problems
 	api.ProblemGetProblemHandler = problem.GetProblemHandlerFunc(func(params problem.GetProblemParams, principal interface{}) middleware.Responder {
 		return HandleProblemGetList(params)
 	})
-	// List of all Students for a School
-	api.SchoolGetSchoolIDStudentsHandler = school.GetSchoolIDStudentsHandlerFunc(func(params school.GetSchoolIDStudentsParams, principal interface{}) middleware.Responder {
-		return HandleSchoolGetStudentList(params, principal)
-	})
-	// List all Advisors
-	api.AdvisorGetAdvisorHandler = advisor.GetAdvisorHandlerFunc(func(params advisor.GetAdvisorParams, principal interface{}) middleware.Responder {
-		return HandleAdvisorReadAll(params)
-	})
-
 	//List all solutions for a problem
 	api.ProblemGetProblemIDSolutionsHandler = problem.GetProblemIDSolutionsHandlerFunc(func(params problem.GetProblemIDSolutionsParams, principal interface{}) middleware.Responder {
 		return HandleGetProblemIDSolutions(params)
 	})
 
+	// --- Team ---
 	// Get Team members
 	api.TeamGetTeamIDStudentsHandler = team.GetTeamIDStudentsHandlerFunc(func(params team.GetTeamIDStudentsParams, principal interface{}) middleware.Responder {
 		return HandleGetTeamStudents(params, principal)

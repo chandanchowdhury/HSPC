@@ -1,8 +1,6 @@
 package dbhandler
 
-import (
-	"log"
-)
+import "log"
 
 /*
    Add a Student to a team
@@ -12,6 +10,8 @@ func TeamAddMember(team_id int64, student_id int64) bool {
 	log.Printf("Team ID = %d, Student ID = %d", team_id, student_id)
 
 	db := getDBConn()
+
+	//TODO: Make sure the Team and Student belong to the same School
 
 	stmt, err := db.Prepare("INSERT INTO Student_Team(team_id, student_id) " +
 		"VALUES($1, $2)")
@@ -26,6 +26,11 @@ func TeamAddMember(team_id int64, student_id int64) bool {
 
 	if err != nil {
 		if isForeignKeyError(err) {
+			return false
+		}
+
+		if isDuplicateKeyError(err) {
+			//if the entry already exists
 			return false
 		}
 

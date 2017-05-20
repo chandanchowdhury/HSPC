@@ -193,3 +193,38 @@ func TeamDelete(team_id int64) int64 {
 
 	return affectedCount
 }
+
+/**
+Get the list of Teams for a School
+*/
+func TeamListForSchool(school_id int64) []int64 {
+	log.Printf("# Reading team list for SchoolID: %d", school_id)
+
+	db := getDBConn()
+
+	stmt, err := db.Prepare("SELECT school_id " +
+		"FROM team WHERE team_id = $1")
+	defer stmt.Close()
+
+	if err != nil {
+		log.Print("Error creating prepared statement")
+		log.Panic(err)
+	}
+
+	crsr, err := stmt.Query(school_id)
+
+	if err != nil {
+		log.Print("Error getting team data")
+		log.Panic(err)
+	}
+
+	team_ids := make([]int64, 0)
+
+	for crsr.Next() {
+		var team_id int64
+		crsr.Scan(&team_id)
+		team_ids = append(team_ids, team_id)
+	}
+
+	return team_ids
+}

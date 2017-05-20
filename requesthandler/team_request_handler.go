@@ -1,13 +1,53 @@
 package requesthandler
 
 import (
+	"log"
+
 	"github.com/chandanchowdhury/HSPC/dbhandler"
 	"github.com/chandanchowdhury/HSPC/models"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/team"
 	"github.com/go-openapi/runtime/middleware"
 )
 
+func checkAdvisorAccessTeam(principal interface{}, team_id int64) bool {
+	//TODO: Implement this
+	//get AdvisorID from email
+	//try to convert the interface to string
+	email, isEmail := principal.(string)
+
+	if !isEmail {
+		log.Panic("Could not get Email from Principal")
+	}
+
+	advisor := dbhandler.AdvisorReadByEmail(email)
+
+	//Get Schools Advisor is approved for
+	advisor_school_ids := dbhandler.AdvisorGetAllSchools(advisor.AdvisorID)
+
+	//Get SchoolID for the TeamID
+	team_detail := dbhandler.TeamRead(team_id)
+
+	//if SchoolID in list of approved Schools, allow
+	for _, sid := range advisor_school_ids {
+		if sid == *team_detail.SchoolID {
+			return true
+		}
+	}
+
+	return true
+}
+
 func HandleTeamPost(params team.PostTeamParams, principal interface{}) middleware.Responder {
+	//first check advisor access
+	if allowed := checkAdvisorAccessTeam(principal, params.Team.TeamID); allowed == false {
+		resp := team.NewPostTeamDefault(400)
+		error := new(models.Error)
+		error.Code = -3
+		error.Message = "Advisor Not Approved for School"
+		resp.SetPayload(error)
+		return resp
+	}
+
 	//create the team
 	team_id := dbhandler.TeamCreate(*params.Team)
 
@@ -45,6 +85,17 @@ func HandleTeamPost(params team.PostTeamParams, principal interface{}) middlewar
 }
 
 func HandleTeamGet(params team.GetTeamIDParams, principal interface{}) middleware.Responder {
+	//TODO: Check that Advisor is approved for the School the Team belongs to
+	//first check advisor access
+	if allowed := checkAdvisorAccessTeam(principal, params.ID); allowed == false {
+		resp := team.NewPostTeamDefault(400)
+		error := new(models.Error)
+		error.Code = -3
+		error.Message = "Advisor Not Approved for School"
+		resp.SetPayload(error)
+		return resp
+	}
+
 	//get team details based on the provided id
 	team_data := dbhandler.TeamRead(params.ID)
 
@@ -63,6 +114,17 @@ func HandleTeamGet(params team.GetTeamIDParams, principal interface{}) middlewar
 }
 
 func HandleTeamPut(params team.PutTeamParams, principal interface{}) middleware.Responder {
+	//TODO: Check that Advisor is approved for the School the Team belongs to
+	//first check advisor access
+	if allowed := checkAdvisorAccessTeam(principal, params.Team.TeamID); allowed == false {
+		resp := team.NewPostTeamDefault(400)
+		error := new(models.Error)
+		error.Code = -3
+		error.Message = "Advisor Not Approved for School"
+		resp.SetPayload(error)
+		return resp
+	}
+
 	affected_count := dbhandler.TeamUpdate(*params.Team)
 
 	error := new(models.Error)
@@ -96,6 +158,17 @@ func HandleTeamPut(params team.PutTeamParams, principal interface{}) middleware.
 }
 
 func HandleTeamDelete(params team.DeleteTeamIDParams, principal interface{}) middleware.Responder {
+	//TODO: Check that Advisor is approved for the School the Team belongs to
+	//first check advisor access
+	if allowed := checkAdvisorAccessTeam(principal, params.ID); allowed == false {
+		resp := team.NewPostTeamDefault(400)
+		error := new(models.Error)
+		error.Code = -3
+		error.Message = "Advisor Not Approved for School"
+		resp.SetPayload(error)
+		return resp
+	}
+
 	affected_count := dbhandler.TeamDelete(params.ID)
 
 	error := new(models.Error)
@@ -123,5 +196,98 @@ func HandleTeamDelete(params team.DeleteTeamIDParams, principal interface{}) mid
 	error.Message = "Deleted"
 	resp.SetPayload(error)
 
+	return resp
+}
+
+func HandleGetTeamStudents(params team.GetTeamIDStudentsParams, principal interface{}) middleware.Responder {
+	//TODO: Check that Advisor is approved for the School the Team belongs to
+	//first check advisor access
+	if allowed := checkAdvisorAccessTeam(principal, params.ID); allowed == false {
+		resp := team.NewPostTeamDefault(400)
+		error := new(models.Error)
+		error.Code = -3
+		error.Message = "Advisor Not Approved for School"
+		resp.SetPayload(error)
+		return resp
+	}
+
+	//get the list of Student_ids
+	team_member := dbhandler.TeamReadMembers(params.ID)
+
+	//prepare the list of Students
+	if team_member != nil && len(team_member) > 0 {
+		student_list := make([]*models.Student, 0)
+		for _, id := range team_member {
+			student := dbhandler.StudentRead(id)
+
+			student_list = append(student_list, &student)
+		}
+
+		resp := team.NewGetTeamIDStudentsOK()
+
+		resp.SetPayload(student_list)
+		return resp
+	}
+
+	error := new(models.Error)
+	error.Code = -1
+	error.Message = "Unexpected error"
+	resp := team.NewGetTeamIDStudentsDefault(400)
+	resp.SetPayload(error)
+	return resp
+
+}
+
+func HandleTeamAddStudent(params team.GetTeamTeamIDAddStudentIDParams, principal interface{}) middleware.Responder {
+	//TODO: Check that Advisor is approved for the School the Team belongs to
+	//first check advisor access
+	if allowed := checkAdvisorAccessTeam(principal, params.TeamID); allowed == false {
+		resp := team.NewPostTeamDefault(400)
+		error := new(models.Error)
+		error.Code = -3
+		error.Message = "Advisor Not Approved for School"
+		resp.SetPayload(error)
+		return resp
+	}
+
+	if success := dbhandler.TeamAddMember(params.TeamID, params.StudentID); success == true {
+		// just return 201 without any content
+		resp := team.NewGetTeamTeamIDAddStudentIDNoContent()
+
+		return resp
+	}
+
+	error := new(models.Error)
+	error.Code = -1
+	error.Message = "Unexpected error"
+	resp := team.NewGetTeamIDStudentsDefault(400)
+	resp.SetPayload(error)
+	return resp
+}
+
+func HandleTeamRemoveStudent(params team.GetTeamTeamIDRemoveStudentIDParams, principal interface{}) middleware.Responder {
+	//TODO: Check that Advisor is approved for the School the Team belongs to
+	//first check advisor access
+	if allowed := checkAdvisorAccessTeam(principal, params.TeamID); allowed == false {
+		resp := team.NewPostTeamDefault(400)
+		error := new(models.Error)
+		error.Code = -3
+		error.Message = "Advisor Not Approved for School"
+		resp.SetPayload(error)
+		return resp
+	}
+
+	if success := dbhandler.TeamDeleteMember(params.TeamID, params.StudentID); success == true {
+		// just return 201 without any content
+		resp := team.NewGetTeamTeamIDRemoveStudentIDNoContent()
+
+		return resp
+	}
+
+	error := new(models.Error)
+	error.Code = -1
+	error.Message = "Unexpected error"
+	resp := team.NewGetTeamIDStudentsDefault(400)
+	resp.SetPayload(error)
 	return resp
 }

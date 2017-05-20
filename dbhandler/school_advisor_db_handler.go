@@ -26,6 +26,10 @@ func SchoolAddAdvisor(school_id int64, advisor_id int64) bool {
 			return false
 		}
 
+		if isDuplicateKeyError(err) {
+			return false
+		}
+
 		log.Panic(err)
 	}
 
@@ -58,11 +62,18 @@ func SchoolDeleteAdvisor(school_id int64, advisor_id int64) bool {
 
 	affectedRows, err := result.RowsAffected()
 	if affectedRows != 1 {
+		if affectedRows == 0 {
+			return false
+		}
 		log.Panic("Unexpected number of deletion")
 	}
 
 	if err != nil {
 		if isForeignKeyError(err) {
+			return false
+		}
+
+		if isDuplicateKeyError(err) {
 			return false
 		}
 
@@ -99,4 +110,38 @@ func SchoolReadAdvisor(school_id int64) int64 {
 	}
 
 	return advisor_id
+}
+
+/**
+Given an AdvisorID, find all Schools
+*/
+func AdvisorGetAllSchools(advisor_id int64) []int64 {
+	log.Printf("Read all Schools for AdvisorID = %d", advisor_id)
+
+	db := getDBConn()
+
+	stmt, err := db.Prepare("SELECT school_id " +
+		"FROM School_Advisor WHERE advisor_id = $1")
+	defer stmt.Close()
+
+	if err != nil {
+		log.Print("Error creating prepared statement")
+		log.Panic(err)
+	}
+
+	crsr, err := stmt.Query(advisor_id)
+
+	if err != nil {
+		log.Print("Error getting team data")
+		log.Panic(err)
+	}
+
+	schools := make([]int64, 0)
+	for crsr.Next() {
+		var school_id int64
+		crsr.Scan(&school_id)
+		schools = append(schools, school_id)
+	}
+
+	return schools
 }

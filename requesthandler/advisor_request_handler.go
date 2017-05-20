@@ -133,3 +133,18 @@ func HandleAdvisorReadAll(params advisor.GetAdvisorParams) middleware.Responder 
 
 	return resp
 }
+
+func HandleAdvisorListSchool(params advisor.GetAdvisorIDSchoolsParams, principal interface{}) middleware.Responder {
+	// Get School list for advisor
+	school_ids := dbhandler.AdvisorGetAllSchools(params.ID)
+
+	schools := make([]*models.School, 0)
+	for _, sid := range school_ids {
+		school := dbhandler.SchoolRead(sid)
+		schools = append(schools, &school)
+	}
+
+	resp := advisor.NewGetAdvisorIDSchoolsOK()
+	resp.SetPayload(schools)
+	return resp
+}
