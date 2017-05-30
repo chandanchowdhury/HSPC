@@ -1,0 +1,2962 @@
+{
+	"variables": [],
+	"info": {
+		"name": "HSPC",
+		"_postman_id": "904555c6-8d39-b952-d422-ffcc7c7e2cad",
+		"description": "Test APIs for HSPC project.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Address",
+			"description": "APIs for EmailAddress",
+			"item": [
+				{
+					"name": "Address - Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Your test name\"] = jsonData.country === \"USA\";",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"username": "hspc",
+								"password": "hspc",
+								"saveHelperData": true,
+								"showPassword": false
+							}
+						},
+						"url": "http://127.0.0.1:8080/v1/address/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"country\"\t: \"USA\"\n\t, \"zipcode\" : \"66502\"\n\t, \"state\"\t: \"KS\"\n\t, \"city\"\t: \"Manhattan\"\n\t, \"line1\"\t: \"2200 Poyntz\"\n}"
+						},
+						"description": "Test add email address"
+					},
+					"response": []
+				},
+				{
+					"name": "Address - Create - Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 400\"] = responseCode.code === 400;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/address/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"country\"\t: \"USA\"\n\t, \"zipcode\" : \"66502999\"\n\t, \"state\"\t: \"KS\"\n\t, \"city\"\t: \"Manhattan\"\n\t, \"line1\"\t: \"2200 Poyntz\"\n}"
+						},
+						"description": "Test add email address"
+					},
+					"response": []
+				},
+				{
+					"name": "Address - Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									"tests[\"has zipcode\"] = responseBody.has(\"zipcode\");",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Read Address Success\"] = jsonData.country = \"USA\"",
+									"",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/address/1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				},
+				{
+					"name": "Address - Read - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									"",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/address/-1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				},
+				{
+					"name": "Address - Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Update Success\"] = responseBody.has(\"Updated\");",
+									"",
+									"",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/address/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"address_id\" : 12\n\t, \"country\"\t: \"USA\"\n\t, \"zipcode\" : \"66502\"\n\t, \"state\"\t: \"KS\"\n\t, \"city\"\t: \"Manhattan\"\n\t, \"line2\"\t: \"Poyntz\"\n\t, \"line1\"\t: \"2200\"\n}"
+						},
+						"description": "Test emailaddress update"
+					},
+					"response": []
+				},
+				{
+					"name": "Address - Update - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/address/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"address_id\" : 12\n\t, \"country\"\t: \"USA\"\n\t, \"zipcode\" : \"66502\"\n\t, \"state\"\t: \"KS\"\n\t, \"city\"\t: \"Manhattan\"\n\t, \"line2\"\t: \"Poyntz\"\n\t, \"line1\"\t: \"2200\"\n}"
+						},
+						"description": "Test emailaddress update"
+					},
+					"response": []
+				},
+				{
+					"name": "Address - Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Deleted\"] = responseBody.has(\"Deleted\");",
+									"",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/address/12",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Test delete email address"
+					},
+					"response": []
+				},
+				{
+					"name": "Address - Delete - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/address/9999",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Test delete email address"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Advisor",
+			"description": "APIs for EmailAddress",
+			"item": [
+				{
+					"name": "Advisor - Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Created Advisor\"] = jsonData.advisor_name === \"Idle Advisor\"",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/advisor/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"advisor_name\"\t: \"Idle Advisor\"\n\t, \"credential_id\" : 1\n}"
+						},
+						"description": "Test add email address"
+					},
+					"response": []
+				},
+				{
+					"name": "Advisor - Create - Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is NOT 200\"] = responseCode.code !== 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/advisor/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"advisor_name\"\t: \"Idle Advisor\"\n\t, \"credential_id\" : -1\n}"
+						},
+						"description": "Test add email address"
+					},
+					"response": []
+				},
+				{
+					"name": "Advisor - Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Read Advisor\"] = jsonData.advisor_id === 10",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/advisor/10",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				},
+				{
+					"name": "Advisor - Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Advisor - Update\"] = responseBody.has(\"Success\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/advisor/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"advisor_id\" : 1\n\t, \"advisor_name\"\t: \"Idle Updated Advisor\"\n\t, \"credential_id\" : 1\n}"
+						},
+						"description": "Test emailaddress update"
+					},
+					"response": []
+				},
+				{
+					"name": "Advisor - Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Advisor - Delete\"] = responseBody.has(\"Deleted\");",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"username": "hspc",
+								"password": "hspc",
+								"saveHelperData": true,
+								"showPassword": false
+							}
+						},
+						"url": "http://127.0.0.1:8080/v1/advisor/6",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": "Test delete email address"
+					},
+					"response": []
+				},
+				{
+					"name": "Advisor - Delete - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"username": "hspc",
+								"password": "hspc",
+								"saveHelperData": true,
+								"showPassword": false
+							}
+						},
+						"url": "http://127.0.0.1:8080/v1/advisor/-1",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic aHNwYzpoc3Bj",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Test delete email address"
+					},
+					"response": []
+				},
+				{
+					"name": "Advisor - List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/advisor/",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				},
+				{
+					"name": "Advisor - School - List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/advisor/1/schools",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Credential",
+			"description": "APIs for Credential",
+			"item": [
+				{
+					"name": "Credential - Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Create Credential\"] = responseBody.has(\"credential_id\");",
+									"",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/credential/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n\t\"emailaddress\": \"advisor1@ksu.edu\"\n\t, \"password\": \"pass\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Credential - Create - Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is NOT 200\"] = responseCode.code !==  200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/credential/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n\t\"emailaddress\": \"advisor1\"\n\t, \"password\": \"pass\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Credential - Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Read Credential\"] = jsonData.emailaddress === \"test@ksu.edu\";"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/credential/advisor1@ksu.edu",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Credential - Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/credential/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"emailaddress\" : \"advisor1@ksu.edu\"\n\t, \"password\" : \"pass\"\n\t, \"credential_active\": true\n}"
+						},
+						"description": "Test emailaddress update"
+					},
+					"response": []
+				},
+				{
+					"name": "Credential - Update - Not found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/credential/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"emailaddress\" : \"advisor1@ksu.eduuuuuu\"\n\t, \"password\" : \"pass\"\n\t, \"credential_active\": true\n}"
+						},
+						"description": "Test emailaddress update"
+					},
+					"response": []
+				},
+				{
+					"name": "Credential - Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/credential/advisor1@ksu.edu",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Credential - Delete - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/credential/advisor1@ksu.eduuuuu",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Login-Logout",
+			"description": "",
+			"item": [
+				{
+					"name": "Login - Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									"//set the received token in Environment variable for reuse in other requests",
+									"postman.setEnvironmentVariable(\"Hspc-Token\", postman.getResponseHeader(\"Hspc-Token\"));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/login/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "emailaddress",
+								"value": "test1@ksu.edu",
+								"description": ""
+							},
+							{
+								"key": "password",
+								"value": "pass1",
+								"description": ""
+							},
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									"//clear the session token from environment",
+									"postman.clearEnvironmentVariable(\"Hspc-Token\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/logout/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Fail - Wrong Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 401\"] = responseCode.code === 401;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/login/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "emailaddress",
+								"value": "test1@ksu.edu",
+								"description": ""
+							},
+							{
+								"key": "password",
+								"value": "wrongPass",
+								"description": ""
+							},
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Fail - Wrong User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 401\"] = responseCode.code === 401;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/login/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "emailaddress",
+								"value": "test1@su.edu",
+								"description": ""
+							},
+							{
+								"key": "password",
+								"value": "wrongPass",
+								"description": ""
+							},
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Problem",
+			"description": "",
+			"item": [
+				{
+					"name": "Problem - Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/problem/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"problem_id\" : 1\n\t, \"problem_desc\" : \"This is a problem desc 1\"\n\t, \"problem_category\": \"Beginner\"\n\t, \"problem_round\" : 1\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Problem - Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/problem/1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Problem - Read - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/problem/-1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Problem - Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/problem/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"problem_id\" : 1\n\t, \"problem_desc\" : \"This is a problem desc 1\"\n\t, \"problem_category\": \"Advanced\"\n\t, \"problem_round\" : 1\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Problem - Update - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/problem/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"problem_id\" : 99999\n\t, \"problem_desc\" : \"This is a problem desc 1\"\n\t, \"problem_category\": \"Advanced\"\n\t, \"problem_round\" : 1\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Problem - Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/problem/1",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Problem - Delete - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/problem/999999",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Problem - List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/problem/",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Problem - Solution - List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/problem/1/solutions",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "School",
+			"description": "APIs for EmailAddress",
+			"item": [
+				{
+					"name": "School - Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Created Address\"] = jsonData.school_name === \"Idle World High School\"",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"username": "hspc",
+								"password": "hspc",
+								"saveHelperData": true,
+								"showPassword": false
+							}
+						},
+						"url": "http://127.0.0.1:8080/v1/school/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"school_name\"\t: \"Idle World High School\"\n\t, \"address_id\"\t: 3\n}"
+						},
+						"description": "Test add email address"
+					},
+					"response": []
+				},
+				{
+					"name": "School - Create - Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 400\"] = responseCode.code === 400;",
+									"",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/school/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"school_name\"\t: \"Idle World High School\"\n\t, \"address_id\"\t: 3\n}"
+						},
+						"description": "Test add email address"
+					},
+					"response": []
+				},
+				{
+					"name": "School - Read - Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Read Address\"] = jsonData.school_id === 1;",
+									"",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/school/1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				},
+				{
+					"name": "School - Read - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/school/-1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				},
+				{
+					"name": "School - Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/school/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"school_id\" : 18\n\t, \"school_name\"\t: \"Idle World High School\"\n\t, \"address_id\"\t: 2\n}"
+						},
+						"description": "Test emailaddress update"
+					},
+					"response": []
+				},
+				{
+					"name": "School - Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/school/1/",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Test delete email address"
+					},
+					"response": []
+				},
+				{
+					"name": "School - List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									"tests[\"Correct format\"] = responseBody.has(\"address_id\") && responseBody.has(\"school_name\");",
+									"",
+									"//var jsonData = JSON.parse(responseBody);",
+									"//tests[\"Read Address\"] = jsonData.has(\"school_id\");",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/school/",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				},
+				{
+					"name": "School - Student - List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									"tests[\"Correct format\"] = responseBody.has(\"address_id\") && responseBody.has(\"school_name\");",
+									"",
+									"//var jsonData = JSON.parse(responseBody);",
+									"//tests[\"Read Address\"] = jsonData.has(\"school_id\");",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/school/1/students/",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				},
+				{
+					"name": "School - Team - List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									"tests[\"Correct format\"] = responseBody.has(\"school_id\") && responseBody.has(\"team_name\");",
+									"",
+									"//var jsonData = JSON.parse(responseBody);",
+									"//tests[\"Read Address\"] = jsonData.has(\"school_id\");",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/school/1/teams/",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				},
+				{
+					"name": "School - Team - List - Not Approved",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 403\"] = responseCode.code === 403;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/school/3/teams/",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "School - Advisor",
+			"description": "",
+			"item": [
+				{
+					"name": "School - Advisor - Set",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 204\"] = responseCode.code === 204;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/school/8/advisor/5",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Test emailaddress update"
+					},
+					"response": []
+				},
+				{
+					"name": "School - Advisor - Remove",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 204\"] = responseCode.code === 204;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/school/8/advisor/5",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Test emailaddress update"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Solution",
+			"description": "",
+			"item": [
+				{
+					"name": "Solution - Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Your test name\"] = jsonData.solution_id === 1;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/solution/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"solution_id\" : 1\n\t, \"problem_id\" : 1\n\t, \"solution_desc\" : \"This is a solution for problem 1\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Solution - Create - Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 400\"] = responseCode.code === 400;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/solution/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"solution_id\" : 1\n\t, \"problem_id\" : 9999\n\t, \"solution_desc\" : \"This is a solution for problem 1\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Solution - Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Solution ID Matched\"] = jsonData.solution_id === 1",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/solution/1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Solution - Read - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/solution/-1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Solution - Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/solution/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"solution_id\" : 1\n\t,\"problem_id\" : 1\n\t, \"solution_desc\" : \"This is updated solution desc\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Solution - Update - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/solution/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"solution_id\" : 99999\n\t,\"problem_id\" : 1\n\t, \"solution_desc\" : \"This is updated solution desc\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Solution - Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/solution/1",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Solution - Delete - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/solution/9999999",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Student",
+			"description": "APIs for EmailAddress",
+			"item": [
+				{
+					"name": "Student - Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/student/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"student_name\"\t: \"Idle Student\"\n\t, \"school_id\" : 1\n\t, \"student_grade\": \"Freshmen\"\n}"
+						},
+						"description": "Test add email address"
+					},
+					"response": []
+				},
+				{
+					"name": "Student - Create - Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 400\"] = responseCode.code === 400;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/student/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"student_name\"\t: \"Idle Student\"\n\t, \"school_id\" : 99\n\t, \"student_grade\": \"Freshmen\"\n}"
+						},
+						"description": "Test add email address"
+					},
+					"response": []
+				},
+				{
+					"name": "Student - Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Read Student\"] = jsonData.student_id === 1;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/student/1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Try to get an emailaddress."
+					},
+					"response": []
+				},
+				{
+					"name": "Student - Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/student/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"student_id\": 38\n\t, \"student_name\"\t: \"Idle Student\"\n\t, \"school_id\" : 1\n\t, \"student_grade\": \"Senior\"\n}"
+						},
+						"description": "Test emailaddress update"
+					},
+					"response": []
+				},
+				{
+					"name": "Student - Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Student - Delete\"] = responseBody.has(\"Success\");",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/student/38",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Test delete email address"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TODO",
+			"description": "",
+			"item": []
+		},
+		{
+			"name": "Team",
+			"description": "",
+			"item": [
+				{
+					"name": "Team - Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Your test name\"] = jsonData.team_name === \"New Team\";",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/team/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"school_id\": 9,\n  \"team_division\": \"Advance\",\n  \"team_name\": \"New Team\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Team - Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"TeamID Matched\"] = jsonData.team_id === 1",
+									"    //postman.getEnvironmentVariable(\"team_id\");",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/team/{{team_id}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Team - Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/team/",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"school_id\": 9,\n  \"team_division\": \"Beginner\",\n  \"team_id\": 14,\n  \"team_name\": \"New Team\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Team - Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/team/16",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Team - Student",
+			"description": "",
+			"item": [
+				{
+					"name": "Team - Student - List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/team/1/students/",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Team - Add - Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 204\"] = responseCode.code === 204;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/team/2/add/12",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Team - Remove - Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 204\"] = responseCode.code === 204;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/team/2/remove/12",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
