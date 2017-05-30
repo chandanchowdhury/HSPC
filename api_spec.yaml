@@ -23,18 +23,18 @@ info:
 # host: hspc.cs.ksu.com
 
 # security definitions
-# UserSecurity is for Advisors for maintaining Teams and Students
-# AdminSecurity is for organizors who will maintain the system
 securityDefinitions:
-  UserSecurityBasic:
-    type: basic
-    description: UserSecurity is for Advisors for maintaining Teams and Students
-  AdminSecurityBasic:
-    type: basic
-    description: AdminSecurity is for organisers who will maintain the system
+  APISecurity:
+    type: apiKey
+    in: header
+    name: hspc-api-key
+  SessionSecurity:
+    type: apiKey
+    in: header
+    name: hspc-token
 
 security:
-  - AdminSecurityBasic: []
+  - APISecurity: []
 
 # array of all schemes that your API supports
 schemes:
@@ -48,6 +48,53 @@ consumes:
 produces:
   - application/json
 paths:
+  # API paths for Login
+  /login:
+    post:
+      tags:
+        - login
+      parameters:
+        - name: emailaddress
+          description: Email address
+          in: header
+          type: string
+          format: email
+          required: true
+        - name: password
+          description: Password
+          in: header
+          type: string
+          format: password
+          required: true
+      responses:
+        200:
+          description: Return a new session token
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            hspc-token:
+              description: The Principal object in String format
+              type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  # API paths for Logout
+  /logout:
+    post:
+      tags:
+        - logout
+      security:
+        - SessionSecurity: []
+      responses:
+        200:
+          description: Returns Success/Failure message with code
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 # API paths for Credential
   /credential:
     post:
@@ -60,6 +107,8 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/Credential'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns the newly created Credential
@@ -80,6 +129,8 @@ paths:
           description: Updated Credential object
           schema:
             $ref: '#/definitions/Credential'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -96,6 +147,8 @@ paths:
       description: Find Credential using email address
       tags:
         - credential
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns the Credential
@@ -109,6 +162,8 @@ paths:
       description: Given an emailaddress, delete the Credential
       tags:
         - credential
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -118,53 +173,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-# API paths for Login
-# TODO: Test/Validate login and logout functions
-  /login/{emailaddress}/{password}:
-    get:
-      tags:
-        - login
-      parameters:
-        - name: emailaddress
-          description: Email address
-          in: path
-          type: string
-          format: email
-          required: true
-        - name: password
-          description: Password
-          in: path
-          type: string
-          format: password
-          required: true
-      responses:
-        200:
-          description: Return a new session
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /logout/{session-id}:
-    get:
-      tags:
-        - logout
-      parameters:
-        - name: session-id
-          description: The session which need to be invalidated
-          in: path
-          type: string
-          required: true
-      responses:
-        200:
-          description: Returns Success/Failure message with code
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+
 # API paths for Address
   /address:
     post:
@@ -177,6 +186,8 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/Address'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns the newly created Address
@@ -196,6 +207,8 @@ paths:
           in: body
           schema:
             $ref: '#/definitions/Address'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -217,6 +230,8 @@ paths:
       description: Find Address using AddressID
       tags:
         - address
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Address
@@ -230,6 +245,8 @@ paths:
       description: Delete Address using AddressID
       tags:
         - address
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -253,6 +270,8 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/School'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Return the newly created School
@@ -272,6 +291,8 @@ paths:
           in: body
           schema:
             $ref: '#/definitions/School'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -286,7 +307,7 @@ paths:
       tags:
         - school
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns School list
@@ -311,8 +332,7 @@ paths:
       tags:
         - school
       security:
-        - AdminSecurityBasic: []
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns School
@@ -326,6 +346,8 @@ paths:
       description: Delete School using SchoolID
       tags:
         - school
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -348,7 +370,7 @@ paths:
       tags:
         - school
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns the list of Students for the School
@@ -373,7 +395,7 @@ paths:
       tags:
         - school
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns the list of Teams for the School
@@ -397,6 +419,8 @@ paths:
       description: Find the Advisor for a School
       tags:
         - school
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Advisor
@@ -424,6 +448,8 @@ paths:
         description: Set the Advisor for a School
         tags:
           - school
+        security:
+          - SessionSecurity: []
         responses:
           204:
             description: Success
@@ -435,6 +461,8 @@ paths:
         description: Remove the Advisor for a School
         tags:
           - school
+        security:
+          - SessionSecurity: []
         responses:
           204:
             description: Success
@@ -454,6 +482,8 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/Advisor'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Return the newly created Advisor
@@ -475,7 +505,7 @@ paths:
           schema:
             $ref: '#/definitions/Advisor'
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -489,6 +519,8 @@ paths:
       description: Find all Advisors
       tags:
         - advisor
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns list of Advisors
@@ -513,7 +545,7 @@ paths:
       tags:
         - advisor
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Advisor
@@ -527,6 +559,8 @@ paths:
       description: Given an emailaddress, delete the advisor
       tags:
         - advisor
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Return success
@@ -549,7 +583,7 @@ paths:
       tags:
         - advisor
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns list of Schools
@@ -574,7 +608,7 @@ paths:
           schema:
             $ref: '#/definitions/Student'
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Return the newly created Student
@@ -596,7 +630,7 @@ paths:
           schema:
             $ref: '#/definitions/Student'
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -619,7 +653,7 @@ paths:
       tags:
         - student
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Student
@@ -634,7 +668,7 @@ paths:
       tags:
         - student
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Return success
@@ -657,7 +691,7 @@ paths:
           schema:
             $ref: '#/definitions/Team'
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Return the newly created Team
@@ -679,7 +713,7 @@ paths:
           schema:
             $ref: '#/definitions/Team'
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -702,7 +736,7 @@ paths:
       tags:
         - team
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Team
@@ -717,7 +751,7 @@ paths:
       tags:
         - team
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Return success
@@ -746,7 +780,7 @@ paths:
       tags:
         - team
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         204:
           description: Student added to the Team, no data
@@ -773,7 +807,7 @@ paths:
       tags:
         - team
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         204:
           description: Student removed from the Team, no data
@@ -794,7 +828,7 @@ paths:
       tags:
         - team
       security:
-        - UserSecurityBasic: []
+        - SessionSecurity: []
       responses:
         200:
           description: Returns List of Students in a Team
@@ -819,6 +853,8 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/Problem'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Return the newly created Problem
@@ -839,6 +875,8 @@ paths:
           description: Updated Problem object
           schema:
             $ref: '#/definitions/Problem'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -852,6 +890,8 @@ paths:
       description: List of all Problems
       tags:
         - problem
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns list of all Problems
@@ -875,6 +915,8 @@ paths:
       description: Find Problem using ProblemID
       tags:
         - problem
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Problem
@@ -888,6 +930,8 @@ paths:
       description: Delete Problem using ProblemID
       tags:
         - problem
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -909,6 +953,8 @@ paths:
       description: Find all Solutions to a Problem
       tags:
         - problem
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns list of Solutions to a Problem
@@ -932,6 +978,8 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/Solution'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Return the newly created Solution
@@ -952,6 +1000,8 @@ paths:
           description: Updated Solution object
           schema:
             $ref: '#/definitions/Solution'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -973,6 +1023,8 @@ paths:
       description: Find Solution using SolutionID
       tags:
         - solution
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Return Solution
@@ -986,6 +1038,8 @@ paths:
       description: Delete Solution using SolutionID
       tags:
         - solution
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -1007,6 +1061,8 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/TeamScore'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Return the newly created TeamScore
@@ -1027,6 +1083,8 @@ paths:
           description: Updated TeamScore object
           schema:
             $ref: '#/definitions/TeamScore'
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -1040,6 +1098,8 @@ paths:
       description: Find all TeamScores
       tags:
         - teamscore
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Retrun the list of all TeamScore
@@ -1063,6 +1123,8 @@ paths:
       description: Find TeamScore using TeamScoreID
       tags:
         - teamscore
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns TeamScore
@@ -1076,6 +1138,8 @@ paths:
       description: Delete TeamScore using TeamScoreID
       tags:
         - teamscore
+      security:
+        - SessionSecurity: []
       responses:
         200:
           description: Returns Success/Failure message with code
@@ -1325,6 +1389,18 @@ definitions:
         type: string
       fields:
         type: string
+#
+  Principal:
+    type: object
+    description: The Principal model is used for authentication and session management.
+    properties:
+      email:
+        type: string
+      session-token:
+        type: string
+      created_ts:
+        type: string
+        format: dateTime
 
 parameters:
   emailaddress:
