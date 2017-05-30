@@ -6,12 +6,18 @@ import "log"
    Add a Student to a team
 */
 func TeamAddMember(team_id int64, student_id int64) bool {
-	log.Print("# Add Team member")
-	log.Printf("Team ID = %d, Student ID = %d", team_id, student_id)
+	log.Printf("Add Team member : Team ID = %d, Student ID = %d", team_id, student_id)
 
 	db := getDBConn()
 
-	//TODO: Make sure the Team and Student belong to the same School
+	//Make sure the Team and Student belong to the same School
+	team := TeamRead(team_id)
+	student := StudentRead(student_id)
+
+	if team.SchoolID != student.SchoolID {
+		log.Print("Team and Student are not from same School")
+		return false
+	}
 
 	stmt, err := db.Prepare("INSERT INTO Student_Team(team_id, student_id) " +
 		"VALUES($1, $2)")
