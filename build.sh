@@ -16,7 +16,7 @@ then
         echo "Deleting direcotries..."
         rm -rf cmd restapi models
     fi
-    swagger generate server -A hspc -f api_spec.yaml
+    swagger generate server -A hspc -P models.Principal -f api_spec.yaml
 
     go get -u -f ./...
 fi
