@@ -138,7 +138,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		return HandleProblemDelete(params)
 	})
 	api.SchoolDeleteSchoolIDHandler = school.DeleteSchoolIDHandlerFunc(func(params school.DeleteSchoolIDParams, principal *models.Principal) middleware.Responder {
-		return HandleSchoolDelete(params)
+		return HandleSchoolDelete(params, principal)
 	})
 	api.SolutionDeleteSolutionIDHandler = solution.DeleteSolutionIDHandlerFunc(func(params solution.DeleteSolutionIDParams, principal *models.Principal) middleware.Responder {
 		return HandleSolutionDelete(params)
@@ -163,7 +163,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		return HandleProblemGet(params)
 	})
 	api.SchoolGetSchoolIDHandler = school.GetSchoolIDHandlerFunc(func(params school.GetSchoolIDParams, principal *models.Principal) middleware.Responder {
-		return HandleSchoolGet(params)
+		return HandleSchoolGet(params, principal)
 	})
 	api.SolutionGetSolutionIDHandler = solution.GetSolutionIDHandlerFunc(func(params solution.GetSolutionIDParams, principal *models.Principal) middleware.Responder {
 		return HandleSolutionGet(params)
@@ -187,7 +187,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		return HandleProblemPost(params)
 	})
 	api.SchoolPostSchoolHandler = school.PostSchoolHandlerFunc(func(params school.PostSchoolParams, principal *models.Principal) middleware.Responder {
-		return HandleSchoolPost(params)
+		return HandleSchoolPost(params, principal)
 	})
 	api.SolutionPostSolutionHandler = solution.PostSolutionHandlerFunc(func(params solution.PostSolutionParams, principal *models.Principal) middleware.Responder {
 		return HandleSolutionPost(params)
@@ -211,7 +211,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		return HandleProblemPut(params)
 	})
 	api.SchoolPutSchoolHandler = school.PutSchoolHandlerFunc(func(params school.PutSchoolParams, principal *models.Principal) middleware.Responder {
-		return HandleSchoolPut(params)
+		return HandleSchoolPut(params, principal)
 	})
 	api.SolutionPutSolutionHandler = solution.PutSolutionHandlerFunc(func(params solution.PutSolutionParams, principal *models.Principal) middleware.Responder {
 		return HandleSolutionPut(params)
@@ -226,7 +226,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 	// --- School ---
 	// List of all Schools
 	api.SchoolGetSchoolHandler = school.GetSchoolHandlerFunc(func(params school.GetSchoolParams, principal *models.Principal) middleware.Responder {
-		return HandleSchoolGetList(params)
+		return HandleSchoolGetList(params, principal)
 	})
 	// List of all Students for a School
 	api.SchoolGetSchoolIDStudentsHandler = school.GetSchoolIDStudentsHandlerFunc(func(params school.GetSchoolIDStudentsParams, principal *models.Principal) middleware.Responder {

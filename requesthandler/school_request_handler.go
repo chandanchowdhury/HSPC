@@ -11,21 +11,13 @@ import (
 
 /**
 Check if the Advisor has access to the School
- */
-func checkAdvisorAccessSchool(principal interface{}, school_id int64) bool {
+*/
+func checkAdvisorAccessSchool(principal *models.Principal, school_id int64) bool {
 	//Only School advisor or admin should get the list of Teams
-
-	//try to convert the interface to string
-	email, isEmail := principal.(string)
-
-	if isEmail == false {
-		return false
-	}
-
-	log.Printf("Checking Advisor = %s access for School = %d", email, school_id)
+	log.Printf("Checking Advisor = %s access for School = %d", principal.Email, school_id)
 
 	// Get the Advisor detail using the principal
-	advisor := dbhandler.AdvisorReadByEmail(email)
+	advisor := dbhandler.AdvisorReadByEmail(principal.Email)
 
 	//get the school advisor
 	school_advisor := dbhandler.SchoolReadAdvisor(school_id)
@@ -39,7 +31,7 @@ func checkAdvisorAccessSchool(principal interface{}, school_id int64) bool {
 	return false
 }
 
-func HandleSchoolPost(params school.PostSchoolParams) middleware.Responder {
+func HandleSchoolPost(params school.PostSchoolParams, principal *models.Principal) middleware.Responder {
 	//create the school
 	school_id := dbhandler.SchoolCreate(*params.School)
 
@@ -74,7 +66,7 @@ func HandleSchoolPost(params school.PostSchoolParams) middleware.Responder {
 	return resp
 }
 
-func HandleSchoolGet(params school.GetSchoolIDParams) middleware.Responder {
+func HandleSchoolGet(params school.GetSchoolIDParams, principal *models.Principal) middleware.Responder {
 	//get school details based on the provided id
 	school_data := dbhandler.SchoolRead(params.ID)
 
@@ -92,7 +84,7 @@ func HandleSchoolGet(params school.GetSchoolIDParams) middleware.Responder {
 	return resp
 }
 
-func HandleSchoolPut(params school.PutSchoolParams) middleware.Responder {
+func HandleSchoolPut(params school.PutSchoolParams, principal *models.Principal) middleware.Responder {
 	affected_count := dbhandler.SchoolUpdate(*params.School)
 
 	error := new(models.Error)
@@ -128,7 +120,7 @@ func HandleSchoolPut(params school.PutSchoolParams) middleware.Responder {
 
 }
 
-func HandleSchoolDelete(params school.DeleteSchoolIDParams) middleware.Responder {
+func HandleSchoolDelete(params school.DeleteSchoolIDParams, principal *models.Principal) middleware.Responder {
 	affected_count := dbhandler.SchoolDelete(params.ID)
 
 	error := new(models.Error)
@@ -161,7 +153,7 @@ func HandleSchoolDelete(params school.DeleteSchoolIDParams) middleware.Responder
 	return resp
 }
 
-func HandleSchoolGetList(params school.GetSchoolParams) middleware.Responder {
+func HandleSchoolGetList(params school.GetSchoolParams, principal *models.Principal) middleware.Responder {
 	school_list := dbhandler.SchoolList(params)
 
 	if school_list == nil {
@@ -180,8 +172,8 @@ func HandleSchoolGetList(params school.GetSchoolParams) middleware.Responder {
 	return resp
 }
 
-func HandleSchoolGetStudentList(params school.GetSchoolIDStudentsParams, principal interface{}) middleware.Responder {
-	log.Printf("SchoolStudentList principal = %s", principal)
+func HandleSchoolGetStudentList(params school.GetSchoolIDStudentsParams, principal *models.Principal) middleware.Responder {
+	log.Printf("SchoolStudentList principal = %s", principal.Email)
 
 	//Only School advisor
 	if result := checkAdvisorAccessSchool(principal, params.ID); result == false {
@@ -212,7 +204,7 @@ func HandleSchoolGetStudentList(params school.GetSchoolIDStudentsParams, princip
 	return resp
 }
 
-func HandleSchoolGetTeamList(params school.GetSchoolIDTeamsParams, principal interface{}) middleware.Responder {
+func HandleSchoolGetTeamList(params school.GetSchoolIDTeamsParams, principal *models.Principal) middleware.Responder {
 	log.Printf("SchoolTeamList SchooldID = %d", params.ID)
 
 	//Only School advisor
@@ -255,8 +247,8 @@ func HandleSchoolGetTeamList(params school.GetSchoolIDTeamsParams, principal int
 
 /**
 Add an Advisor to a School
- */
-func SchoolAddAdvisor(params school.PutSchoolSchoolIDAdvisorAdvisorIDParams, principal interface{}) middleware.Responder {
+*/
+func SchoolAddAdvisor(params school.PutSchoolSchoolIDAdvisorAdvisorIDParams, principal *models.Principal) middleware.Responder {
 	log.Printf("Set Advisor = %d for School = %d", params.AdvisorID, params.SchoolID)
 
 	//try to set the advisor for the school
@@ -271,8 +263,8 @@ func SchoolAddAdvisor(params school.PutSchoolSchoolIDAdvisorAdvisorIDParams, pri
 
 /**
 Remove an Advisor to a School
- */
-func SchoolRemoveAdvisor(params school.DeleteSchoolSchoolIDAdvisorAdvisorIDParams, principal interface{}) middleware.Responder {
+*/
+func SchoolRemoveAdvisor(params school.DeleteSchoolSchoolIDAdvisorAdvisorIDParams, principal *models.Principal) middleware.Responder {
 	log.Printf("Remove Advisor = %d for School = %d", params.AdvisorID, params.SchoolID)
 
 	//try to set the advisor for the school

@@ -1,25 +1,14 @@
 package requesthandler
 
 import (
-	"log"
-
 	"github.com/chandanchowdhury/HSPC/dbhandler"
 	"github.com/chandanchowdhury/HSPC/models"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/team"
 	"github.com/go-openapi/runtime/middleware"
 )
 
-func checkAdvisorAccessTeam(principal interface{}, team_id int64) bool {
-	//TODO: Implement this
-	//get AdvisorID from email
-	//try to convert the interface to string
-	email, isEmail := principal.(string)
-
-	if !isEmail {
-		log.Panic("Could not get Email from Principal")
-	}
-
-	advisor := dbhandler.AdvisorReadByEmail(email)
+func checkAdvisorAccessTeam(principal *models.Principal, team_id int64) bool {
+	advisor := dbhandler.AdvisorReadByEmail(principal.Email)
 
 	//Get Schools Advisor is approved for
 	advisor_school_ids := dbhandler.AdvisorGetAllSchools(advisor.AdvisorID)
@@ -37,7 +26,7 @@ func checkAdvisorAccessTeam(principal interface{}, team_id int64) bool {
 	return true
 }
 
-func HandleTeamPost(params team.PostTeamParams, principal interface{}) middleware.Responder {
+func HandleTeamPost(params team.PostTeamParams, principal *models.Principal) middleware.Responder {
 	//first check advisor access
 	if allowed := checkAdvisorAccessTeam(principal, params.Team.TeamID); allowed == false {
 		resp := team.NewPostTeamDefault(400)
@@ -84,8 +73,7 @@ func HandleTeamPost(params team.PostTeamParams, principal interface{}) middlewar
 	return resp
 }
 
-func HandleTeamGet(params team.GetTeamIDParams, principal interface{}) middleware.Responder {
-	//TODO: Check that Advisor is approved for the School the Team belongs to
+func HandleTeamGet(params team.GetTeamIDParams, principal *models.Principal) middleware.Responder {
 	//first check advisor access
 	if allowed := checkAdvisorAccessTeam(principal, params.ID); allowed == false {
 		resp := team.NewPostTeamDefault(400)
@@ -113,8 +101,7 @@ func HandleTeamGet(params team.GetTeamIDParams, principal interface{}) middlewar
 	return resp
 }
 
-func HandleTeamPut(params team.PutTeamParams, principal interface{}) middleware.Responder {
-	//TODO: Check that Advisor is approved for the School the Team belongs to
+func HandleTeamPut(params team.PutTeamParams, principal *models.Principal) middleware.Responder {
 	//first check advisor access
 	if allowed := checkAdvisorAccessTeam(principal, params.Team.TeamID); allowed == false {
 		resp := team.NewPostTeamDefault(400)
@@ -157,8 +144,7 @@ func HandleTeamPut(params team.PutTeamParams, principal interface{}) middleware.
 	return resp
 }
 
-func HandleTeamDelete(params team.DeleteTeamIDParams, principal interface{}) middleware.Responder {
-	//TODO: Check that Advisor is approved for the School the Team belongs to
+func HandleTeamDelete(params team.DeleteTeamIDParams, principal *models.Principal) middleware.Responder {
 	//first check advisor access
 	if allowed := checkAdvisorAccessTeam(principal, params.ID); allowed == false {
 		resp := team.NewPostTeamDefault(400)
@@ -199,8 +185,7 @@ func HandleTeamDelete(params team.DeleteTeamIDParams, principal interface{}) mid
 	return resp
 }
 
-func HandleGetTeamStudents(params team.GetTeamIDStudentsParams, principal interface{}) middleware.Responder {
-	//TODO: Check that Advisor is approved for the School the Team belongs to
+func HandleGetTeamStudents(params team.GetTeamIDStudentsParams, principal *models.Principal) middleware.Responder {
 	//first check advisor access
 	if allowed := checkAdvisorAccessTeam(principal, params.ID); allowed == false {
 		resp := team.NewPostTeamDefault(400)
@@ -238,8 +223,7 @@ func HandleGetTeamStudents(params team.GetTeamIDStudentsParams, principal interf
 
 }
 
-func HandleTeamAddStudent(params team.GetTeamTeamIDAddStudentIDParams, principal interface{}) middleware.Responder {
-	//TODO: Check that Advisor is approved for the School the Team belongs to
+func HandleTeamAddStudent(params team.GetTeamTeamIDAddStudentIDParams, principal *models.Principal) middleware.Responder {
 	//first check advisor access
 	if allowed := checkAdvisorAccessTeam(principal, params.TeamID); allowed == false {
 		resp := team.NewPostTeamDefault(400)
@@ -265,8 +249,7 @@ func HandleTeamAddStudent(params team.GetTeamTeamIDAddStudentIDParams, principal
 	return resp
 }
 
-func HandleTeamRemoveStudent(params team.GetTeamTeamIDRemoveStudentIDParams, principal interface{}) middleware.Responder {
-	//TODO: Check that Advisor is approved for the School the Team belongs to
+func HandleTeamRemoveStudent(params team.GetTeamTeamIDRemoveStudentIDParams, principal *models.Principal) middleware.Responder {
 	//first check advisor access
 	if allowed := checkAdvisorAccessTeam(principal, params.TeamID); allowed == false {
 		resp := team.NewPostTeamDefault(400)
