@@ -127,7 +127,7 @@ func SolutionUpdate(solution models.Solution) int64 {
 
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			log.Print("Trying to update non-existing Solution: %d", solution.SolutionID)
+			log.Printf("Trying to update non-existing Solution: %d", solution.SolutionID)
 			return 0
 		}
 
@@ -146,7 +146,7 @@ func SolutionDelete(solution_id int64) int64 {
 
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			log.Print("Trying to delete non-existing Solution: %d", solution_id)
+			log.Printf("Trying to delete non-existing Solution: %d", solution_id)
 			return 0
 		}
 
