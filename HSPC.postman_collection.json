@@ -2646,11 +2646,6 @@
 			]
 		},
 		{
-			"name": "TODO",
-			"description": "",
-			"item": []
-		},
-		{
 			"name": "Team",
 			"description": "",
 			"item": [
@@ -2955,8 +2950,53 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Team - Add - Student - Fail - Different School",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 204\"] = responseCode.code === 204;",
+									"",
+									"tests[\"Response time is less than 200ms\"] = responseTime < 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://127.0.0.1:8080/v1/team/1/add/1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "hspc-api-key",
+								"value": "This is USER app API key",
+								"description": ""
+							},
+							{
+								"key": "Hspc-Token",
+								"value": "{{Hspc-Token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
 				}
 			]
+		},
+		{
+			"name": "z -TODO",
+			"description": "",
+			"item": []
 		}
 	]
 }
