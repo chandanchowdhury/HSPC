@@ -17,7 +17,6 @@ import (
 
 func HandleLogin(params login.PostLoginParams, principal *models.Principal) middleware.Responder {
 	log.Print("api.LoginPostLoginHandler()")
-	log.Printf("Principal = %s", principal.Email)
 
 	user := params.Emailaddress.String()
 	pass := params.Password.String()
@@ -31,8 +30,6 @@ func HandleLogin(params login.PostLoginParams, principal *models.Principal) midd
 		return resp
 	}
 
-	log.Printf("From DB - email: %s, password: %s Active: %t", credential.Emailaddress.String(), credential.Password.String(), *credential.CredentialActive)
-
 	if credential.Password.String() == pass && *credential.CredentialActive == true {
 		log.Print("Password Matched")
 		resp := login.NewPostLoginOK()
@@ -42,8 +39,6 @@ func HandleLogin(params login.PostLoginParams, principal *models.Principal) midd
 		ts := time.Now()
 		prin.CreatedTs = ts.Format(time.UnixDate)
 
-		//TODO: Save the session data in a table to improve security
-
 		hmac_func := hmac.New(sha256.New, hashKey)
 
 		//add email
@@ -52,7 +47,16 @@ func HandleLogin(params login.PostLoginParams, principal *models.Principal) midd
 		hmac_func.Write([]byte(prin.CreatedTs))
 		// encode the HMAC in Base64 and save it in SessionToken
 		prin.SessionToken = base64.URLEncoding.EncodeToString(hmac_func.Sum(nil))
+		// alternate to Base64 ecnoding
 		//prin.SessionToken = fmt.Sprintf("%x", hmac_func.Sum(nil))
+
+		//Save the session data in a database to improve security
+		serr := dbhandler.SessionCreate(prin)
+
+		if serr.Code != 0 {
+			log.Print("Failed to save session in database")
+			log.Panic(serr)
+		}
 
 		//now serialize the Principal object and return to API caller
 		// gob encoder

@@ -66,6 +66,8 @@ paths:
           type: string
           format: password
           required: true
+      security:
+        - APISecurity: []
       responses:
         200:
           description: Return a new session token

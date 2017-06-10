@@ -14,6 +14,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 
+	"github.com/chandanchowdhury/HSPC/dbhandler"
 	"github.com/chandanchowdhury/HSPC/models"
 	"github.com/chandanchowdhury/HSPC/restapi/operations"
 	"github.com/chandanchowdhury/HSPC/restapi/operations/address"
@@ -67,7 +68,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 
 		log.Print("No or Invalid API key")
 
-		return nil, errors.Unauthenticated("Invalid API key")
+		return nil, errors.New(403, "Invalid API key")
 	}
 
 	// Applies when the "Hspc-Token" header is set
@@ -78,8 +79,7 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		uDec, err := base64.URLEncoding.DecodeString(token)
 		if err != nil {
 			log.Print("Base64 decoding failed")
-			//log.Panic(err)
-			return nil, errors.NotFound("Session not found")
+			return nil, errors.New(401, "Session Not Found")
 		}
 
 		// deserialize the GOB
@@ -108,8 +108,11 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		// encode the HMAC in Base64 and store it
 		sessionToken := base64.URLEncoding.EncodeToString(hmac_func.Sum(nil))
 
+		//does the session exists in our database?
+		prin_in_db := dbhandler.SessionRead(prin.Email)
+
 		//compare the HMAC generated against the HMAC sent by the client
-		if sessionToken == prin.SessionToken {
+		if sessionToken == prin.SessionToken && prin_in_db.Email == prin.Email {
 			log.Printf("Session Principal: %s", prin.Email)
 			return prin, nil
 		}
