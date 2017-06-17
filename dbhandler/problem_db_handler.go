@@ -6,15 +6,16 @@ import (
 	"github.com/chandanchowdhury/HSPC/models"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"os"
 	"strings"
 )
 
 //TODO: Read from config file
-const (
-	MONGO_DB_HOST           = "localhost"
-	MONGO_DB_USER           = "hspc"
-	MONGO_AUTH_DB           = "admin"
-	MONGO_DB_PASSWORD       = "HSPC-Password"
+var (
+	MONGO_DB_HOST           = os.Getenv("MONGO_DB_HOST")
+	MONGO_DB_USER           = os.Getenv("MONGO_DB_USER")
+	MONGO_DB_PASSWORD       = os.Getenv("MONGO_DB_PASSWORD")
+	MONGO_AUTH_DB           = os.Getenv("MONGO_DB_AUTH_DB")
 	Problem_Collection_Name = "Problems"
 )
 
