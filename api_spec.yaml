@@ -33,9 +33,6 @@ securityDefinitions:
     in: header
     name: hspc-token
 
-security:
-  - APISecurity: []
-
 # array of all schemes that your API supports
 schemes:
   # TODO: Disable HTTP and enable HTTPS when implementing in production
@@ -69,10 +66,8 @@ paths:
       security:
         - APISecurity: []
       responses:
-        200:
+        204:
           description: Return a new session token
-          schema:
-            $ref: '#/definitions/Error'
           headers:
             hspc-token:
               description: The Principal object in String format
@@ -81,6 +76,26 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+#    options:
+#      tags:
+#        - login
+#      responses:
+#        200:
+#          description: Return accepted headers to client
+#          headers:
+#            Access-Control-Allow-Origin:
+#              description: CORS allowed origins
+#              type: string
+#            Access-Control-Allow-Methods:
+#              description: CORS allowed methids
+#              type: string
+#            Access-Control-Allow-Headers:
+#              description: CORS allowed headers
+#              type: string
+#            Access-Control-Max-Age:
+#              description: CORS allowed headers
+#              type: integer
+#              format: int64
   # API paths for Logout
   /logout:
     post:
@@ -97,6 +112,12 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+#    options:
+#      tags:
+#        - logout
+#      responses:
+#        200:
+#          $ref: "#/responses/defaultOPTIONSResponse"
 # API paths for Credential
   /credential:
     post:
@@ -321,6 +342,12 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+#    options:
+#      tags:
+#        - school
+#      responses:
+#        200:
+#          $ref: '#/responses/defaultOPTIONSResponse'
   /school/{id}:
     parameters:
       - name: id
@@ -359,6 +386,12 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+#    options:
+#      tags:
+#        - school
+#      responses:
+#        200:
+#          $ref: '#/responses/defaultOPTIONSResponse'
   /school/{id}/students:
     parameters:
       - name: id
@@ -1440,3 +1473,44 @@ parameters:
     type: integer
     format: int64
     required: true
+
+#responses:
+#  defaultOPTIONSResponse:
+#    description: default Response when request method is OPTIONS
+#    headers:
+#      Access-Control-Allow-Origin:
+#        description: CORS allowed origins
+#        type: string
+#        default: '*'
+#      Access-Control-Allow-Methods:
+#        description: CORS allowed methods
+#        type: string
+#        default: 'GET, POST, PUT, DELETE, OPTIONS'
+#      Access-Control-Allow-Headers:
+#        description: CORS allowed headers
+#        type: string
+#        default: 'hspc-api-key, hspc-token, Access-Control-Allow-Origin'
+#      Access-Control-Max-Age:
+#        description: CORS cache headers duration
+#        type: integer
+#        format: int64
+#        default: 60
+#  defaultCORSHeaders:
+#    description: default CORS headers in Response when method is not OPTIONS
+#    headers:
+#      hspc-token:
+#        description: The Principal object in String format
+#        type: string
+#      Access-Control-Allow-Origin:
+#        description: CORS allowed origins
+#        type: string
+#        default: '*'
+#      Access-Control-Max-Age:
+#        description: CORS cache headers duration
+#        type: integer
+#        format: int64
+#        default: 60
+#      Access-Control-Expose-Headers:
+#        description: Expose the CORS headers so it is accessible via javascript
+#        type: string
+#        default: 'hspc-api-key, hspc-token'
