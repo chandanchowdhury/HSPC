@@ -30,6 +30,7 @@ import (
 	"github.com/didip/tollbooth"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/rs/cors"
 )
 
 //TODO: Generate 128 bit random hash key
@@ -119,6 +120,21 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 
 		return nil, errors.NotFound("Session not found")
 	}
+
+	//api.LoginOptionsLoginHandler = login.OptionsLoginHandlerFunc(func(params login.OptionsLoginParams) middleware.Responder {
+	//	log.Print("login - OPTIONS")
+	//
+	//	resp := login.NewOptionsLoginOK()
+	//
+	//	req_headers := params.HTTPRequest.Header
+	//	resp.AccessControlAllowMethods = req_headers.Get("Access-Control-Request-Method")
+	//	resp.AccessControlAllowHeaders = req_headers.Get("Access-Control-Request-Headers")
+	//
+	//	resp.AccessControlAllowOrigin = "*"
+	//	resp.AccessControlMaxAge = 86400
+	//
+	//	return resp
+	//})
 
 	api.LoginPostLoginHandler = login.PostLoginHandlerFunc(func(params login.PostLoginParams, principal *models.Principal) middleware.Responder {
 		return HandleLogin(params, principal)
@@ -249,6 +265,22 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		return SchoolRemoveAdvisor(params, principal)
 	})
 
+	//api.SchoolOptionsSchoolIDHandler = school.OptionsSchoolIDHandlerFunc(func(params school.OptionsSchoolIDParams) middleware.Responder {
+	//	log.Print("school/id - OPTIONS")
+	//
+	//	resp := school.NewOptionsSchoolIDOK()
+	//
+	//	//req_headers := params.HTTPRequest.Header
+	//	//resp.AccessControlAllowMethods = req_headers.Get("Access-Control-Request-Method")
+	//	//resp.AccessControlAllowHeaders = req_headers.Get("Access-Control-Request-Headers")
+	//	//
+	//	//resp.AccessControlAllowOrigin = "*"
+	//	//resp.AccessControlMaxAge = 86400
+	//	//
+	//
+	//	return resp
+	//})
+
 	// --- Advisor ---
 	// List all Advisors
 	api.AdvisorGetAdvisorHandler = advisor.GetAdvisorHandlerFunc(func(params advisor.GetAdvisorParams, principal *models.Principal) middleware.Responder {
@@ -284,10 +316,33 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 }
 
 func RateLimitMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		limiter := tollbooth.NewLimiter(1, time.Second)
-		limiter.IPLookups = []string{"RemoteAddr", "X-Forwarded-For", "X-Real-IP"}
-		//return tollbooth.LimitFuncHandler(next)
-		next.ServeHTTP(w, r)
+	log.Print("RateLimitMiddleware()")
+	limiter := tollbooth.NewLimiter(5, time.Second)
+	limiter.IPLookups = []string{"RemoteAddr", "X-Forwarded-For", "X-Real-IP"}
+	return tollbooth.LimitFuncHandler(limiter, next.ServeHTTP)
+}
+
+func HandleCORS(next http.Handler) http.Handler {
+	log.Print("HandleCORS()")
+
+	//set up the CORS handler
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Access-Control-Allow-Origin", "Hspc-Api-Key", "Hspc-Token", "Emailaddress", "Password"},
+		ExposedHeaders: []string{"Hspc-Token"},
+		//Debug:          true,
 	})
+
+	return c.Handler(RateLimitMiddleware(next))
+	//return c.Handler(next)
+}
+
+/**
+Call this function inside setupGlobalMiddleware in configure_hspc.go to setup CORS and RateLimit handling middlewares
+
+return requesthandler.HspcMiddlewares(handler)
+*/
+func HspcMiddlewares(next http.Handler) http.Handler {
+	return HandleCORS(RateLimitMiddleware(next))
 }
