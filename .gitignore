@@ -1,10 +1,11 @@
-.DS_Store
 cmd/
 models/
-mongodb_store/
 restapi/
+mongodb_store/
 postgres_db/
 .idea/
+unused/
+.DS_Store
 *.txt
 *.log
 *.iml
