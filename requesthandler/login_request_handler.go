@@ -32,7 +32,7 @@ func HandleLogin(params login.PostLoginParams, principal *models.Principal) midd
 
 	if credential.Password.String() == pass && *credential.CredentialActive == true {
 		log.Print("Password Matched")
-		resp := login.NewPostLoginOK()
+		resp := login.NewPostLoginNoContent()
 
 		prin := new(models.Principal)
 		prin.Email = user
