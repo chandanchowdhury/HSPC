@@ -121,21 +121,6 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 		return nil, errors.NotFound("Session not found")
 	}
 
-	//api.LoginOptionsLoginHandler = login.OptionsLoginHandlerFunc(func(params login.OptionsLoginParams) middleware.Responder {
-	//	log.Print("login - OPTIONS")
-	//
-	//	resp := login.NewOptionsLoginOK()
-	//
-	//	req_headers := params.HTTPRequest.Header
-	//	resp.AccessControlAllowMethods = req_headers.Get("Access-Control-Request-Method")
-	//	resp.AccessControlAllowHeaders = req_headers.Get("Access-Control-Request-Headers")
-	//
-	//	resp.AccessControlAllowOrigin = "*"
-	//	resp.AccessControlMaxAge = 86400
-	//
-	//	return resp
-	//})
-
 	api.LoginPostLoginHandler = login.PostLoginHandlerFunc(func(params login.PostLoginParams, principal *models.Principal) middleware.Responder {
 		return HandleLogin(params, principal)
 	})
@@ -264,22 +249,6 @@ func Override_configure_hspc(api *operations.HspcAPI) {
 	api.SchoolDeleteSchoolSchoolIDAdvisorAdvisorIDHandler = school.DeleteSchoolSchoolIDAdvisorAdvisorIDHandlerFunc(func(params school.DeleteSchoolSchoolIDAdvisorAdvisorIDParams, principal *models.Principal) middleware.Responder {
 		return SchoolRemoveAdvisor(params, principal)
 	})
-
-	//api.SchoolOptionsSchoolIDHandler = school.OptionsSchoolIDHandlerFunc(func(params school.OptionsSchoolIDParams) middleware.Responder {
-	//	log.Print("school/id - OPTIONS")
-	//
-	//	resp := school.NewOptionsSchoolIDOK()
-	//
-	//	//req_headers := params.HTTPRequest.Header
-	//	//resp.AccessControlAllowMethods = req_headers.Get("Access-Control-Request-Method")
-	//	//resp.AccessControlAllowHeaders = req_headers.Get("Access-Control-Request-Headers")
-	//	//
-	//	//resp.AccessControlAllowOrigin = "*"
-	//	//resp.AccessControlMaxAge = 86400
-	//	//
-	//
-	//	return resp
-	//})
 
 	// --- Advisor ---
 	// List all Advisors
