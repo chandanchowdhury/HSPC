@@ -3,6 +3,7 @@ Maintain the order as they follow they dependency.
 */
 DROP TABLE IF EXISTS parking;
 DROP TABLE IF EXISTS team_score;
+DROP TABLE IF EXISTS student_team;
 DROP TABLE IF EXISTS student;
 DROP TABLE IF EXISTS team;
 DROP TABLE IF EXISTS school_advisor;
