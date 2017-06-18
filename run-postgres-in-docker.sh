@@ -1,5 +1,5 @@
 #!/bin/bash
-docker pull postgres
+docker pull postgres:9-alpine
 
 POSTGRES_DB=HSPC
 POSTGRES_USER=hspc
@@ -27,4 +27,4 @@ docker run -d -t -p 5432:5432 --rm \
     -e POSTGRES_USER=$POSTGRES_USER \
     -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
     -v $DBPATH:/var/lib/postgresql/data \
-    postgres
+    postgres:9-alpine
