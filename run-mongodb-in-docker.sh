@@ -1,5 +1,5 @@
 #!/bin/bash
-docker pull mongo
+docker pull mongo:3
 
 MONGO_DB=HSPC
 MONGO_USER=hspc
@@ -26,4 +26,4 @@ docker run -d -t --rm -p 27017:27017 \
     -v $DBPATH:/data/db \
     -e MONGO_INITDB_ROOT_USERNAME=$MONGO_USER \
     -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD \
-    mongo
+    mongo:3
