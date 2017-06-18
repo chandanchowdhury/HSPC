@@ -182,13 +182,3 @@ CREATE TABLE parking (
 /*
   Problem and Solution will be stored in MongoDB.
 */
-
-/**
-  For keeping track of active sessions.
- */
-CREATE TABLE Session (
-  credential_id SERIAL NOT NULL PRIMARY KEY
-  , session_data VARCHAR
-  , CONSTRAINT Session_FK_credential_id
-    FOREIGN KEY(credential_id) REFERENCES credential(credential_id)
-);
