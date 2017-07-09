@@ -21,4 +21,7 @@ export MONGO_DB_PASSWORD="HSPC-Password"
 export MONGO_DB_AUTH_DB="admin"
 
 # run the server
-go run ./cmd/hspc-server/main.go --port 8080
+go run ./cmd/hspc-server/main.go --port 8080 
+#go run ./cmd/hspc-server/main.go --tls-port 8080 --scheme https --tls-certificate certificates/hspc-api.crt --tls-key certificates/hspc-api.key
+#go run ./cmd/hspc-server/main.go --tls-port 8080 --scheme https --tls-certificate certificates/localhost.crt --tls-key certificates/localhost.key
+    
